@@ -67,6 +67,31 @@
 
 - (void)songCell:(SongCell*)songCell didTapSong:(Song*)song
 {
+    song.isPlaying = YES;
+    for (Song* s in _songs) {
+        if (s.isPlaying && s != song) {
+            s.isPlaying = NO;
+        }
+    }
+    [_table reloadData];
+}
+
+- (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song
+{
+}
+
+- (void)stopSong
+{
+    BOOL changed = NO;
+    for (Song* song in _songs) {
+        if (song.isPlaying) {
+            song.isPlaying = NO;
+            changed = YES;
+        }
+    }
+    if (changed) {
+        [_table reloadData];
+    }
 }
 
 @end

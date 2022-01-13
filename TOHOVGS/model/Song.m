@@ -28,8 +28,8 @@
         song.mml = data[@"mml"];
         song.loop = [data[@"loop"] integerValue];
         song.name = data[@"name"];
-        song.english = data[@"english"];
-        song.french = data[@"french"];
+        song.english = data[@"english"] != [NSNull null] ? data[@"english"] : nil;
+        song.french = data[@"french"] != [NSNull null] ? data[@"french"] : nil;
         [result addObject:song];
     }
     return result;

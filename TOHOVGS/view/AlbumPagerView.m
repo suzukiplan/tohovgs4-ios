@@ -79,4 +79,11 @@
     [_pager scrollRectToVisible:_pages[position].frame animated:YES];
 }
 
+- (void)albumTabViewDidMoveEnd
+{
+    for (SongListView* page in _pages) {
+        [page stopSong];
+    }
+}
+
 @end

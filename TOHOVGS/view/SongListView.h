@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SongListView : UIView
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
                                   songs:(NSArray<Song*>*)songs;
+- (void)stopSong;
 @end
 
 NS_ASSUME_NONNULL_END

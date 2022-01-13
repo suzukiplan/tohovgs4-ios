@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol AlbumTabViewDelegate <NSObject>
 - (void)albumTabView:(AlbumTabView*)tabView didChangePosition:(NSInteger)position;
+- (void)albumTabViewDidMoveEnd;
 @end
 
 @interface AlbumTabView : UIScrollView

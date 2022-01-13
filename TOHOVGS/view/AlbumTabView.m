@@ -20,7 +20,6 @@
 @property (nonatomic) NSMutableArray<UILabel*>* labels;
 @property (nonatomic) UIFont* selectedFont;
 @property (nonatomic) UIFont* notSelectedFont;
-@property (nonatomic) BOOL needFireDelegate;
 @end
 
 @implementation AlbumTabView
@@ -68,9 +67,8 @@
 
 - (void)didPushPushableView:(PushableView*)pushableView
 {
-    _needFireDelegate = YES;
     [self setPosition:[_pushables indexOfObject:pushableView]];
-    _needFireDelegate = NO;
+    [_tabDelegate albumTabView:self didChangePosition:_position];
 }
 
 - (void)setPosition:(NSInteger)position
@@ -84,10 +82,8 @@
         weakSelf.labels[position].font = weakSelf.selectedFont;
         [weakSelf setFrame:weakSelf.frame];
         [weakSelf scrollRectToVisible:weakSelf.cursor.frame animated:YES];
+        [weakSelf.tabDelegate albumTabViewDidMoveEnd];
     }];
-    if (_needFireDelegate) {
-        [_tabDelegate albumTabView:self didChangePosition:_position];
-    }
 }
 
 - (void)setFrame:(CGRect)frame
