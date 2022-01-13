@@ -67,10 +67,14 @@
 
 - (void)songCell:(SongCell*)songCell didTapSong:(Song*)song
 {
-    song.isPlaying = YES;
-    for (Song* s in _songs) {
-        if (s.isPlaying && s != song) {
-            s.isPlaying = NO;
+    if (song.isPlaying) {
+        song.isPlaying = NO;
+    } else {
+        song.isPlaying = YES;
+        for (Song* s in _songs) {
+            if (s.isPlaying && s != song) {
+                s.isPlaying = NO;
+            }
         }
     }
     [_table reloadData];
