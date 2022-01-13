@@ -6,9 +6,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "api/MusicManager.h"
 
 @interface ViewController : UIViewController
-
-
+@property (nonatomic, readonly) MusicManager* musicManager;
 @end
 

@@ -1,0 +1,78 @@
+//
+//  FooterView.m
+//  TOHOVGS
+//
+//  Created by Yoji Suzuki on 2022/01/11.
+//
+
+#import "FooterView.h"
+
+@interface FooterView() <FooterButtonDelegate>
+@property (nonatomic, weak) id<FooterButtonDelegate> delegate;
+@property (nonatomic) UIView* cursor;
+@property (nonatomic) NSArray<FooterButton*>* buttons;
+@property (nonatomic) NSInteger selection;
+@property (nonatomic) BOOL isMoving;
+@end
+
+@implementation FooterView
+
+- (instancetype)initWithDelegate:(id<FooterButtonDelegate>)delegate
+{
+    if (self = [super init]) {
+        _delegate = delegate;
+        [self setBackgroundColor:[UIColor colorWithWhite:0 alpha:1]];
+        _cursor = [[UIView alloc] init];
+        _cursor.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
+        _cursor.layer.cornerRadius = 4.0;
+        [self addSubview:_cursor];
+        _buttons = @[[self _makeButton:FooterButtonTypeHome],
+                     [self _makeButton:FooterButtonTypeAll],
+                     [self _makeButton:FooterButtonTypeShuffle],
+                     [self _makeButton:FooterButtonTypeRetro]];
+        for (UIView* view in _buttons) {
+            [self addSubview:view];
+        }
+    }
+    return self;
+}
+
+- (FooterButton*)_makeButton:(FooterButtonType)type
+{
+    return [[FooterButton alloc] initWithType:type delegate:self];
+}
+
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    CGFloat width = frame.size.width / _buttons.count;
+    CGFloat x = 0;
+    for (NSInteger i = 0; i < _buttons.count; i++, x += width) {
+        _buttons[i].frame = CGRectMake(x, 0, width, frame.size.height);
+        _buttons[i].enabled = i != _selection;
+    }
+    _buttons[2].enabled = YES; // support shuffle again
+    _cursor.frame = CGRectMake(_selection * width + 4, 4, width - 8, frame.size.height - 8);
+}
+
+- (void)footerButton:(FooterButton*)button didTapWithType:(FooterButtonType)type
+{
+    if (_isMoving) return;
+    NSInteger tappedIndex = [_buttons indexOfObject:button];
+    BOOL isSame = _selection == tappedIndex;
+    _selection = tappedIndex;
+    __weak FooterView* weakSelf = self;
+    _isMoving = YES;
+    [UIView animateWithDuration:0.2 animations:^{
+        [weakSelf setFrame:weakSelf.frame];
+    } completion:^(BOOL finished) {
+        if (finished) {
+            weakSelf.isMoving = NO;
+        }
+    }];
+    if (!isSame) {
+        [_delegate footerButton:button didTapWithType:type];
+    }
+}
+
+@end

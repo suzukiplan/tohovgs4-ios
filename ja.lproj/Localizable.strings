@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  TOHOVGS
+
+  Created by Yoji Suzuki on 2022/01/11.
+  
+*/
+"home" = "HOME";
+"all" = "ALL";
+"shuffle" = "SHUFFLE";
+"retro" = "RETRO";
