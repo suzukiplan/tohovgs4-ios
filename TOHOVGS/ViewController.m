@@ -11,13 +11,14 @@
 #import "view/AlbumPagerView.h"
 #import "view/SongListView.h"
 #import "view/RetroView.h"
+#import "vgs/vgsplay-ios.h"
 #import "ControlDelegate.h"
 
 #define AD_HEIGHT 56
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIView* pageView;
@@ -33,6 +34,7 @@
     [super viewDidLoad];
     self.view.clipsToBounds = YES;
     _musicManager = [[MusicManager alloc] init];
+    _musicManager.delegate = self;
     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
     _adContainer = [[UIView alloc] init];
     _adContainer.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
@@ -40,6 +42,7 @@
     _pageView = [[AlbumPagerView alloc] initWithControlDelegate:self];
     [self.view addSubview:_pageView];
     _seekBar = [[SeekBarView alloc] init];
+    _seekBar.delegate = self;
     [self.view addSubview:_seekBar];
     _footer = [[FooterView alloc] initWithDelegate:self];
     [self.view addSubview:_footer];
@@ -77,6 +80,7 @@
 - (void)footerButton:(FooterButton*)button didTapWithType:(FooterButtonType)type
 {
     if (_pageMoving) return;
+    [_musicManager stopPlaying];
     _pageMoving = YES;
     UIView* nextPage;
     NSInteger nextPageIndex;
@@ -137,6 +141,26 @@
 - (ViewController*)getViewController
 {
     return self;
+}
+
+- (void)musicManager:(MusicManager*)manager didStartPlayingSong:(Song*)song
+{
+    _seekBar.max = vgsplay_getSongLength();
+}
+
+- (void)musicManager:(MusicManager*)manager didStopPlayingSong:(Song*)song
+{
+    _seekBar.max = 0;
+}
+
+- (void)musicManager:(MusicManager*)manager didChangeProgress:(NSInteger)progress
+{
+    _seekBar.progress = progress;
+}
+
+- (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress
+{
+    [_musicManager seekTo:progress];
 }
 
 @end

@@ -13,7 +13,6 @@
 @property (nonatomic, readwrite) NSInteger loop;
 @property (nonatomic, readwrite) NSString* name;
 @property (nonatomic, readwrite, nullable) NSString* english;
-@property (nonatomic, readwrite, nullable) NSString* french;
 @end
 
 @implementation Song
@@ -29,7 +28,6 @@
         song.loop = [data[@"loop"] integerValue];
         song.name = data[@"name"];
         song.english = data[@"english"] != [NSNull null] ? data[@"english"] : nil;
-        song.french = data[@"french"] != [NSNull null] ? data[@"french"] : nil;
         [result addObject:song];
     }
     return result;

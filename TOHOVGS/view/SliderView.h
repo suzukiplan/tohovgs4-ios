@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SliderViewDelegate <NSObject>
 - (void)didStartTouchWithSliderView:(SliderView*)sliderView;
 - (void)didEndTouchWithSliderView:(SliderView*)sliderView;
-- (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress;
+- (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress max:(NSInteger)max;
 @end
 
 @interface SliderView : PushableView

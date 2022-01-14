@@ -6,8 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "../ControlDelegate.h"
 #import "../model/Song.h"
+#import "../ControlDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

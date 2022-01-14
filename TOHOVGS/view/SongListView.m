@@ -7,9 +7,10 @@
 
 #import "SongListView.h"
 #import "SongCell.h"
+#import "../api/MusicManager.h"
 
 @interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
-@property (nonatomic, weak) id<ControlDelegate> controlDelegate;
+@property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic) UITableView* table;
 @property (nonatomic, weak) NSArray<Song*>* songs;
 @end
@@ -17,11 +18,11 @@
 @implementation SongListView
 
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
-                                  songs:(NSArray<Song*>*)songs
+                                  songs:(NSArray<Song*>*)songs;
 {
     if (self = [super init]) {
-        _controlDelegate = controlDelegate;
         _songs = songs;
+        _musicManager = [controlDelegate getViewController].musicManager;
         self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
         _table = [[UITableView alloc] initWithFrame:self.frame style:UITableViewStylePlain];
         _table.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
@@ -69,6 +70,7 @@
 {
     if (song.isPlaying) {
         song.isPlaying = NO;
+        [_musicManager stopPlaying];
     } else {
         song.isPlaying = YES;
         for (Song* s in _songs) {
@@ -76,6 +78,7 @@
                 s.isPlaying = NO;
             }
         }
+        [_musicManager playSong:song];
     }
     [_table reloadData];
 }
@@ -86,15 +89,13 @@
 
 - (void)stopSong
 {
-    BOOL changed = NO;
     for (Song* song in _songs) {
         if (song.isPlaying) {
             song.isPlaying = NO;
-            changed = YES;
+            [_table reloadData];
+            [_musicManager stopPlaying];
+            break;
         }
-    }
-    if (changed) {
-        [_table reloadData];
     }
 }
 

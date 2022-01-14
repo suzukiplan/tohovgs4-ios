@@ -39,7 +39,7 @@
         _thumb.layer.cornerRadius = THUMB_SIZE / 2;
         _thumb.backgroundColor = [UIColor colorWithRed:0 green:0.6 blue:0.8 alpha:1];
         [self addSubview:_thumb];
-        _max = 100;
+        _max = 0;
         _progress = 0;
     }
     return self;
@@ -58,12 +58,24 @@
     _right.frame = CGRectMake(w, y, frame.size.width - w, BAR_HEIGHT);
 }
 
-- (void)updateProgress
+- (void)setMax:(NSInteger)max
 {
-    _progress = _max * self.position.x / self.frame.size.width;
-    if (_progress < 0) _progress = 0;
-    else if (_max < _progress) _progress = _max;
+    NSLog(@"set max: %ld", max);
+    _max = max;
+    self.progress = 0;
+}
+
+- (void)setProgress:(NSInteger)progress
+{
+    if (progress < 0) {
+        _progress = 0;
+    } else if (_max < progress) {
+        _progress = _max;
+    } else {
+        _progress = progress;
+    }
     [self setFrame:self.frame];
+    [_sliderDelegate sliderView:self didChangeProgress:_progress max:_max];
 }
 
 - (void)didPushPushableView:(PushableView*)pushableView
@@ -72,22 +84,25 @@
 
 - (void)didStartTouchingOfPushableView:(PushableView*)pushableView
 {
-    [self updateProgress];
+    self.progress = _max * self.position.x / self.frame.size.width;
     [self setFrame:self.frame];
+    [_sliderDelegate didStartTouchWithSliderView:self];
 }
 
 - (void)didMoveTouchingOfPushableView:(PushableView*)pushableView
 {
-    [self updateProgress];
+    self.progress = _max * self.position.x / self.frame.size.width;
     [self setFrame:self.frame];
 }
 
 - (void)didEndTouchingOfPushableView:(PushableView*)pushableView
 {
+    [_sliderDelegate didEndTouchWithSliderView:self];
 }
 
 - (void)didCancelTouchingOfPushableView:(PushableView*)pushableView
 {
+    [_sliderDelegate didEndTouchWithSliderView:self];
 }
 
 @end

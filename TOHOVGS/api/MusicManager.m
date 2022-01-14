@@ -6,10 +6,16 @@
 //
 
 #import "MusicManager.h"
+#import "../ControlDelegate.h"
+#import "../vgs/vgsplay-ios.h"
+
+extern void* vgsdec;
 
 @interface MusicManager()
 @property (nonatomic, readwrite) NSArray<Album*>* albums;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
+@property (nonatomic, weak) Song* playingSong;
+@property (nonatomic) NSTimer* monitoringTimer;
 @end
 
 @implementation MusicManager
@@ -33,9 +39,52 @@
             NSLog(@"Exist album: %@", album.name);
             [_allUnlockedSongs addObjectsFromArray:album.songs]; // TODO: ロックされている曲を除外
         }
-        
     }
     return self;
+}
+
+- (void)playSong:(Song*)song
+{
+    _playingSong = song;
+    NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
+    NSString* mmlPath = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
+    vgsplay_start(mmlPath.UTF8String);
+    [_delegate musicManager:self didStartPlayingSong:song];
+    _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.5f
+                                                        target:self
+                                                      selector:@selector(_monitor:)
+                                                      userInfo:nil
+                                                       repeats:YES];
+    [_monitoringTimer fire];
+}
+
+- (void)_monitor:(NSTimer*)timer
+{
+    __weak MusicManager* weakSelf = self;
+    NSInteger progress = vgsplay_getCurrentTime();
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf.delegate musicManager:weakSelf didChangeProgress:progress];
+    });
+}
+
+- (void)stopPlaying
+{
+    if (_playingSong) {
+        vgsplay_stop();
+        _playingSong.isPlaying = NO;
+        [_delegate musicManager:self didStopPlayingSong:_playingSong];
+        _playingSong = nil;
+    }
+    if (_monitoringTimer) {
+        [_monitoringTimer invalidate];
+        _monitoringTimer = nil;
+    }
+}
+
+- (void)seekTo:(NSInteger)progress
+{
+    NSLog(@"seekTo: %ld", progress);
+    vgsplay_seek((unsigned int)progress);
 }
 
 @end

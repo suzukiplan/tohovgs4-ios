@@ -30,6 +30,11 @@
 		7443D7A7278FB2C8002EF802 /* MusicManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7A6278FB2C8002EF802 /* MusicManager.m */; };
 		7443D7AB278FB6A3002EF802 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 7443D7AA278FB6A3002EF802 /* assets */; };
 		7443D7B1278FC2A4002EF802 /* AlbumTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7B0278FC2A4002EF802 /* AlbumTabView.m */; };
+		7443D7C5279063CC002EF802 /* vgsmml.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7C2279063CC002EF802 /* vgsmml.c */; };
+		7443D7C6279063CC002EF802 /* vgsdec.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7C3279063CC002EF802 /* vgsdec.c */; };
+		7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7C4279063CC002EF802 /* vgs2tone.c */; };
+		7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */; };
+		7443D7D227910441002EF802 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7443D7D127910441002EF802 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +82,17 @@
 		7443D7AC278FC0E5002EF802 /* ControlDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ControlDelegate.h; sourceTree = "<group>"; };
 		7443D7AF278FC2A4002EF802 /* AlbumTabView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlbumTabView.h; sourceTree = "<group>"; };
 		7443D7B0278FC2A4002EF802 /* AlbumTabView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlbumTabView.m; sourceTree = "<group>"; };
+		7443D7BE279063CC002EF802 /* vgsmml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vgsmml.h; sourceTree = "<group>"; };
+		7443D7BF279063CC002EF802 /* vgsdec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vgsdec.h; sourceTree = "<group>"; };
+		7443D7C0279063CC002EF802 /* vgsdec_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vgsdec_internal.h; sourceTree = "<group>"; };
+		7443D7C1279063CC002EF802 /* vgstone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vgstone.h; sourceTree = "<group>"; };
+		7443D7C2279063CC002EF802 /* vgsmml.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vgsmml.c; sourceTree = "<group>"; };
+		7443D7C3279063CC002EF802 /* vgsdec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vgsdec.c; sourceTree = "<group>"; };
+		7443D7C4279063CC002EF802 /* vgs2tone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vgs2tone.c; sourceTree = "<group>"; };
+		7443D7C9279069A7002EF802 /* vgsplay-ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vgsplay-ios.h"; sourceTree = "<group>"; };
+		7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "vgsplay-ios.cpp"; sourceTree = "<group>"; };
+		7443D7CF27910426002EF802 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		7443D7D127910441002EF802 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7443D7D227910441002EF802 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +113,7 @@
 				7443D78D278D6C50002EF802 /* Localizable.strings */,
 				7443D753278D161F002EF802 /* TOHOVGS */,
 				7443D752278D161F002EF802 /* Products */,
+				7443D7CE27910425002EF802 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				7443D7AA278FB6A3002EF802 /* assets */,
+				7443D7B327906380002EF802 /* vgs */,
 				7443D7A3278FB2A6002EF802 /* api */,
 				7443D771278D1830002EF802 /* model */,
 				7443D76D278D1754002EF802 /* view */,
@@ -177,6 +196,31 @@
 				7443D7A6278FB2C8002EF802 /* MusicManager.m */,
 			);
 			path = api;
+			sourceTree = "<group>";
+		};
+		7443D7B327906380002EF802 /* vgs */ = {
+			isa = PBXGroup;
+			children = (
+				7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */,
+				7443D7C9279069A7002EF802 /* vgsplay-ios.h */,
+				7443D7C4279063CC002EF802 /* vgs2tone.c */,
+				7443D7C0279063CC002EF802 /* vgsdec_internal.h */,
+				7443D7C3279063CC002EF802 /* vgsdec.c */,
+				7443D7BF279063CC002EF802 /* vgsdec.h */,
+				7443D7C2279063CC002EF802 /* vgsmml.c */,
+				7443D7BE279063CC002EF802 /* vgsmml.h */,
+				7443D7C1279063CC002EF802 /* vgstone.h */,
+			);
+			path = vgs;
+			sourceTree = "<group>";
+		};
+		7443D7CE27910425002EF802 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7443D7D127910441002EF802 /* AudioToolbox.framework */,
+				7443D7CF27910426002EF802 /* CoreAudio.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7443D774278D1846002EF802 /* Song.m in Sources */,
+				7443D7C5279063CC002EF802 /* vgsmml.c in Sources */,
 				7443D786278D6002002EF802 /* RetroView.m in Sources */,
 				7443D79B278ED62B002EF802 /* PushableView.m in Sources */,
 				7443D79F278EE0B4002EF802 /* ToggleView.m in Sources */,
@@ -264,12 +309,15 @@
 				7443D75C278D161F002EF802 /* ViewController.m in Sources */,
 				7443D795278D828A002EF802 /* SeekBarView.m in Sources */,
 				7443D756278D161F002EF802 /* AppDelegate.m in Sources */,
+				7443D7C6279063CC002EF802 /* vgsdec.c in Sources */,
 				7443D780278D5F9B002EF802 /* FooterView.m in Sources */,
 				7443D77A278D50AC002EF802 /* SongCell.m in Sources */,
 				7443D7B1278FC2A4002EF802 /* AlbumTabView.m in Sources */,
 				7443D767278D1620002EF802 /* main.m in Sources */,
+				7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */,
 				7443D777278D1855002EF802 /* Album.m in Sources */,
 				7443D759278D161F002EF802 /* SceneDelegate.m in Sources */,
+				7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

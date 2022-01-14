@@ -16,6 +16,7 @@
 @property (nonatomic) UIView* border;
 @property (nonatomic) UILabel* inifinityLabel;
 @property (nonatomic) ToggleView* infinitySwitch;
+@property (nonatomic) BOOL isDragging;
 @end
 
 @implementation SeekBarView
@@ -25,13 +26,13 @@
     if (self = [super init]) {
         self.backgroundColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.5 alpha:0.5];
         _progressLabel = [[UILabel alloc] init];
-        _progressLabel.font = [UIFont systemFontOfSize:12];
+        _progressLabel.font = [UIFont monospacedDigitSystemFontOfSize:12 weight:UIFontWeightRegular];
         _progressLabel.textColor = [UIColor colorWithWhite:1 alpha:1];
         _progressLabel.textAlignment = NSTextAlignmentCenter;
         _progressLabel.text = @"00:00";
         [self addSubview:_progressLabel];
         _leftLabel = [[UILabel alloc] init];
-        _leftLabel.font = [UIFont systemFontOfSize:12];
+        _leftLabel.font = [UIFont monospacedDigitSystemFontOfSize:12 weight:UIFontWeightRegular];
         _leftLabel.textColor = [UIColor colorWithWhite:1 alpha:1];
         _leftLabel.textAlignment = NSTextAlignmentCenter;
         _leftLabel.text = @"00:00";
@@ -78,22 +79,41 @@
 
 - (void)didStartTouchWithSliderView:(SliderView*)sliderView
 {
-}
-
-- (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress
-{
+    _isDragging = YES;
 }
 
 - (void)didEndTouchWithSliderView:(SliderView*)sliderView
 {
+    _isDragging = NO;
+    [_delegate seekBarView:self didRequestSeekTo:sliderView.progress];
 }
 
-- (void)didCancelTouchWithSliderView:(SliderView*)sliderView
+- (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress max:(NSInteger)max
 {
+    NSInteger sec = progress / 22050;
+    _progressLabel.text = [self _timeFromValue:sec];
+    _leftLabel.text = [self _timeFromValue:max / 22050 - sec];
+}
+
+- (NSString*)_timeFromValue:(NSInteger)sec
+{
+    return [NSString stringWithFormat:@"%02ld:%02ld", sec / 60, sec % 60];
 }
 
 - (void)toggleView:(ToggleView*)toggleView didChangeStatus:(BOOL)status
 {
+}
+
+- (void)setMax:(NSInteger)max
+{
+    _slider.max = max;
+}
+
+- (void)setProgress:(NSInteger)progress
+{
+    if (!_isDragging) {
+        _slider.progress = progress;
+    }
 }
 
 @end

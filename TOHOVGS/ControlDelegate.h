@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ViewController.h"
+#import "model/Song.h"
 
 @class ViewController;
 

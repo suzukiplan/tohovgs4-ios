@@ -9,8 +9,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SeekBarView : UIView
+@class SeekBarView;
 
+@protocol SeekBarViewDelegate <NSObject>
+- (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress;
+@end
+
+@interface SeekBarView : UIView
+@property (nonatomic, weak) id<SeekBarViewDelegate> delegate;
+@property (nonatomic) NSInteger max;
+@property (nonatomic) NSInteger progress;
 @end
 
 NS_ASSUME_NONNULL_END
