@@ -12,6 +12,7 @@
 @property (nonatomic, weak) Song* song;
 @property (nonatomic) PushableView* pushable;
 @property (nonatomic) UILabel* titleLabel;
+@property (nonatomic, nullable) UILabel* englishLabel;
 @end
 
 @implementation SongCell
@@ -29,6 +30,13 @@
         _titleLabel.textColor = [UIColor whiteColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         [_pushable addSubview:_titleLabel];
+        if ([[NSLocale currentLocale].languageCode isEqualToString:@"ja"]) {
+            _englishLabel = [[UILabel alloc] init];
+            _englishLabel.textColor = [UIColor colorWithWhite:1 alpha:0.75];
+            _englishLabel.textAlignment = NSTextAlignmentCenter;
+            _englishLabel.font = [UIFont systemFontOfSize:11];
+            [_pushable addSubview:_englishLabel];
+        }
     }
     return self;
 }
@@ -37,7 +45,14 @@
 {
     [super setFrame:frame];
     _pushable.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-    _titleLabel.frame = CGRectMake(8, 0, frame.size.width - 16, frame.size.height);
+    if (_englishLabel.text) {
+        CGFloat y = (frame.size.height - (_titleLabel.intrinsicContentSize.height + _englishLabel.intrinsicContentSize.height)) / 2;
+        _titleLabel.frame = CGRectMake(8, y, frame.size.width - 16, _titleLabel.intrinsicContentSize.height);
+        y += _titleLabel.intrinsicContentSize.height;
+        _englishLabel.frame = CGRectMake(8, y, frame.size.width - 16, _englishLabel.intrinsicContentSize.height);
+    } else {
+        _titleLabel.frame = CGRectMake(8, 0, frame.size.width - 16, frame.size.height);
+    }
     if (_song.isPlaying) {
         _titleLabel.font = [UIFont boldSystemFontOfSize:14.5];
         self.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
@@ -51,6 +66,7 @@
 {
     _song = song;
     _titleLabel.text = song.name;
+    _englishLabel.text = song.english;
     [self setFrame:self.frame];
 }
 

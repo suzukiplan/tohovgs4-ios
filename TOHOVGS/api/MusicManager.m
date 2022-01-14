@@ -48,9 +48,9 @@ extern void* vgsdec;
     _playingSong = song;
     NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
     NSString* mmlPath = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
-    vgsplay_start(mmlPath.UTF8String);
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0);
     [_delegate musicManager:self didStartPlayingSong:song];
-    _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.5f
+    _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
                                                       selector:@selector(_monitor:)
                                                       userInfo:nil
@@ -63,16 +63,26 @@ extern void* vgsdec;
     __weak MusicManager* weakSelf = self;
     NSInteger progress = vgsplay_getCurrentTime();
     dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf.delegate musicManager:weakSelf didChangeProgress:progress];
+        if (weakSelf.playingSong) {
+            if (!vgsplay_isPlaying()) {
+                NSLog(@"detect end: %@", weakSelf.playingSong.name);
+                [weakSelf.delegate musicManager:weakSelf didEndPlayingSong:weakSelf.playingSong];
+            } else {
+                [weakSelf.delegate musicManager:weakSelf didChangeProgress:progress];
+            }
+        }
     });
 }
 
 - (void)stopPlaying
 {
     if (_playingSong) {
+        BOOL isPlaying = vgsplay_isPlaying() ? YES : NO;
         vgsplay_stop();
         _playingSong.isPlaying = NO;
-        [_delegate musicManager:self didStopPlayingSong:_playingSong];
+        if (isPlaying) {
+            [_delegate musicManager:self didStopPlayingSong:_playingSong];
+        }
         _playingSong = nil;
     }
     if (_monitoringTimer) {
@@ -85,6 +95,12 @@ extern void* vgsdec;
 {
     NSLog(@"seekTo: %ld", progress);
     vgsplay_seek((unsigned int)progress);
+}
+
+- (void)setInfinity:(BOOL)infinity
+{
+    _infinity = infinity;
+    vgsplay_changeInfinity(infinity ? 1 : 0);
 }
 
 @end

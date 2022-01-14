@@ -7,11 +7,14 @@
 
 #import <UIKit/UIKit.h>
 #import "../ControlDelegate.h"
+#import "../model/Song.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AlbumPagerView : UIView
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate;
+- (void)requireNextSong:(Song*)song
+               infinity:(BOOL)infinity;
 @end
 
 NS_ASSUME_NONNULL_END

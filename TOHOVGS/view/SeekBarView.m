@@ -102,6 +102,7 @@
 
 - (void)toggleView:(ToggleView*)toggleView didChangeStatus:(BOOL)status
 {
+    [_delegate seekBarView:self didChangeInfinity:status];
 }
 
 - (void)setMax:(NSInteger)max

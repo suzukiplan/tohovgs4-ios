@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SeekBarViewDelegate <NSObject>
 - (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress;
+- (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity;
 @end
 
 @interface SeekBarView : UIView

@@ -30,6 +30,9 @@ struct Context {
     AudioQueueBufferRef buffers[2];
     unsigned char rawBuffers[2][BUFFER_SIZE];
     int latch;
+    int loop;
+    int infinity;
+    bool fadeout;
     void* vgsdec;
 };
 
@@ -45,13 +48,19 @@ static void callback(void* context, AudioQueueRef queue, AudioQueueBufferRef buf
     c->latch = 1 - c->latch;
     if (c->vgsdec) {
         vgsdec_execute(c->vgsdec, c->rawBuffers[c->latch], BUFFER_SIZE);
+        if (c->loop && !c->fadeout) {
+            if (!c->infinity && c->loop <= vgsdec_get_value(c->vgsdec, VGSDEC_REG_LOOP_COUNT)) {
+                vgsdec_set_value(c->vgsdec, VGSDEC_REG_FADEOUT, 1);
+                c->fadeout = true;
+            }
+        }
     } else {
         memset(c->rawBuffers[c->latch], 0, BUFFER_SIZE);
     }
     pthread_mutex_unlock(&c->mutex);
 }
 
-static struct Context* internal_sound_create(const char* mmlPath)
+static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity)
 {
     struct Context* result = (struct Context*)malloc(sizeof(struct Context));
     if (!result) return NULL;
@@ -67,7 +76,9 @@ static struct Context* internal_sound_create(const char* mmlPath)
     result->format.mBytesPerPacket = result->format.mBytesPerFrame * result->format.mFramesPerPacket;
     result->format.mReserved = 0;
     AudioQueueNewOutput(&result->format, callback, result, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &result->queue);
-
+    result->loop = loop;
+    result->infinity = infinity;
+    result->fadeout = false;
     result->vgsdec = vgsdec_create_context();
     VgsMmlErrorInfo err;
     VgsBgmData* bgm = vgsmml_compile_from_file(mmlPath, &err);
@@ -102,11 +113,11 @@ static void internal_sound_destroy(void* context)
     free(c);
 }
 
-void vgsplay_start(const char* mmlPath)
+void vgsplay_start(const char* mmlPath, int loop, int infinity)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
-    fs_context = internal_sound_create(mmlPath);
+    fs_context = internal_sound_create(mmlPath, loop, infinity);
     pthread_mutex_unlock(&fs_mutex);
 }
 
@@ -120,12 +131,25 @@ void vgsplay_stop()
     pthread_mutex_unlock(&fs_mutex);
 }
 
+void vgsplay_changeLoopCount(int loop)
+{
+    pthread_mutex_lock(&fs_mutex);
+    if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
+        fs_context->loop = loop;
+        pthread_mutex_unlock(&fs_context->mutex);
+    }
+    pthread_mutex_unlock(&fs_mutex);
+}
+
 unsigned int vgsplay_getSongLength()
 {
     unsigned int result = 0;
     pthread_mutex_lock(&fs_mutex);
     if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
         result = (unsigned int)vgsdec_get_value(fs_context->vgsdec, VGSDEC_REG_TIME_LENGTH);
+        pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
     return result;
@@ -136,7 +160,9 @@ unsigned int vgsplay_getCurrentTime()
     unsigned int result = 0;
     pthread_mutex_lock(&fs_mutex);
     if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
         result = (unsigned int)vgsdec_get_value(fs_context->vgsdec, VGSDEC_REG_TIME);
+        pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
     return result;
@@ -146,7 +172,33 @@ void vgsplay_seek(unsigned int time)
 {
     pthread_mutex_lock(&fs_mutex);
     if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
         vgsdec_set_value(fs_context->vgsdec, VGSDEC_REG_TIME, (int)time);
+        pthread_mutex_unlock(&fs_context->mutex);
+    }
+    pthread_mutex_unlock(&fs_mutex);
+}
+
+int vgsplay_isPlaying()
+{
+    int result = 0;
+    pthread_mutex_lock(&fs_mutex);
+    if (fs_context && fs_context->vgsdec) {
+        pthread_mutex_lock(&fs_context->mutex);
+        result = vgsdec_get_value(fs_context->vgsdec, VGSDEC_REG_PLAYING);
+        pthread_mutex_unlock(&fs_context->mutex);
+    }
+    pthread_mutex_unlock(&fs_mutex);
+    return result;
+}
+
+void vgsplay_changeInfinity(int infinity)
+{
+    pthread_mutex_lock(&fs_mutex);
+    if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
+        fs_context->infinity = infinity;
+        pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
 }

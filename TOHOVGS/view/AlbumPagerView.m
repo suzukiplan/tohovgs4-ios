@@ -36,7 +36,8 @@
         NSMutableArray<SongListView*>* pages = [NSMutableArray arrayWithCapacity:_albums.count];
         for (Album* album in _albums) {
             SongListView* page = [[SongListView alloc] initWithControlDelegate:controlDelegate
-                                                                         songs:album.songs];
+                                                                         songs:album.songs
+                                                                  splitByAlbum:NO];
             [_pager addSubview:page];
             [pages addObject:page];
         }
@@ -84,6 +85,13 @@
     for (SongListView* page in _pages) {
         [page stopSong];
     }
+}
+
+- (void)requireNextSong:(Song*)song
+               infinity:(BOOL)infinity
+{
+    NSInteger index = [_albums indexOfObject:song.parentAlbum];
+    [_pages[index] requireNextSong:song infinity:infinity];
 }
 
 @end

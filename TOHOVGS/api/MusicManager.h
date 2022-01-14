@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MusicManagerDelegate <NSObject>
 - (void)musicManager:(MusicManager*)manager didStartPlayingSong:(Song*)song;
 - (void)musicManager:(MusicManager*)manager didStopPlayingSong:(Song*)song;
+- (void)musicManager:(MusicManager*)manager didEndPlayingSong:(Song*)song;
 - (void)musicManager:(MusicManager*)manager didChangeProgress:(NSInteger)progress;
 @end
 
@@ -22,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<MusicManagerDelegate> delegate;
 @property (nonatomic, readonly) NSArray<Album*>* albums;
 @property (nonatomic, readonly) NSArray<Song*>* allUnlockedSongs;
+@property (nonatomic) BOOL infinity;
 - (void)playSong:(Song*)song;
 - (void)stopPlaying;
 - (void)seekTo:(NSInteger)progress;

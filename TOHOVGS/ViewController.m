@@ -90,11 +90,15 @@
             nextPageIndex = 0;
             break;
         case FooterButtonTypeAll:
-            nextPage = [[SongListView alloc] initWithControlDelegate:self songs:_musicManager.allUnlockedSongs];
+            nextPage = [[SongListView alloc] initWithControlDelegate:self
+                                                               songs:_musicManager.allUnlockedSongs
+                                                        splitByAlbum:YES];
             nextPageIndex = 1;
             break;
         case FooterButtonTypeShuffle:
-            nextPage = [[SongListView alloc] initWithControlDelegate:self songs:_musicManager.allUnlockedSongs];
+            nextPage = [[SongListView alloc] initWithControlDelegate:self
+                                                               songs:_musicManager.allUnlockedSongs
+                                                        splitByAlbum:NO];
             nextPageIndex = 2;
             break;
         case FooterButtonTypeRetro:
@@ -153,6 +157,18 @@
     _seekBar.max = 0;
 }
 
+- (void)musicManager:(MusicManager*)manager didEndPlayingSong:(Song*)song
+{
+    if ([_pageView isKindOfClass:[AlbumPagerView class]]) {
+        [(AlbumPagerView*)_pageView requireNextSong:song
+                                           infinity:_musicManager.infinity];
+    } else if ([_pageView isKindOfClass:[SongListView class]]) {
+        [(SongListView*)_pageView requireNextSong:song
+                                         infinity:_musicManager.infinity];
+    } else if ([_pageView isKindOfClass:[RetroView class]]) {
+    }
+}
+
 - (void)musicManager:(MusicManager*)manager didChangeProgress:(NSInteger)progress
 {
     _seekBar.progress = progress;
@@ -161,6 +177,11 @@
 - (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress
 {
     [_musicManager seekTo:progress];
+}
+
+- (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity
+{
+    _musicManager.infinity = infinity;
 }
 
 @end
