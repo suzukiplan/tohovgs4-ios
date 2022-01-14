@@ -14,10 +14,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SongListView : UIView
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
                                   songs:(NSArray<Song*>*)songs
-                           splitByAlbum:(BOOL)splitByAlbum;
+                           splitByAlbum:(BOOL)splitByAlbum
+                                shuffle:(BOOL)shuffle;
 - (void)stopSong;
 - (void)requireNextSong:(Song*)song
                infinity:(BOOL)infinity;
+- (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate;
 @end
 
 NS_ASSUME_NONNULL_END

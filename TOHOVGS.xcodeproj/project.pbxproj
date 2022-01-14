@@ -35,6 +35,7 @@
 		7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7C4279063CC002EF802 /* vgs2tone.c */; };
 		7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */; };
 		7443D7D227910441002EF802 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7443D7D127910441002EF802 /* AudioToolbox.framework */; };
+		7443D7D52791A91D002EF802 /* ProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D42791A91D002EF802 /* ProgressView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +94,8 @@
 		7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "vgsplay-ios.cpp"; sourceTree = "<group>"; };
 		7443D7CF27910426002EF802 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		7443D7D127910441002EF802 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		7443D7D32791A91D002EF802 /* ProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressView.h; sourceTree = "<group>"; };
+		7443D7D42791A91D002EF802 /* ProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +177,8 @@
 				7443D79E278EE0B4002EF802 /* ToggleView.m */,
 				7443D7A0278F97C2002EF802 /* SliderView.h */,
 				7443D7A1278F97C2002EF802 /* SliderView.m */,
+				7443D7D32791A91D002EF802 /* ProgressView.h */,
+				7443D7D42791A91D002EF802 /* ProgressView.m */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -318,6 +323,7 @@
 				7443D777278D1855002EF802 /* Album.m in Sources */,
 				7443D759278D161F002EF802 /* SceneDelegate.m in Sources */,
 				7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */,
+				7443D7D52791A91D002EF802 /* ProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

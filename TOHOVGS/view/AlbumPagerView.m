@@ -37,7 +37,8 @@
         for (Album* album in _albums) {
             SongListView* page = [[SongListView alloc] initWithControlDelegate:controlDelegate
                                                                          songs:album.songs
-                                                                  splitByAlbum:NO];
+                                                                  splitByAlbum:NO
+                                                                       shuffle:NO];
             [_pager addSubview:page];
             [pages addObject:page];
         }

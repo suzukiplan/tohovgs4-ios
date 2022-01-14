@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ControlDelegate <NSObject>
 - (ViewController*)getViewController;
+- (void)startProgressWithMessage:(NSString*)message;
+- (void)stopProgress:(void(^)(void))done;
 @end
 
 NS_ASSUME_NONNULL_END

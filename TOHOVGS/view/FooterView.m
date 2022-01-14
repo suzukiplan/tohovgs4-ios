@@ -59,7 +59,6 @@
 {
     if (_isMoving) return;
     NSInteger tappedIndex = [_buttons indexOfObject:button];
-    BOOL isSame = _selection == tappedIndex;
     _selection = tappedIndex;
     __weak FooterView* weakSelf = self;
     _isMoving = YES;
@@ -70,9 +69,7 @@
             weakSelf.isMoving = NO;
         }
     }];
-    if (!isSame) {
-        [_delegate footerButton:button didTapWithType:type];
-    }
+    [_delegate footerButton:button didTapWithType:type];
 }
 
 @end

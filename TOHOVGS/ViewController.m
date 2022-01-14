@@ -11,6 +11,7 @@
 #import "view/AlbumPagerView.h"
 #import "view/SongListView.h"
 #import "view/RetroView.h"
+#import "view/ProgressView.h"
 #import "vgs/vgsplay-ios.h"
 #import "ControlDelegate.h"
 
@@ -26,6 +27,7 @@
 @property (nonatomic) FooterView* footer;
 @property (nonatomic) NSInteger currentPageIndex;
 @property (nonatomic) BOOL pageMoving;
+@property (nonatomic, nullable) ProgressView* progressView;
 @end
 
 @implementation ViewController
@@ -75,6 +77,7 @@
         _seekBar.frame = CGRectMake(sx, sy + sh - FOOTER_HEIGHT - SEEKBAR_HEIGHT, sw, SEEKBAR_HEIGHT);
         _footer.frame = CGRectMake(sx, sy + sh - FOOTER_HEIGHT, sw, FOOTER_HEIGHT);
     }
+    _progressView.frame = CGRectMake(sx, sy, sw, sh);
 }
 
 - (void)footerButton:(FooterButton*)button didTapWithType:(FooterButtonType)type
@@ -92,13 +95,20 @@
         case FooterButtonTypeAll:
             nextPage = [[SongListView alloc] initWithControlDelegate:self
                                                                songs:_musicManager.allUnlockedSongs
-                                                        splitByAlbum:YES];
+                                                        splitByAlbum:YES
+                                                             shuffle:NO];
             nextPageIndex = 1;
             break;
         case FooterButtonTypeShuffle:
+            if (2 == _currentPageIndex) {
+                [(SongListView*)_pageView shuffleWithControlDelegate:self];
+                _pageMoving = NO;
+                return;
+            }
             nextPage = [[SongListView alloc] initWithControlDelegate:self
                                                                songs:_musicManager.allUnlockedSongs
-                                                        splitByAlbum:NO];
+                                                        splitByAlbum:NO
+                                                             shuffle:YES];
             nextPageIndex = 2;
             break;
         case FooterButtonTypeRetro:
@@ -107,6 +117,9 @@
             break;
     }
     [self.view addSubview:nextPage];
+    if (_progressView) {
+        [self.view bringSubviewToFront:_progressView];
+    }
     const CGFloat y = _pageView.frame.origin.y;
     const CGFloat w = _pageView.frame.size.width;
     const CGFloat h = _pageView.frame.size.height - (3 == _currentPageIndex ? SEEKBAR_HEIGHT : 0);
@@ -182,6 +195,34 @@
 - (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity
 {
     _musicManager.infinity = infinity;
+}
+
+- (void)startProgressWithMessage:(NSString *)message
+{
+    _progressView = [[ProgressView alloc] initWithMessage:message];
+    _progressView.alpha = 0;
+    [self.view addSubview:_progressView];
+    [self _resizeAll:NO];
+    __weak ViewController* weakSelf = self;
+    [UIView animateWithDuration:0.2 animations:^{
+        weakSelf.progressView.alpha = 1;
+    }];
+}
+
+- (void)stopProgress:(void(^)(void))done
+{
+    if (_progressView) {
+        __weak ViewController* weakSelf = self;
+        [UIView animateWithDuration:0.2 animations:^{
+            weakSelf.progressView.alpha = 0;
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [weakSelf.progressView removeFromSuperview];
+                weakSelf.progressView = nil;
+                done();
+            }
+        }];
+    }
 }
 
 @end

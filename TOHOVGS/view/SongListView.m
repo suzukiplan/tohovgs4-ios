@@ -13,6 +13,7 @@
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic) UITableView* table;
 @property (nonatomic, weak) NSArray<Song*>* songs;
+@property (nonatomic, nullable) NSMutableArray<Song*>* shuffleSongs;
 @property (nonatomic, nullable) NSMutableArray<Album*>* splitAlbums;
 @property (nonatomic, nullable) NSMutableDictionary<NSString*, NSMutableArray<Song*>*>* splitSongs;
 @property (nonatomic) BOOL splitByAlbum;
@@ -22,10 +23,11 @@
 
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
                                   songs:(NSArray<Song*>*)songs
-                           splitByAlbum:(BOOL)splitByAlbum;
+                           splitByAlbum:(BOOL)splitByAlbum
+                                shuffle:(BOOL)shuffle;
 {
     if (self = [super init]) {
-        _songs = songs;
+        _songs = shuffle ? nil : songs;
         _splitByAlbum = splitByAlbum;
         if (splitByAlbum) {
             _splitAlbums = [NSMutableArray array];
@@ -49,8 +51,35 @@
         [_table setDataSource:self];
         [_table setDelegate:self];
         [self addSubview:_table];
+        if (shuffle) {
+            _songs = songs;
+            [self shuffleWithControlDelegate:controlDelegate];
+        }
     }
     return self;
+}
+
+- (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
+{
+    [controlDelegate startProgressWithMessage:@"Generating Shuffle PlayList..."];
+    __weak SongListView* weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        sleep(2);
+        NSMutableArray<Song*>* sequential = [weakSelf.songs mutableCopy];
+        weakSelf.shuffleSongs = [NSMutableArray arrayWithCapacity:weakSelf.songs.count];
+        srand((unsigned int)time(NULL));
+        while (0 < sequential.count) {
+            NSInteger index = abs(rand()) % sequential.count;
+            [weakSelf.shuffleSongs addObject:sequential[index]];
+            [sequential removeObjectAtIndex:index];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [controlDelegate stopProgress:^{
+                weakSelf.songs = weakSelf.shuffleSongs;
+                [weakSelf.table reloadData];
+            }];
+        });
+    });
 }
 
 - (void)setFrame:(CGRect)frame
