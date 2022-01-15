@@ -48,6 +48,8 @@
         _table = [[UITableView alloc] initWithFrame:self.frame style:UITableViewStylePlain];
         _table.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
         _table.allowsSelection = NO;
+        _table.separatorColor = [UIColor colorWithWhite:0.2 alpha:0.5];
+        _table.separatorInset = UIEdgeInsetsZero;
         if (@available(iOS 15.0, *)) {
             _table.sectionHeaderTopPadding = _splitByAlbum ? 16.0 : 0.0;
         }
