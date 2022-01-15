@@ -30,7 +30,7 @@
         _titleLabel.textColor = [UIColor whiteColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         [_pushable addSubview:_titleLabel];
-        if ([[NSLocale currentLocale].languageCode isEqualToString:@"ja"]) {
+        if (![[NSLocale currentLocale].languageCode isEqualToString:@"ja"]) {
             _englishLabel = [[UILabel alloc] init];
             _englishLabel.textColor = [UIColor colorWithWhite:1 alpha:0.75];
             _englishLabel.textAlignment = NSTextAlignmentCenter;

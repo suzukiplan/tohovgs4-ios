@@ -61,7 +61,7 @@
 
 - (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
-    [controlDelegate startProgressWithMessage:@"Generating Shuffle PlayList..."];
+    [controlDelegate startProgressWithMessage:NSLocalizedString(@"generating_shuffle_play_list", nil)];
     __weak SongListView* weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         sleep(2);
@@ -156,6 +156,7 @@
     } else {
         [self _play:song];
     }
+    [self _scrollToSong:song];
 }
 
 - (void)_play:(Song*)song
@@ -196,16 +197,23 @@
         NSInteger next = infinity ? current : (current + 1) % _songs.count;
         NSLog(@"next: %@", _songs[next].name);
         [self _play:_songs[next]];
-        NSIndexPath* nextIndex;
-        if (_splitByAlbum) {
-            NSInteger s = [_splitAlbums indexOfObject:_songs[next].parentAlbum];
-            NSInteger r = [_splitSongs[_songs[next].parentAlbum.albumId] indexOfObject:_songs[next]];
-            nextIndex = [NSIndexPath indexPathForRow:r inSection:s];
-        } else {
-            nextIndex = [NSIndexPath indexPathForRow:next inSection:0];
-        }
-        [_table scrollToRowAtIndexPath:nextIndex atScrollPosition:UITableViewScrollPositionNone animated:YES];
+        [self _scrollToSong:_songs[next]];
     }
+}
+
+- (void)_scrollToSong:(Song*)song
+{
+    NSIndexPath* indexPath;
+    NSInteger songIndex = [_songs indexOfObject:song];
+    if (_splitByAlbum) {
+        NSInteger s = [_splitAlbums indexOfObject:_songs[songIndex].parentAlbum];
+        NSInteger r = [_splitSongs[_songs[songIndex].parentAlbum.albumId] indexOfObject:_songs[songIndex]];
+        indexPath = [NSIndexPath indexPathForRow:r inSection:s];
+    } else {
+        indexPath = [NSIndexPath indexPathForRow:songIndex inSection:0];
+    }
+    [_table scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+
 }
 
 @end
