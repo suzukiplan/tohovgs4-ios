@@ -569,12 +569,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 408;
+				CURRENT_PROJECT_VERSION = 410;
 				DEVELOPMENT_TEAM = J24C22Y22U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "東方VGS";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "For displaying Ads.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -586,7 +587,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.8;
+				MARKETING_VERSION = 4.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -601,12 +602,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 408;
+				CURRENT_PROJECT_VERSION = 410;
 				DEVELOPMENT_TEAM = J24C22Y22U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "東方VGS";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "For displaying Ads.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -618,7 +620,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.8;
+				MARKETING_VERSION = 4.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
