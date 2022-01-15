@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)playSong:(Song*)song;
 - (void)stopPlaying;
 - (void)seekTo:(NSInteger)progress;
+- (BOOL)isLockedSong:(Song*)song;
+- (void)lock:(BOOL)lock song:(Song*)song;
 @end
 
 NS_ASSUME_NONNULL_END

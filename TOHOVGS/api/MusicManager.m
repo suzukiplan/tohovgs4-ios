@@ -12,6 +12,7 @@
 extern void* vgsdec;
 
 @interface MusicManager()
+@property (nonatomic, weak) NSUserDefaults* userDefaults;
 @property (nonatomic, readwrite) NSArray<Album*>* albums;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
 @property (nonatomic, weak) Song* playingSong;
@@ -23,6 +24,7 @@ extern void* vgsdec;
 - (instancetype)init
 {
     if (self = [super init]) {
+        _userDefaults = [NSUserDefaults standardUserDefaults];
         NSError* error = nil;
         NSString* path = [[NSBundle mainBundle] pathForResource:@"assets/songlist" ofType:@"json"];
         NSLog(@"songlist: %@", path);
@@ -37,7 +39,11 @@ extern void* vgsdec;
         _allUnlockedSongs = [NSMutableArray array];
         for (Album* album in _albums) {
             NSLog(@"Exist album: %@", album.name);
-            [_allUnlockedSongs addObjectsFromArray:album.songs]; // TODO: ロックされている曲を除外
+            for (Song* song in album.songs) {
+                if (![self isLockedSong:song]) {
+                    [_allUnlockedSongs addObject:song];
+                }
+            }
         }
     }
     return self;
@@ -101,6 +107,26 @@ extern void* vgsdec;
 {
     _infinity = infinity;
     vgsplay_changeInfinity(infinity ? 1 : 0);
+}
+
+- (NSString*)_keyForSong:(Song*)song
+{
+    return [NSString stringWithFormat:@"locked_%@", song.mml];
+}
+
+- (BOOL)isLockedSong:(Song*)song
+{
+    NSString* locked = [_userDefaults stringForKey:[self _keyForSong:song]];
+    if (!locked) {
+        return song.parentAlbum.defaultLocked;
+    }
+    return [locked isEqualToString:@"L"];
+}
+
+- (void)lock:(BOOL)lock song:(Song*)song
+{
+    NSString* locked = lock ? @"L" : @"U";
+    [_userDefaults setObject:locked forKey:[self _keyForSong:song]];
 }
 
 @end

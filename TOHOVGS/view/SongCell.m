@@ -13,6 +13,8 @@
 @property (nonatomic) PushableView* pushable;
 @property (nonatomic) UILabel* titleLabel;
 @property (nonatomic, nullable) UILabel* englishLabel;
+@property (nonatomic) UIView* lockedCover;
+@property (nonatomic) UIImageView* lockedImage;
 @end
 
 @implementation SongCell
@@ -37,6 +39,12 @@
             _englishLabel.font = [UIFont systemFontOfSize:11];
             [_pushable addSubview:_englishLabel];
         }
+        _lockedCover = [[UIView alloc] init];
+        _lockedCover.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+        [self.contentView addSubview:_lockedCover];
+        _lockedImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_lock_white_18pt"]];
+        _lockedImage.alpha = 0.5;
+        [self.contentView addSubview:_lockedImage];
     }
     return self;
 }
@@ -53,12 +61,23 @@
     } else {
         _titleLabel.frame = CGRectMake(8, 0, frame.size.width - 16, frame.size.height);
     }
-    if (_song.isPlaying) {
-        _titleLabel.font = [UIFont boldSystemFontOfSize:14.5];
-        self.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
-    } else {
+    if ([_delegate songCell:self didRequestCheckLockedSong:_song]) {
         _titleLabel.font = [UIFont systemFontOfSize:14.5];
         self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _lockedCover.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+        _lockedImage.frame = CGRectMake((frame.size.width - 18) / 2, (frame.size.height - 18) / 2, 18, 18);
+        _lockedCover.hidden = NO;
+        _lockedImage.hidden = NO;
+    } else {
+        _lockedCover.hidden = YES;
+        _lockedImage.hidden = YES;
+        if (_song.isPlaying) {
+            _titleLabel.font = [UIFont boldSystemFontOfSize:14.5];
+            self.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
+        } else {
+            _titleLabel.font = [UIFont systemFontOfSize:14.5];
+            self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
+        }
     }
 }
 

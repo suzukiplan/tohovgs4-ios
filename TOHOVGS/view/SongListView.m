@@ -175,6 +175,11 @@
 {
 }
 
+- (BOOL)songCell:(SongCell*)songCell didRequestCheckLockedSong:(Song*)song
+{
+    return [_musicManager isLockedSong:song];
+}
+
 - (void)stopSong
 {
     for (Song* song in _songs) {
