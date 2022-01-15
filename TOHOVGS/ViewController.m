@@ -119,13 +119,20 @@
     }
 }
 
+- (void)viewSafeAreaInsetsDidChange
+{
+    [super viewSafeAreaInsetsDidChange];
+    [self _resizeAll:YES];
+}
+
 - (void)_resizeAll:(BOOL)all
 {
     const CGFloat bh = self.view.window.windowScene.statusBarManager.statusBarFrame.size.height;
-    const CGFloat sx = self.additionalSafeAreaInsets.left;
-    const CGFloat sy = self.additionalSafeAreaInsets.top + bh;
-    const CGFloat sw = self.view.frame.size.width - self.additionalSafeAreaInsets.left - self.additionalSafeAreaInsets.right;
-    const CGFloat sh = self.view.frame.size.height - self.additionalSafeAreaInsets.top - self.additionalSafeAreaInsets.bottom - bh;
+    UIEdgeInsets safe = [UIApplication sharedApplication].windows.firstObject.safeAreaInsets;
+    const CGFloat sx = safe.left;
+    const CGFloat sy = safe.top + bh;
+    const CGFloat sw = self.view.frame.size.width - safe.left - safe.right;
+    const CGFloat sh = self.view.frame.size.height - safe.top - safe.bottom - bh;
     _bannerView.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
     if (!_bannerLoaded) {
         _bannerLoaded = YES;
