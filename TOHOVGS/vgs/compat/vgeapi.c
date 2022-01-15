@@ -243,7 +243,7 @@ static int fs_seekPosition;
 
 void vge_bplay(const char *mmlPath, int loop, int infinity) {
     fs_mmlPath = mmlPath;
-    vgsplay_start(mmlPath, loop, infinity, 0);
+    vgsplay_start(mmlPath, loop, infinity, 0, 2);
     _psg = vgsplay_getDecoder();
 }
 
@@ -256,7 +256,7 @@ void vge_bstop(void) {
 }
 
 void vge_bresume(int loop, int infinity) {
-    vgsplay_start(fs_mmlPath, loop, infinity, fs_seekPosition);
+    vgsplay_start(fs_mmlPath, loop, infinity, fs_seekPosition, 2);
     _psg = vgsplay_getDecoder();
 }
 

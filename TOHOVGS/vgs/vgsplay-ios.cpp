@@ -18,12 +18,13 @@
 #define SAMPLE_TYPE short
 #define MAX_NUMBER 32767
 #define SAMPLE_RATE 22050
+#define MAX_BUFFER_NUM 16
 
 struct Context {
     pthread_mutex_t mutex;
     AudioStreamBasicDescription format;
     AudioQueueRef queue;
-    AudioQueueBufferRef buffers[2];
+    AudioQueueBufferRef buffers[MAX_BUFFER_NUM];
     unsigned char rawBuffers[2][BUFFER_SIZE];
     int latch;
     int loop;
@@ -56,7 +57,7 @@ static void callback(void* context, AudioQueueRef queue, AudioQueueBufferRef buf
     pthread_mutex_unlock(&c->mutex);
 }
 
-static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity, int seek)
+static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer)
 {
     struct Context* result = (struct Context*)malloc(sizeof(struct Context));
     if (!result) return NULL;
@@ -85,16 +86,15 @@ static struct Context* internal_sound_create(const char* mmlPath, int loop, int 
     if (seek) {
         vgsdec_set_value(result->vgsdec, VGSDEC_REG_TIME, seek);
     }
-    vgsdec_execute(result->vgsdec, result->rawBuffers[0], BUFFER_SIZE); // pre-enqueue
-    vgsdec_execute(result->vgsdec, result->rawBuffers[1], BUFFER_SIZE); // pre-enqueue
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < numberOfBuffer; i++) {
         AudioQueueAllocateBuffer(result->queue, BUFFER_SIZE, &result->buffers[i]);
         result->buffers[i]->mAudioDataByteSize = BUFFER_SIZE;
-        memcpy(result->buffers[i]->mAudioData, result->rawBuffers[i], BUFFER_SIZE);
+        vgsdec_execute(result->vgsdec, result->rawBuffers[0], BUFFER_SIZE); // pre-enqueue
+        memcpy(result->buffers[i]->mAudioData, result->rawBuffers[0], BUFFER_SIZE);
         AudioQueueEnqueueBuffer(result->queue, result->buffers[i], 0, NULL);
     }
-    vgsdec_execute(result->vgsdec, result->rawBuffers[0], BUFFER_SIZE); // decode next
-    result->latch = 0;
+    vgsdec_execute(result->vgsdec, result->rawBuffers[1], BUFFER_SIZE); // decode next
+    result->latch = 1;
     AudioQueueStart(result->queue, NULL);
     return result;
 }
@@ -112,11 +112,11 @@ static void internal_sound_destroy(void* context)
     free(c);
 }
 
-void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek)
+void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
-    fs_context = internal_sound_create(mmlPath, loop, infinity, seek);
+    fs_context = internal_sound_create(mmlPath, loop, infinity, seek, numberOfBuffer);
     pthread_mutex_unlock(&fs_mutex);
 }
 

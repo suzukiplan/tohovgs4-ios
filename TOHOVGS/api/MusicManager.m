@@ -74,7 +74,7 @@ extern void* vgsdec;
 {
     _playingSong = song;
     NSString* mmlPath = [self mmlPathOfSong:song];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0);
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, 16);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self

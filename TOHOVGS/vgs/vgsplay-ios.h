@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek);
+void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer);
 void vgsplay_stop(void);
 unsigned int vgsplay_getSongLength(void);
 unsigned int vgsplay_getCurrentTime(void);
