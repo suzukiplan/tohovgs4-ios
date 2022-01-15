@@ -53,86 +53,91 @@ static int _moveCur;
                 [_unlockedAlbums addObject:song.parentAlbum];
             }
         }
-        tohovgs_cleanUp();
-        tohovgs_allocate((int)_unlockedAlbums.count, (int)_musicManager.allUnlockedSongs.count);
-        int titleIndex = 0;
-        int songIndex = 0;
-        int albumId = 0x10;
-        for (Album* album in _unlockedAlbums) {
-            const char* albumTitle = [album.formalName cStringUsingEncoding:NSShiftJISStringEncoding];
-            const char* albumCopyright = [album.copyright cStringUsingEncoding:NSShiftJISStringEncoding];
-            int songNum = 0;
-            int color = (int)album.compatColor;
-            for (Song* song in album.songs) {
-                if (![_musicManager isLockedSong:song]) {
-                    const char* mmlPath = [_musicManager mmlPathOfSong:song].UTF8String;
-                    const char* titleJ = [song.name cStringUsingEncoding:NSShiftJISStringEncoding];
-                    const char* titleE = titleJ;
-                    if (song.english) {
-                        titleE = [song.english cStringUsingEncoding:NSShiftJISStringEncoding];
-                    }
-                    const char* cp = strstr(song.mml.UTF8String, "-");
-                    int no = 0;
-                    if (cp) {
-                        cp++;
-                        no = atoi(cp);
-                    }
-                    tohovgs_setSong(songIndex,
-                                    albumId,
-                                    no,
-                                    (int)song.loop,
-                                    color,
-                                    (void*)mmlPath,
-                                    strlen(mmlPath),
-                                    (void*)titleJ,
-                                    strlen(titleJ),
-                                    (void*)titleE,
-                                    strlen(titleE));
-                    songNum++;
-                    songIndex++;
-                }
-            }
-            tohovgs_setTitle(titleIndex,
-                             albumId,
-                             songNum,
-                             (void*)albumTitle,
-                             strlen(albumTitle),
-                             (void*)albumCopyright,
-                             strlen(albumCopyright));
-            titleIndex++;
-            albumId += 0x10;
-        }
-        NSString* kanjiPath = [[NSBundle mainBundle] pathForResource:@"assets/compat/DSLOT255"
-                                                              ofType:@"DAT"];
-        NSData* kanji = [NSData dataWithContentsOfFile:kanjiPath];
-        tohovgs_loadKanji(kanji.bytes, kanji.length);
-        NSString* c0Path = [[NSBundle mainBundle] pathForResource:@"assets/compat/GSLOT000"
-                                                         ofType:@"CHR"];
-        NSData* c0 = [NSData dataWithContentsOfFile:c0Path];
-        vge_gload(0, c0.bytes);
-        NSString* c1Path = [[NSBundle mainBundle] pathForResource:@"assets/compat/GSLOT255"
-                                                         ofType:@"CHR"];
-        NSData* c1 = [NSData dataWithContentsOfFile:c1Path];
-        vge_gload(1, c1.bytes);
-        tohovgs_setPreference((int)[_userDefaults integerForKey:@"compat_current_title_id"],
-                              (int)[_userDefaults integerForKey:@"compat_loop"],
-                              (int)[_userDefaults integerForKey:@"compat_base"],
-                              (int)[_userDefaults integerForKey:@"compat_infinity"],
-                              (int)[_userDefaults integerForKey:@"compat_kobushi"],
-                              (int)[_userDefaults integerForKey:@"compat_locale_id"],
-                              (int)[_userDefaults integerForKey:@"compat_list_type"]);
-        self.opaque = NO;
-        self.clearsContextBeforeDrawing = NO;
-        self.multipleTouchEnabled = NO;
-        self.userInteractionEnabled = YES;
-        ((RetroLayer*)self.layer).retroView = self;
-        _displayLink = [CADisplayLink displayLinkWithTarget:self
-                                                   selector:@selector(_detectVsync:)];
-        _displayLink.preferredFramesPerSecond = 60;
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        _destroyed = NO;
+        [self _restart];
     }
     return self;
+}
+
+- (void)_restart
+{
+    tohovgs_cleanUp();
+    tohovgs_allocate((int)_unlockedAlbums.count, (int)_musicManager.allUnlockedSongs.count);
+    int titleIndex = 0;
+    int songIndex = 0;
+    int albumId = 0x10;
+    for (Album* album in _unlockedAlbums) {
+        const char* albumTitle = [album.formalName cStringUsingEncoding:NSShiftJISStringEncoding];
+        const char* albumCopyright = [album.copyright cStringUsingEncoding:NSShiftJISStringEncoding];
+        int songNum = 0;
+        int color = (int)album.compatColor;
+        for (Song* song in album.songs) {
+            if (![_musicManager isLockedSong:song]) {
+                const char* mmlPath = [_musicManager mmlPathOfSong:song].UTF8String;
+                const char* titleJ = [song.name cStringUsingEncoding:NSShiftJISStringEncoding];
+                const char* titleE = titleJ;
+                if (song.english) {
+                    titleE = [song.english cStringUsingEncoding:NSShiftJISStringEncoding];
+                }
+                const char* cp = strstr(song.mml.UTF8String, "-");
+                int no = 0;
+                if (cp) {
+                    cp++;
+                    no = atoi(cp);
+                }
+                tohovgs_setSong(songIndex,
+                                albumId,
+                                no,
+                                (int)song.loop,
+                                color,
+                                (void*)mmlPath,
+                                strlen(mmlPath),
+                                (void*)titleJ,
+                                strlen(titleJ),
+                                (void*)titleE,
+                                strlen(titleE));
+                songNum++;
+                songIndex++;
+            }
+        }
+        tohovgs_setTitle(titleIndex,
+                         albumId,
+                         songNum,
+                         (void*)albumTitle,
+                         strlen(albumTitle),
+                         (void*)albumCopyright,
+                         strlen(albumCopyright));
+        titleIndex++;
+        albumId += 0x10;
+    }
+    NSString* kanjiPath = [[NSBundle mainBundle] pathForResource:@"assets/compat/DSLOT255"
+                                                          ofType:@"DAT"];
+    NSData* kanji = [NSData dataWithContentsOfFile:kanjiPath];
+    tohovgs_loadKanji(kanji.bytes, kanji.length);
+    NSString* c0Path = [[NSBundle mainBundle] pathForResource:@"assets/compat/GSLOT000"
+                                                     ofType:@"CHR"];
+    NSData* c0 = [NSData dataWithContentsOfFile:c0Path];
+    vge_gload(0, c0.bytes);
+    NSString* c1Path = [[NSBundle mainBundle] pathForResource:@"assets/compat/GSLOT255"
+                                                     ofType:@"CHR"];
+    NSData* c1 = [NSData dataWithContentsOfFile:c1Path];
+    vge_gload(1, c1.bytes);
+    tohovgs_setPreference((int)[_userDefaults integerForKey:@"compat_current_title_id"],
+                          (int)[_userDefaults integerForKey:@"compat_loop"],
+                          (int)[_userDefaults integerForKey:@"compat_base"],
+                          (int)[_userDefaults integerForKey:@"compat_infinity"],
+                          (int)[_userDefaults integerForKey:@"compat_kobushi"],
+                          (int)[_userDefaults integerForKey:@"compat_locale_id"],
+                          (int)[_userDefaults integerForKey:@"compat_list_type"]);
+    self.opaque = NO;
+    self.clearsContextBeforeDrawing = NO;
+    self.multipleTouchEnabled = NO;
+    self.userInteractionEnabled = YES;
+    ((RetroLayer*)self.layer).retroView = self;
+    _displayLink = [CADisplayLink displayLinkWithTarget:self
+                                               selector:@selector(_detectVsync:)];
+    _displayLink.preferredFramesPerSecond = 60;
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    _destroyed = NO;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -231,6 +236,16 @@ static int _moveCur;
     } else {
         g_flingX = 0;
     }
+}
+
+- (void)enterBackground
+{
+    [self destroy];
+}
+
+- (void)enterForeground
+{
+    [self _restart];
 }
 
 @end

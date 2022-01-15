@@ -5,6 +5,7 @@
 //  Created by Yoji Suzuki on 2022/01/13.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import "MusicManager.h"
 #import "../ControlDelegate.h"
 #import "../vgs/vgsplay-ios.h"
@@ -63,6 +64,15 @@ extern void* vgsdec;
     return [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
 }
 
+- (void)_active:(BOOL)active
+{
+    NSError* error;
+    [[AVAudioSession sharedInstance] setActive:active error:&error];
+    if (error) {
+        NSLog(@"cannot %@ audio session: %@", active ? @"activate" : @"deactivate", error);
+    }
+}
+
 - (void)playSong:(Song*)song
 {
     _playingSong = song;
@@ -75,6 +85,7 @@ extern void* vgsdec;
                                                       userInfo:nil
                                                        repeats:YES];
     [_monitoringTimer fire];
+    [self _active:YES];
 }
 
 - (void)_monitor:(NSTimer*)timer
@@ -103,6 +114,7 @@ extern void* vgsdec;
             [_delegate musicManager:self didStopPlayingSong:_playingSong];
         }
         _playingSong = nil;
+        [self _active:NO];
     }
     if (_monitoringTimer) {
         [_monitoringTimer invalidate];

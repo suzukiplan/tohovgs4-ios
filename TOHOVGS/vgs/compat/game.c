@@ -156,6 +156,11 @@ static unsigned short get_code(unsigned const char *sjis);
 
 static void put_kanji(int x, int y, int col, const char *msg, ...);
 
+void tohovgs_clearMusicCursor(void)
+{
+    fs_musicCursor = -1;
+}
+
 /*
  *----------------------------------------------------------------------------
  * Main
@@ -785,7 +790,7 @@ int vge_tick(void) {
     if (0 == infinity) {
         int ss;
         int sm;
-        if (fs_list[fs_musicCursor].loop) {
+        if (0 <= fs_musicCursor && fs_list[fs_musicCursor].loop) {
             int introLen = vgsdec_get_value(_psg, VGSDEC_REG_LOOP_TIME);
             int loopLen = vgsdec_get_value(_psg, VGSDEC_REG_TIME_LENGTH) - introLen;
             ss = introLen + loopLen * loop;

@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #define NUM_CHANNELS 1
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 4096
 #define SAMPLE_TYPE short
 #define MAX_NUMBER 32767
 #define SAMPLE_RATE 22050
@@ -106,9 +106,9 @@ static struct Context* internal_sound_create(const char* mmlPath, int loop, int 
 static void internal_sound_destroy(void* context)
 {
     struct Context* c = (struct Context*)context;
+    AudioQueueStop(c->queue, true);
+    AudioQueueDispose(c->queue, true);
     pthread_mutex_lock(&c->mutex);
-    AudioQueueStop(c->queue, false);
-    AudioQueueDispose(c->queue, false);
     vgsdec_release_context(c->vgsdec);
     c->vgsdec = NULL;
     pthread_mutex_unlock(&c->mutex);

@@ -5,6 +5,7 @@
 //  Created by Yoji Suzuki on 2022/01/11.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import "AppDelegate.h"
 #import "vgs/vgsplay-ios.h"
 
@@ -14,6 +15,14 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    NSError* error;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+                                            mode:AVAudioSessionModeMoviePlayback
+                                         options:AVAudioSessionCategoryOptionMixWithOthers
+                                           error:&error];
+    if (error) {
+        NSLog(@"cannot set audio session category: %@", error);
+    }
     return YES;
 }
 

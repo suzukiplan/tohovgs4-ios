@@ -91,6 +91,8 @@ void tohovgs_setPreference(int currentTitleId,
 
 struct Preferences *tohovgs_getPreference(void);
 
+void tohovgs_clearMusicCursor(void);
+
 int vge_tick(void);
 
 int vge_gload(unsigned char n, const unsigned char *bin);

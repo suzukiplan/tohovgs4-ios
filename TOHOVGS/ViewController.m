@@ -5,6 +5,7 @@
 //  Created by Yoji Suzuki on 2022/01/11.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import "ViewController.h"
 #import "view/SeekBarView.h"
 #import "view/FooterView.h"
@@ -49,6 +50,29 @@
     _footer = [[FooterView alloc] initWithDelegate:self];
     [self.view addSubview:_footer];
     _currentPageIndex = 0;
+    NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self
+               selector:@selector(viewWillEnterForeground)
+                   name:UIApplicationWillEnterForegroundNotification
+                 object:nil];
+    [center addObserver:self
+               selector:@selector(viewDidEnterBackground)
+                   name:UIApplicationDidEnterBackgroundNotification
+                 object:nil];
+}
+
+- (void)viewWillEnterForeground
+{
+    if ([_pageView isKindOfClass:[RetroView class]]) {
+        [(RetroView*)_pageView enterForeground];
+    }
+}
+
+- (void)viewDidEnterBackground
+{
+    if ([_pageView isKindOfClass:[RetroView class]]) {
+        [(RetroView*)_pageView enterBackground];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated

@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RetroView : UIView
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate;
+- (void)enterForeground;
+- (void)enterBackground;
 - (void)destroy;
 @end
 
