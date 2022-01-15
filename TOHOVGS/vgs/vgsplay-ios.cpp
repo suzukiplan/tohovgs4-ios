@@ -182,6 +182,7 @@ void vgsplay_changeLoopCount(int loop)
     if (fs_context) {
         pthread_mutex_lock(&fs_context->mutex);
         fs_context->loop = loop;
+        _currentPlayingData.loop = loop;
         pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
