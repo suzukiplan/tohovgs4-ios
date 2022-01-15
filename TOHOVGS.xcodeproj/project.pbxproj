@@ -40,9 +40,12 @@
 		7443D7DA27926C6D002EF802 /* vgeapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D727926C6D002EF802 /* vgeapi.c */; };
 		7443D7DB27926C6D002EF802 /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D927926C6D002EF802 /* game.c */; };
 		7443D7DE27926DA1002EF802 /* RetroLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7DD27926DA1002EF802 /* RetroLayer.m */; };
+		764C3B1D55EDFF58F1966712 /* Pods_TOHOVGS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F716217E36F9D7048F9D3D80 /* Pods_TOHOVGS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1727FD9EE99682870A0AEE2E /* Pods-TOHOVGS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOHOVGS.debug.xcconfig"; path = "Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS.debug.xcconfig"; sourceTree = "<group>"; };
+		1FF733F7CDA1A0A8CD323390 /* Pods-TOHOVGS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOHOVGS.release.xcconfig"; path = "Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS.release.xcconfig"; sourceTree = "<group>"; };
 		74145BB42792B4C700E7F726 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7443D751278D161F002EF802 /* TOHOVGS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOHOVGS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7443D754278D161F002EF802 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -106,6 +109,7 @@
 		7443D7D927926C6D002EF802 /* game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
 		7443D7DC27926DA1002EF802 /* RetroLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RetroLayer.h; sourceTree = "<group>"; };
 		7443D7DD27926DA1002EF802 /* RetroLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RetroLayer.m; sourceTree = "<group>"; };
+		F716217E36F9D7048F9D3D80 /* Pods_TOHOVGS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TOHOVGS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,18 +118,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				7443D7D227910441002EF802 /* AudioToolbox.framework in Frameworks */,
+				764C3B1D55EDFF58F1966712 /* Pods_TOHOVGS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60534149DDB2EB5D994AD21C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1727FD9EE99682870A0AEE2E /* Pods-TOHOVGS.debug.xcconfig */,
+				1FF733F7CDA1A0A8CD323390 /* Pods-TOHOVGS.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		7443D748278D161F002EF802 = {
 			isa = PBXGroup;
 			children = (
 				7443D753278D161F002EF802 /* TOHOVGS */,
 				7443D752278D161F002EF802 /* Products */,
 				7443D7CE27910425002EF802 /* Frameworks */,
+				60534149DDB2EB5D994AD21C /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -238,6 +254,7 @@
 			children = (
 				7443D7D127910441002EF802 /* AudioToolbox.framework */,
 				7443D7CF27910426002EF802 /* CoreAudio.framework */,
+				F716217E36F9D7048F9D3D80 /* Pods_TOHOVGS.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -259,9 +276,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7443D76A278D1620002EF802 /* Build configuration list for PBXNativeTarget "TOHOVGS" */;
 			buildPhases = (
+				47001C9A6412618D09BE7936 /* [CP] Check Pods Manifest.lock */,
 				7443D74D278D161F002EF802 /* Sources */,
 				7443D74E278D161F002EF802 /* Frameworks */,
 				7443D74F278D161F002EF802 /* Resources */,
+				5688797584E394D88046D02D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -320,6 +339,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		47001C9A6412618D09BE7936 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TOHOVGS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5688797584E394D88046D02D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7443D74D278D161F002EF802 /* Sources */ = {
@@ -438,7 +499,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -492,7 +553,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -502,6 +563,7 @@
 		};
 		7443D76B278D1620002EF802 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1727FD9EE99682870A0AEE2E /* Pods-TOHOVGS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -533,6 +595,7 @@
 		};
 		7443D76C278D1620002EF802 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1FF733F7CDA1A0A8CD323390 /* Pods-TOHOVGS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
