@@ -12,9 +12,9 @@
 "please_wait" = "しばらくお待ち下さい…";
 "ok" = "OK";
 "cancel" = "キャンセル";
-"ask_unlock" = "リワード広告を再生することで「%s」の全楽曲をアンロックすることができます。";
+"ask_unlock" = "リワード広告を再生することで「%@」の全楽曲をアンロックすることができます。";
 "ask_unlock_all" = "リワード広告を再生することで全楽曲をアンロックすることができます。";
-"ask_lock" = "「%s」をロックしてもよろしいですか?";
+"ask_lock" = "「%@」をロックしてもよろしいですか?";
 "generating_shuffle_play_list" = "シャッフル・プレイリストを生成中…";
 "all_songs_are_locked" = "全ての楽曲がロックされています";
 "infinity" = "∞";
@@ -24,3 +24,4 @@
 "hide_unlock_all_button" = "一時的に全ての楽曲アンロックボタンを隠す";
 "retro_ui" = "RETRO";
 "launch_emulator_error" = "Cannot launch the VGS emulator.\nALL SONGS ARE LOCKED.";
+"confirm" = "確認";

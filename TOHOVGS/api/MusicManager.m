@@ -36,17 +36,25 @@ extern void* vgsdec;
                                                              options:NSJSONReadingAllowFragments
                                                                error:&error];
         _albums = [Album parseJsonArray:json[@"albums"]];
+        [self _refreshAllUnlockedSongs];
+    }
+    return self;
+}
+
+- (void)_refreshAllUnlockedSongs
+{
+    if (!_allUnlockedSongs) {
         _allUnlockedSongs = [NSMutableArray array];
-        for (Album* album in _albums) {
-            NSLog(@"Exist album: %@", album.name);
-            for (Song* song in album.songs) {
-                if (![self isLockedSong:song]) {
-                    [_allUnlockedSongs addObject:song];
-                }
+    } else {
+        [_allUnlockedSongs removeAllObjects];
+    }
+    for (Album* album in _albums) {
+        for (Song* song in album.songs) {
+            if (![self isLockedSong:song]) {
+                [_allUnlockedSongs addObject:song];
             }
         }
     }
-    return self;
 }
 
 - (void)playSong:(Song*)song
@@ -127,6 +135,7 @@ extern void* vgsdec;
 {
     NSString* locked = lock ? @"L" : @"U";
     [_userDefaults setObject:locked forKey:[self _keyForSong:song]];
+    [self _refreshAllUnlockedSongs];
 }
 
 @end

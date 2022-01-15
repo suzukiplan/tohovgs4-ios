@@ -10,8 +10,10 @@
 #import "../api/MusicManager.h"
 
 @interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
+@property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic) UITableView* table;
+@property (nonatomic) UILabel* noContentMessage;
 @property (nonatomic, weak) NSArray<Song*>* songs;
 @property (nonatomic, nullable) NSMutableArray<Song*>* shuffleSongs;
 @property (nonatomic, nullable) NSMutableArray<Album*>* splitAlbums;
@@ -40,6 +42,7 @@
                 [_splitSongs[song.parentAlbum.albumId] addObject:song];
             }
         }
+        _controlDelegate = controlDelegate;
         _musicManager = [controlDelegate getViewController].musicManager;
         self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
         _table = [[UITableView alloc] initWithFrame:self.frame style:UITableViewStylePlain];
@@ -51,6 +54,14 @@
         [_table setDataSource:self];
         [_table setDelegate:self];
         [self addSubview:_table];
+        if (songs.count < 1) {
+            _noContentMessage = [[UILabel alloc] init];
+            _noContentMessage.text = NSLocalizedString(@"all_songs_are_locked", nil);
+            _noContentMessage.textColor = [UIColor whiteColor];
+            _noContentMessage.font = [UIFont systemFontOfSize:12];
+            _noContentMessage.textAlignment = NSTextAlignmentCenter;
+            [self addSubview:_noContentMessage];
+        }
         if (shuffle) {
             _songs = songs;
             [self shuffleWithControlDelegate:controlDelegate];
@@ -61,6 +72,7 @@
 
 - (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
+    if (_songs.count < 1) return;
     [controlDelegate startProgressWithMessage:NSLocalizedString(@"generating_shuffle_play_list", nil)];
     __weak SongListView* weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -86,6 +98,7 @@
 {
     [super setFrame:frame];
     _table.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+    _noContentMessage.frame = _table.frame;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -173,6 +186,10 @@
 
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song
 {
+    __weak SongListView* weakSelf = self;
+    [_controlDelegate askLockWithSong:song locked:^{
+        [weakSelf.table reloadData];
+    }];
 }
 
 - (BOOL)songCell:(SongCell*)songCell didRequestCheckLockedSong:(Song*)song
@@ -200,6 +217,15 @@
         NSLog(@"NSNotFound!");
     } else {
         NSInteger next = infinity ? current : (current + 1) % _songs.count;
+        NSInteger giveUp = next;
+        while ([_musicManager isLockedSong:_songs[next]]) {
+            next++;
+            next %= _songs.count;
+            if (giveUp == next) {
+                NSLog(@"All unlocked");
+                return;
+            }
+        }
         NSLog(@"next: %@", _songs[next].name);
         [self _play:_songs[next]];
         [self _scrollToSong:_songs[next]];

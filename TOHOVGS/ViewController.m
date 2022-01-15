@@ -225,4 +225,26 @@
     }
 }
 
+- (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked
+{
+    __weak ViewController* weakSelf = self;
+    NSString* title = NSLocalizedString(@"confirm", nil);
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_lock", nil), song.name];
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil)
+                                                     style:UIAlertActionStyleCancel
+                                                   handler:nil];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction * _Nonnull action) {
+        [weakSelf.musicManager lock:YES song:song];
+        locked();
+    }];
+    [controller addAction:cancel];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
 @end
