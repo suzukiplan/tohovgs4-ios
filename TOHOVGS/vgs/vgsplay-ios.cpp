@@ -25,10 +25,15 @@ struct Context {
     AudioStreamBasicDescription format;
     AudioQueueRef queue;
     AudioQueueBufferRef buffers[MAX_BUFFER_NUM];
+    int numberOfBuffer;
+    int emptyEnqueueCounter;
+    unsigned char emptyBuffer[BUFFER_SIZE];
     unsigned char rawBuffers[2][BUFFER_SIZE];
     int latch;
     int loop;
     int infinity;
+    int timeLog[MAX_BUFFER_NUM];
+    int timeLogIndex;
     bool fadeout;
     void* vgsdec;
 };
@@ -36,15 +41,27 @@ struct Context {
 static struct Context* fs_context;
 static pthread_mutex_t fs_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+static void executeDecode(Context* c, void* buffer)
+{
+    vgsdec_execute(c->vgsdec, buffer, BUFFER_SIZE);
+    c->timeLog[c->timeLogIndex++] = vgsdec_get_value(c->vgsdec, VGSDEC_REG_TIME);
+    c->timeLogIndex &= 0x0F;
+}
+
 static void callback(void* context, AudioQueueRef queue, AudioQueueBufferRef buffer)
 {
     struct Context* c = (struct Context*)context;
     pthread_mutex_lock(&c->mutex);
-    memcpy(buffer->mAudioData, c->rawBuffers[c->latch], BUFFER_SIZE);
+    if (vgsdec_get_value(c->vgsdec, VGSDEC_REG_PLAYING)) {
+        memcpy(buffer->mAudioData, c->rawBuffers[c->latch], BUFFER_SIZE);
+    } else {
+        memcpy(buffer->mAudioData, c->emptyBuffer, BUFFER_SIZE);
+        c->emptyEnqueueCounter++;
+    }
     AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
     c->latch = 1 - c->latch;
     if (c->vgsdec) {
-        vgsdec_execute(c->vgsdec, c->rawBuffers[c->latch], BUFFER_SIZE);
+        executeDecode(c, c->rawBuffers[c->latch]);
         if (c->loop && !c->fadeout) {
             if (!c->infinity && c->loop <= vgsdec_get_value(c->vgsdec, VGSDEC_REG_LOOP_COUNT)) {
                 vgsdec_set_value(c->vgsdec, VGSDEC_REG_FADEOUT, 1);
@@ -89,11 +106,11 @@ static struct Context* internal_sound_create(const char* mmlPath, int loop, int 
     for (int i = 0; i < numberOfBuffer; i++) {
         AudioQueueAllocateBuffer(result->queue, BUFFER_SIZE, &result->buffers[i]);
         result->buffers[i]->mAudioDataByteSize = BUFFER_SIZE;
-        vgsdec_execute(result->vgsdec, result->rawBuffers[0], BUFFER_SIZE); // pre-enqueue
+        executeDecode(result, result->rawBuffers[0]); // pre-enqueue
         memcpy(result->buffers[i]->mAudioData, result->rawBuffers[0], BUFFER_SIZE);
         AudioQueueEnqueueBuffer(result->queue, result->buffers[i], 0, NULL);
     }
-    vgsdec_execute(result->vgsdec, result->rawBuffers[1], BUFFER_SIZE); // decode next
+    executeDecode(result, result->rawBuffers[1]); // decode next
     result->latch = 1;
     AudioQueueStart(result->queue, NULL);
     return result;
@@ -112,11 +129,25 @@ static void internal_sound_destroy(void* context)
     free(c);
 }
 
+struct CurrentPlayingData {
+    char mmlPath[4096];
+    int loop;
+    int infinity;
+    int seek;
+    int numberOfBuffer;
+};
+static struct CurrentPlayingData _currentPlayingData;
+
 void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
     fs_context = internal_sound_create(mmlPath, loop, infinity, seek, numberOfBuffer);
+    strcpy(_currentPlayingData.mmlPath, mmlPath);
+    _currentPlayingData.loop = loop;
+    _currentPlayingData.infinity = infinity;
+    _currentPlayingData.seek = seek;
+    _currentPlayingData.numberOfBuffer = numberOfBuffer;
     pthread_mutex_unlock(&fs_mutex);
 }
 
@@ -154,13 +185,13 @@ unsigned int vgsplay_getSongLength()
     return result;
 }
 
-unsigned int vgsplay_getCurrentTime()
+unsigned int vgsplay_getCurrentTime(void)
 {
     unsigned int result = 0;
     pthread_mutex_lock(&fs_mutex);
     if (fs_context) {
         pthread_mutex_lock(&fs_context->mutex);
-        result = (unsigned int)vgsdec_get_value(fs_context->vgsdec, VGSDEC_REG_TIME);
+        result = fs_context->timeLog[(fs_context->timeLogIndex + 1) & 0x0F];
         pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
@@ -169,13 +200,15 @@ unsigned int vgsplay_getCurrentTime()
 
 void vgsplay_seek(unsigned int time)
 {
-    pthread_mutex_lock(&fs_mutex);
     if (fs_context) {
-        pthread_mutex_lock(&fs_context->mutex);
-        vgsdec_set_value(fs_context->vgsdec, VGSDEC_REG_TIME, (int)time);
-        pthread_mutex_unlock(&fs_context->mutex);
+        vgsplay_stop();
+        _currentPlayingData.seek = time;
+        vgsplay_start(_currentPlayingData.mmlPath,
+                      _currentPlayingData.loop,
+                      _currentPlayingData.infinity,
+                      _currentPlayingData.seek,
+                      _currentPlayingData.numberOfBuffer);
     }
-    pthread_mutex_unlock(&fs_mutex);
 }
 
 int vgsplay_isPlaying()
@@ -185,6 +218,9 @@ int vgsplay_isPlaying()
     if (fs_context && fs_context->vgsdec) {
         pthread_mutex_lock(&fs_context->mutex);
         result = vgsdec_get_value(fs_context->vgsdec, VGSDEC_REG_PLAYING);
+        if (!result) {
+            result = fs_context->emptyEnqueueCounter < MAX_BUFFER_NUM ? 1 : 0;
+        }
         pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
@@ -197,6 +233,7 @@ void vgsplay_changeInfinity(int infinity)
     if (fs_context) {
         pthread_mutex_lock(&fs_context->mutex);
         fs_context->infinity = infinity;
+        _currentPlayingData.infinity = infinity;
         pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
