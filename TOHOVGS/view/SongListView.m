@@ -197,6 +197,14 @@
     return [_musicManager isLockedSong:song];
 }
 
+- (void)songCell:(SongCell*)songCell didRequestUnlockSong:(Song*)song
+{
+    __weak SongListView* weakSelf = self;
+    [_controlDelegate askUnlockWithAlbum:song.parentAlbum unlocked:^{
+        [weakSelf.table reloadData];
+    }];
+}
+
 - (void)stopSong
 {
     for (Song* song in _songs) {

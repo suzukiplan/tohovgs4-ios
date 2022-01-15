@@ -13,7 +13,7 @@
 @property (nonatomic) PushableView* pushable;
 @property (nonatomic) UILabel* titleLabel;
 @property (nonatomic, nullable) UILabel* englishLabel;
-@property (nonatomic) UIView* lockedCover;
+@property (nonatomic) PushableView* lockedCover;
 @property (nonatomic) UIImageView* lockedImage;
 @end
 
@@ -39,12 +39,14 @@
             _englishLabel.font = [UIFont systemFontOfSize:11];
             [_pushable addSubview:_englishLabel];
         }
-        _lockedCover = [[UIView alloc] init];
+        _lockedCover = [[PushableView alloc] initWithDelegate:self];
+        _lockedCover.tapBoundAnimation = NO;
+        _lockedCover.touchAlphaAnimation = YES;
         _lockedCover.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
         [self.contentView addSubview:_lockedCover];
         _lockedImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_lock_white_18pt"]];
         _lockedImage.alpha = 0.5;
-        [self.contentView addSubview:_lockedImage];
+        [_lockedCover addSubview:_lockedImage];
     }
     return self;
 }
@@ -91,12 +93,18 @@
 
 - (void)didPushPushableView:(PushableView*)pushableView
 {
-    [_delegate songCell:self didTapSong:_song];
+    if (pushableView == _pushable) {
+        [_delegate songCell:self didTapSong:_song];
+    } else if (pushableView == _lockedCover) {
+        [_delegate songCell:self didRequestUnlockSong:_song];
+    }
 }
 
 - (void)didLongPressOfPushableView:(PushableView*)pushableView
 {
-    [_delegate songCell:self didLongPressSong:_song];
+    if (pushableView == _pushable) {
+        [_delegate songCell:self didLongPressSong:_song];
+    }
 }
 
 @end

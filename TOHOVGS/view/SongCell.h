@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SongCellDelegate <NSObject>
 - (void)songCell:(SongCell*)songCell didTapSong:(Song*)song;
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song;
-- (BOOL)songCell:(SongCell *)songCell didRequestCheckLockedSong:(Song*)song;
+- (BOOL)songCell:(SongCell*)songCell didRequestCheckLockedSong:(Song*)song;
+- (void)songCell:(SongCell*)songCell didRequestUnlockSong:(Song*)song;
 @end
 
 @interface SongCell : UITableViewCell

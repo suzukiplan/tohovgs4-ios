@@ -247,4 +247,29 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
+- (void)askUnlockWithAlbum:(Album*)album unlocked:(void(^)(void))unlocked
+{
+    __weak ViewController* weakSelf = self;
+    NSString* title = NSLocalizedString(@"confirm", nil);
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_unlock", nil), album.name];
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil)
+                                                     style:UIAlertActionStyleCancel
+                                                   handler:nil];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction * _Nonnull action) {
+        for (Song* song in album.songs) {
+            [weakSelf.musicManager lock:NO song:song];
+        }
+        unlocked();
+    }];
+    [controller addAction:cancel];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+
+}
+
 @end
