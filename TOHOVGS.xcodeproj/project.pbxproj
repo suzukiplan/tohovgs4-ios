@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		74145BB52792B4C800E7F726 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74145BB42792B4C700E7F726 /* GoogleService-Info.plist */; };
 		7443D756278D161F002EF802 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D755278D161F002EF802 /* AppDelegate.m */; };
 		7443D759278D161F002EF802 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D758278D161F002EF802 /* SceneDelegate.m */; };
 		7443D75C278D161F002EF802 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D75B278D161F002EF802 /* ViewController.m */; };
@@ -42,6 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		74145BB42792B4C700E7F726 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7443D751278D161F002EF802 /* TOHOVGS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOHOVGS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7443D754278D161F002EF802 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7443D755278D161F002EF802 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				7443D760278D1620002EF802 /* Assets.xcassets */,
 				7443D762278D1620002EF802 /* LaunchScreen.storyboard */,
 				7443D765278D1620002EF802 /* Info.plist */,
+				74145BB42792B4C700E7F726 /* GoogleService-Info.plist */,
 				7443D766278D1620002EF802 /* main.m */,
 			);
 			path = TOHOVGS;
@@ -312,6 +315,7 @@
 				7443D78B278D6C50002EF802 /* Localizable.strings in Resources */,
 				7443D761278D1620002EF802 /* Assets.xcassets in Resources */,
 				7443D75F278D161F002EF802 /* Main.storyboard in Resources */,
+				74145BB52792B4C800E7F726 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,6 +511,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "東方VGS";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -519,7 +524,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.8;
-				PRODUCT_BUNDLE_IDENTIFIER = com.suzukiplan.TOHOVGS;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -537,6 +542,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "東方VGS";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -549,7 +555,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 4.8;
-				PRODUCT_BUNDLE_IDENTIFIER = com.suzukiplan.TOHOVGS;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
