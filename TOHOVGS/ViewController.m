@@ -424,8 +424,8 @@
 - (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(nonnull NSError*)error
 {
     NSLog(@"Ad did fail to present full screen content.");
-    // TODO: show error message
     [self stopProgress:^{}];
+    [self showErrorMessage:NSLocalizedString(@"error_ads", nil)];
 }
 
 - (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
