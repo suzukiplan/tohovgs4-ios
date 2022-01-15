@@ -156,6 +156,11 @@
 
 - (void)albumTabViewDidMoveEnd
 {
+    [self _stopSong];
+}
+
+- (void)_stopSong
+{
     for (SongListView* page in _pages) {
         [page stopSong];
     }
@@ -171,6 +176,7 @@
 - (void)didPushPushableView:(PushableView*)pushableView
 {
     __weak AlbumPagerView* weakSelf = self;
+    [self _stopSong];
     [_controlDelegate askUnlockAllWithCallback:^{
         [weakSelf refreshIsThereLockedSongWithAnimate:YES];
         for (SongListView* page in weakSelf.pages) {

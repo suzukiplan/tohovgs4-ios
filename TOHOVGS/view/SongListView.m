@@ -186,6 +186,7 @@
 
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song
 {
+    [self stopSong];
     __weak SongListView* weakSelf = self;
     [_controlDelegate askLockWithSong:song locked:^{
         [weakSelf.table reloadData];
@@ -199,6 +200,7 @@
 
 - (void)songCell:(SongCell*)songCell didRequestUnlockSong:(Song*)song
 {
+    [self stopSong];
     __weak SongListView* weakSelf = self;
     [_controlDelegate askUnlockWithAlbum:song.parentAlbum unlocked:^{
         [weakSelf.table reloadData];
