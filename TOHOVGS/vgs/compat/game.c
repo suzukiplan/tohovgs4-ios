@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include "vge.h"
 #include "vgsdec.h"
+#include "../vgsplay-ios.h"
 
 /* Macro */
 #define HIT_CHECK(X1, Y1, XS1, YS1, X2, Y2, XS2, YS2) (X1 < X2 + XS2 && X2 < X1 + XS1 && Y1 < Y2 + YS2 && Y2 < Y1 + YS1)
@@ -985,6 +986,7 @@ int vge_tick(void) {
                 if (push) {
                     loop++;
                     if (3 < loop) loop = 1;
+                    vgsplay_changeLoopCount(loop);
                 }
             } else {
                 vge_putSP(0, (loop - 1) * 24, 160, 24, 12, 80 + ii, 112);
