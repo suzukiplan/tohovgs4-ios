@@ -8,6 +8,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AppDelegate.h"
 #import "vgs/vgsplay-ios.h"
+@import Firebase;
 
 @interface AppDelegate ()
 @end
@@ -15,6 +16,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [FIRApp configure];
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
                                             mode:AVAudioSessionModeMoviePlayback
