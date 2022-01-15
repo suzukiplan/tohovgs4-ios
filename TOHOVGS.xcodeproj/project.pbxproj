@@ -36,6 +36,8 @@
 		7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */; };
 		7443D7D227910441002EF802 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7443D7D127910441002EF802 /* AudioToolbox.framework */; };
 		7443D7D52791A91D002EF802 /* ProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D42791A91D002EF802 /* ProgressView.m */; };
+		7443D7DA27926C6D002EF802 /* vgeapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D727926C6D002EF802 /* vgeapi.c */; };
+		7443D7DB27926C6D002EF802 /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D927926C6D002EF802 /* game.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +98,9 @@
 		7443D7D127910441002EF802 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		7443D7D32791A91D002EF802 /* ProgressView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressView.h; sourceTree = "<group>"; };
 		7443D7D42791A91D002EF802 /* ProgressView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressView.m; sourceTree = "<group>"; };
+		7443D7D727926C6D002EF802 /* vgeapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vgeapi.c; sourceTree = "<group>"; };
+		7443D7D827926C6D002EF802 /* vge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vge.h; sourceTree = "<group>"; };
+		7443D7D927926C6D002EF802 /* game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +211,7 @@
 		7443D7B327906380002EF802 /* vgs */ = {
 			isa = PBXGroup;
 			children = (
+				7443D7D627926C5F002EF802 /* compat */,
 				7443D7CA279069A7002EF802 /* vgsplay-ios.cpp */,
 				7443D7C9279069A7002EF802 /* vgsplay-ios.h */,
 				7443D7C4279063CC002EF802 /* vgs2tone.c */,
@@ -226,6 +232,16 @@
 				7443D7CF27910426002EF802 /* CoreAudio.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7443D7D627926C5F002EF802 /* compat */ = {
+			isa = PBXGroup;
+			children = (
+				7443D7D927926C6D002EF802 /* game.c */,
+				7443D7D827926C6D002EF802 /* vge.h */,
+				7443D7D727926C6D002EF802 /* vgeapi.c */,
+			);
+			path = compat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -301,6 +317,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7443D7DB27926C6D002EF802 /* game.c in Sources */,
 				7443D774278D1846002EF802 /* Song.m in Sources */,
 				7443D7C5279063CC002EF802 /* vgsmml.c in Sources */,
 				7443D786278D6002002EF802 /* RetroView.m in Sources */,
@@ -322,6 +339,7 @@
 				7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */,
 				7443D777278D1855002EF802 /* Album.m in Sources */,
 				7443D759278D161F002EF802 /* SceneDelegate.m in Sources */,
+				7443D7DA27926C6D002EF802 /* vgeapi.c in Sources */,
 				7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */,
 				7443D7D52791A91D002EF802 /* ProgressView.m in Sources */,
 			);
