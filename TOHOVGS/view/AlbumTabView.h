@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSInteger position;
 @property (nonatomic, readonly) CGFloat height;
 - (instancetype)initWithAlbums:(NSArray<Album*>*)albums
+               initialPosition:(NSInteger)initialPosition
                       delegate:(id<AlbumTabViewDelegate>)delegate;
 @end
 

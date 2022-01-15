@@ -20,16 +20,19 @@
 @property (nonatomic) NSMutableArray<UILabel*>* labels;
 @property (nonatomic) UIFont* selectedFont;
 @property (nonatomic) UIFont* notSelectedFont;
+@property (nonatomic) NSInteger initialPosition;
 @end
 
 @implementation AlbumTabView
 
 - (instancetype)initWithAlbums:(NSArray<Album*>*)albums
+               initialPosition:(NSInteger)initialPosition
                       delegate:(nonnull id<AlbumTabViewDelegate>)delegate
 {
     if (self = [super init]) {
         self.showsHorizontalScrollIndicator = NO;
         _albums = albums;
+        _initialPosition = initialPosition;
         _tabDelegate = delegate;
         _height = HEIGHT;
         _cursor = [[UIView alloc] init];
@@ -97,6 +100,21 @@
         view.enabled = YES;
     }
     _pushables[_position].enabled = NO;
+    if (0 < _initialPosition) {
+        NSInteger initialPosition = _initialPosition;
+        _initialPosition = -1;
+        CGFloat x = _pushables[initialPosition].frame.origin.x;
+        x -= (frame.size.width - _pushables[initialPosition].frame.size.width) / 2;
+        self.contentOffset = CGPointMake(x, 0);
+        _labels[_position].font = _notSelectedFont;
+        _labels[initialPosition].font = _selectedFont;
+        _cursor.frame = CGRectMake(_pushables[initialPosition].frame.origin.x + 4,
+                                   _pushables[initialPosition].frame.origin.y + 4,
+                                   _pushables[initialPosition].frame.size.width - 8,
+                                   _pushables[initialPosition].frame.size.height - 8);
+        [self scrollRectToVisible:_cursor.frame animated:NO];
+        _position = initialPosition;
+    }
 }
 
 @end

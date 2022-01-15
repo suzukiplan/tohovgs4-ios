@@ -13,10 +13,12 @@
 @interface AlbumPagerView() <UIScrollViewDelegate, AlbumTabViewDelegate>
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic, weak) NSArray<Album*>* albums;
+@property (nonatomic, weak) NSUserDefaults* userDefaults;
 @property (nonatomic) AlbumTabView* tabView;
 @property (nonatomic) UIScrollView* pager;
 @property (nonatomic) NSArray<SongListView*>* pages;
 @property (nonatomic) BOOL forceScrolling;
+@property (nonatomic) NSInteger initialPageIndex;
 @end
 
 @implementation AlbumPagerView
@@ -24,16 +26,21 @@
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
     if (self = [super init]) {
+        _userDefaults = [NSUserDefaults standardUserDefaults];
         _musicManager = [controlDelegate getViewController].musicManager;
         _albums = _musicManager.albums;
-        _tabView = [[AlbumTabView alloc] initWithAlbums:_albums delegate:self];
-        [self addSubview:_tabView];
         _pager = [[UIScrollView alloc] init];
         _pager.pagingEnabled = YES;
         _pager.delegate = self;
         _pager.showsHorizontalScrollIndicator = NO;
         [self addSubview:_pager];
         NSMutableArray<SongListView*>* pages = [NSMutableArray arrayWithCapacity:_albums.count];
+        NSString* initialAlbumId = [_userDefaults stringForKey:@"initial_album_id"];
+        if (!initialAlbumId) {
+            initialAlbumId = @"th06";
+        } else {
+            NSLog(@"initial page: %@", initialAlbumId);
+        }
         for (Album* album in _albums) {
             SongListView* page = [[SongListView alloc] initWithControlDelegate:controlDelegate
                                                                          songs:album.songs
@@ -41,6 +48,13 @@
                                                                        shuffle:NO];
             [_pager addSubview:page];
             [pages addObject:page];
+            if ([album.albumId isEqualToString:initialAlbumId]) {
+                _initialPageIndex = [pages indexOfObject:page];
+            }
+            _tabView = [[AlbumTabView alloc] initWithAlbums:_albums
+                                            initialPosition:_initialPageIndex
+                                                   delegate:self];
+            [self addSubview:_tabView];
         }
         _pages = pages;
     }
@@ -58,6 +72,10 @@
         x += _pager.frame.size.width;
     }
     _pager.contentSize = CGSizeMake(x, _pager.frame.size.height);
+    if (0 < _initialPageIndex) {
+        [_pager scrollRectToVisible:_pages[_initialPageIndex].frame animated:NO];
+        _initialPageIndex = -1;
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView*)scrollView
@@ -72,6 +90,10 @@
     NSInteger position = (scrollView.contentOffset.x + _pager.frame.size.width / 2) / _pager.frame.size.width;
     if (_albums.count <= position) position = _albums.count - 1;
     if (position < 0) position = 0;
+    if (_tabView.position != position) {
+        NSLog(@"position changed by swipe: %@", _albums[position].albumId);
+        [_userDefaults setObject:_albums[position].albumId forKey:@"initial_album_id"];
+    }
     _tabView.position = position;
 }
 
@@ -79,6 +101,8 @@
 {
     _forceScrolling = YES;
     [_pager scrollRectToVisible:_pages[position].frame animated:YES];
+    NSLog(@"position changed by tab: %@", _albums[position].albumId);
+    [_userDefaults setObject:_albums[position].albumId forKey:@"initial_album_id"];
 }
 
 - (void)albumTabViewDidMoveEnd
