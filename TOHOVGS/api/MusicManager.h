@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray<Album*>* albums;
 @property (nonatomic, readonly) NSArray<Song*>* allUnlockedSongs;
 @property (nonatomic) BOOL infinity;
+- (NSString*)mmlPathOfSong:(Song*)song;
 - (void)playSong:(Song*)song;
 - (void)stopPlaying;
 - (void)seekTo:(NSInteger)progress;

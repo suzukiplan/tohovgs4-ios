@@ -60,7 +60,7 @@ static void callback(void* context, AudioQueueRef queue, AudioQueueBufferRef buf
     pthread_mutex_unlock(&c->mutex);
 }
 
-static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity)
+static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity, int seek)
 {
     struct Context* result = (struct Context*)malloc(sizeof(struct Context));
     if (!result) return NULL;
@@ -85,6 +85,9 @@ static struct Context* internal_sound_create(const char* mmlPath, int loop, int 
     if (bgm) {
         vgsdec_load_bgm_from_memory(result->vgsdec, bgm->data, bgm->size);
         vgsmml_free_bgm_data(bgm);
+    }
+    if (seek) {
+        vgsdec_set_value(result->vgsdec, VGSDEC_REG_TIME, seek);
     }
     vgsdec_execute(result->vgsdec, result->rawBuffers[0], BUFFER_SIZE); // pre-enqueue
     vgsdec_execute(result->vgsdec, result->rawBuffers[1], BUFFER_SIZE); // pre-enqueue
@@ -113,11 +116,11 @@ static void internal_sound_destroy(void* context)
     free(c);
 }
 
-void vgsplay_start(const char* mmlPath, int loop, int infinity)
+void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
-    fs_context = internal_sound_create(mmlPath, loop, infinity);
+    fs_context = internal_sound_create(mmlPath, loop, infinity, seek);
     pthread_mutex_unlock(&fs_mutex);
 }
 
@@ -201,4 +204,17 @@ void vgsplay_changeInfinity(int infinity)
         pthread_mutex_unlock(&fs_context->mutex);
     }
     pthread_mutex_unlock(&fs_mutex);
+}
+
+void* vgsplay_getDecoder(void)
+{
+    void* result = NULL;
+    pthread_mutex_lock(&fs_mutex);
+    if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
+        result = fs_context->vgsdec;
+        pthread_mutex_unlock(&fs_context->mutex);
+    }
+    pthread_mutex_unlock(&fs_mutex);
+    return result;
 }

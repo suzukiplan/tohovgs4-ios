@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-void vgsplay_start(const char* mmlPath, int loop, int infinity);
+void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek);
 void vgsplay_stop(void);
 unsigned int vgsplay_getSongLength(void);
 unsigned int vgsplay_getCurrentTime(void);
@@ -22,6 +22,7 @@ void vgsplay_seek(unsigned int time);
 void vgsplay_changeLoopCount(int loop);
 int vgsplay_isPlaying(void);
 void vgsplay_changeInfinity(int infinity);
+void* vgsplay_getDecoder(void);
 
 #ifdef __cplusplus
 };

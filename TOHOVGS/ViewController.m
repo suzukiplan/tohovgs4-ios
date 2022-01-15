@@ -112,7 +112,7 @@
             nextPageIndex = 2;
             break;
         case FooterButtonTypeRetro:
-            nextPage = [[RetroView alloc] init];
+            nextPage = [[RetroView alloc] initWithControlDelegate:self];
             nextPageIndex = 3;
             break;
     }
@@ -133,6 +133,9 @@
         [weakSelf _resizeAll:NO];
     } completion:^(BOOL finished) {
         if (finished) {
+            if ([weakSelf.pageView isKindOfClass:[RetroView class]]) {
+                [(RetroView*)weakSelf.pageView destroy];
+            }
             [weakSelf.pageView removeFromSuperview];
             weakSelf.pageView = nextPage;
             weakSelf.pageMoving = NO;

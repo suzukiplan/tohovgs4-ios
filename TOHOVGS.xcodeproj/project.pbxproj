@@ -38,6 +38,7 @@
 		7443D7D52791A91D002EF802 /* ProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D42791A91D002EF802 /* ProgressView.m */; };
 		7443D7DA27926C6D002EF802 /* vgeapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D727926C6D002EF802 /* vgeapi.c */; };
 		7443D7DB27926C6D002EF802 /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7D927926C6D002EF802 /* game.c */; };
+		7443D7DE27926DA1002EF802 /* RetroLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7DD27926DA1002EF802 /* RetroLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -101,6 +102,8 @@
 		7443D7D727926C6D002EF802 /* vgeapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vgeapi.c; sourceTree = "<group>"; };
 		7443D7D827926C6D002EF802 /* vge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vge.h; sourceTree = "<group>"; };
 		7443D7D927926C6D002EF802 /* game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
+		7443D7DC27926DA1002EF802 /* RetroLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RetroLayer.h; sourceTree = "<group>"; };
+		7443D7DD27926DA1002EF802 /* RetroLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RetroLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +173,8 @@
 				7443D779278D50AC002EF802 /* SongCell.m */,
 				7443D784278D6002002EF802 /* RetroView.h */,
 				7443D785278D6002002EF802 /* RetroView.m */,
+				7443D7DC27926DA1002EF802 /* RetroLayer.h */,
+				7443D7DD27926DA1002EF802 /* RetroLayer.m */,
 				7443D77B278D5F88002EF802 /* FooterButton.h */,
 				7443D77C278D5F88002EF802 /* FooterButton.m */,
 				7443D77E278D5F9B002EF802 /* FooterView.h */,
@@ -331,6 +336,7 @@
 				7443D75C278D161F002EF802 /* ViewController.m in Sources */,
 				7443D795278D828A002EF802 /* SeekBarView.m in Sources */,
 				7443D756278D161F002EF802 /* AppDelegate.m in Sources */,
+				7443D7DE27926DA1002EF802 /* RetroLayer.m in Sources */,
 				7443D7C6279063CC002EF802 /* vgsdec.c in Sources */,
 				7443D780278D5F9B002EF802 /* FooterView.m in Sources */,
 				7443D77A278D50AC002EF802 /* SongCell.m in Sources */,

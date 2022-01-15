@@ -63,9 +63,8 @@ void tohovgs_cleanUp(void) {
     fs_list = NULL;
     if (fs_kanji) free(fs_kanji);
     fs_kanji = NULL;
-    if (_psg) vgsdec_release_context(_psg);
-    _psg = NULL;
     fs_musicCursor = -1;
+    if (_psg) vge_bstop();
 }
 
 void tohovgs_allocate(int nTitle, int nSong) {
@@ -75,7 +74,6 @@ void tohovgs_allocate(int nTitle, int nSong) {
     fs_list = (struct SongData *) malloc(sizeof(struct SongData) * nSong);
     fs_SongNum = nSong;
     memset(fs_list, 0, sizeof(struct SongData) * nSong);
-    _psg = vgsdec_create_context();
 }
 
 void tohovgs_loadKanji(const void *data, size_t size) {
@@ -254,7 +252,7 @@ int vge_tick(void) {
         playwait--;
         if (0 == playwait) {
             g_songChanged++;
-            vge_bplay(fs_list[fs_musicCursor].mmlPath);
+            vge_bplay(fs_list[fs_musicCursor].mmlPath, loop, infinity);
             vgsdec_set_value(_psg, VGSDEC_REG_KOBUSHI, kobushi);
             focus = 1;
             whourai = 120;
@@ -817,7 +815,7 @@ int vge_tick(void) {
     vge_lineSP(16, 37, 229, 37, 53);
     vge_lineSP(16, 39, 229, 39, 48);
     vge_putSP(0, 232, 64, 8, 8, 4, 34);
-    if (vgsdec_get_value(_psg, VGSDEC_REG_PLAYING)) {
+    if (_psg && vgsdec_get_value(_psg, VGSDEC_REG_PLAYING)) {
         u = vgsdec_get_value(_psg, VGSDEC_REG_TIME) / 22050;
         ii = vgsdec_get_value(_psg, VGSDEC_REG_TIME_LENGTH) / 22050;
         ii = (int) (u * 212 / ii);
@@ -850,10 +848,17 @@ int vge_tick(void) {
 
     /* piano */
     for (i = 0; i < 6; i++) {
-        put_font_S(4, 46 + i * 10, "CH%d %s", i, tn[vgsdec_get_value(_psg, VGSDEC_REG_TONE_0 + i)]);
+        const char* toneName = tn[0];
+        int vol = 0;
+        int keyOn = 0;
+        if (_psg) {
+            toneName = tn[vgsdec_get_value(_psg, VGSDEC_REG_TONE_0 + i)];
+            vol = vgsdec_get_value(_psg, VGSDEC_REG_VOL_0 + i);
+            keyOn = vgsdec_get_value(_psg, VGSDEC_REG_KEYON_0 + i);
+        }
+        put_font_S(4, 46 + i * 10, "CH%d %s", i, toneName);
         vge_putSP(0, 0, 208, 200, 8, 36, 46 + i * 10);
-        if (vgsdec_get_value(_psg, VGSDEC_REG_VOL_0 + i) != 0 ||
-            vgsdec_get_value(_psg, VGSDEC_REG_KEYON_0 + i) != 0) {
+        if (vol != 0 || keyOn != 0) {
             k = vgsdec_get_value(_psg, VGSDEC_REG_KEY_0 + i);
             switch (k % 12) {
                 case 0:
@@ -931,7 +936,7 @@ int vge_tick(void) {
                 vge_putSP(0, 48, 32, 24, 12, 2 + ii, 112);
                 if (push) {
                     paused = 0;
-                    vge_bresume();
+                    vge_bresume(loop, infinity);
                     playing = 1;
                 }
             } else {
@@ -999,7 +1004,7 @@ int vge_tick(void) {
         vge_putSP(0, 24, 216, 24, 12, 240 - 28, 112);
         if (push) {
             kobushi = 1 - kobushi;
-            if (vgsdec_get_value(_psg, VGSDEC_REG_PLAYING)) {
+            if (_psg && vgsdec_get_value(_psg, VGSDEC_REG_PLAYING)) {
                 push = 0;
                 ci.s = 0;
                 paused = 0;
@@ -1013,7 +1018,7 @@ int vge_tick(void) {
     }
 
     // acyclic song
-    if (-1 == vgsdec_get_value(_psg, VGSDEC_REG_LOOP_INDEX) &&
+    if (_psg && -1 == vgsdec_get_value(_psg, VGSDEC_REG_LOOP_INDEX) &&
         !vgsdec_get_value(_psg, VGSDEC_REG_PLAYING)) {
         if (0 == interval2) {
             interval2 = 1;
@@ -1036,8 +1041,8 @@ int vge_tick(void) {
     }
 
     // cyclic songs
-    if (-1 != fs_musicCursor && 0 == infinity && fs_list[fs_musicCursor].loop &&
-        loop <= vgsdec_get_value(_psg, VGSDEC_REG_LOOP_COUNT)) {
+    int loopCount = _psg ? vgsdec_get_value(_psg, VGSDEC_REG_LOOP_COUNT) : 0;
+    if (-1 != fs_musicCursor && 0 == infinity && fs_list[fs_musicCursor].loop && loop <= loopCount) {
         if (vgsdec_get_value(_psg, VGSDEC_REG_FADEOUT_COUNTER) == 0) {
             vgsdec_set_value(_psg, VGSDEC_REG_FADEOUT, 1);
             interval = 0;

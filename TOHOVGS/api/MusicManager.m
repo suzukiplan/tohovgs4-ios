@@ -57,12 +57,17 @@ extern void* vgsdec;
     }
 }
 
+- (NSString*)mmlPathOfSong:(Song*)song
+{
+    NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
+    return [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
+}
+
 - (void)playSong:(Song*)song
 {
     _playingSong = song;
-    NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
-    NSString* mmlPath = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0);
+    NSString* mmlPath = [self mmlPathOfSong:song];
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self

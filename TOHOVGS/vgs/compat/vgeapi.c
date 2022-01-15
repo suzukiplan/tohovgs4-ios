@@ -8,13 +8,13 @@
 #include "vge.h"
 #include "vgsdec.h"
 #include "vgsmml.h"
+#include "../vgsplay-ios.h"
 
 /* グローバル変数の実体宣言 */
 struct _VRAM _vram;
 struct _SLOT _slot[MAXSLOT];
 struct _TOUCH _touch;
 void *_psg;
-static int fs_bstop;
 
 /* 内部関数 */
 static int gclip(unsigned char n, int *sx, int *sy, int *xs, int *ys, int *dx, int *dy);
@@ -39,10 +39,10 @@ int vge_gload(unsigned char n, const unsigned char *bin) {
     bin += 4;
     memcpy(_vram.pal, bin, sizeof(_vram.pal));
 
-    /* パレットを ARGB8888 -> RGB565 に変換 */
+    /* パレットを ARGB8888 -> RGB555 に変換 */
     for (i = 0; i < 256; i++) {
-        unsigned int r = (_vram.pal[i] & 0x00F80000) >> 8;
-        unsigned int g = (_vram.pal[i] & 0x0000FC00) >> 5;
+        unsigned int r = (_vram.pal[i] & 0x00F80000) >> 9;
+        unsigned int g = (_vram.pal[i] & 0x0000F800) >> 6;
         unsigned int b = (_vram.pal[i] & 0x000000F8) >> 3;
         _vram.pal[i] = r | g | b;
     }
@@ -238,44 +238,28 @@ void vge_touch(int *s, int *cx, int *cy, int *dx, int *dy) {
     _touch.dy = 0;
 }
 
-void vge_bplay(const char *mmlPath) {
-    struct VgsMmlErrorInfo err;
-    struct VgsBgmData *data;
-    static unsigned char mmlDataBuffer[1048576];
-    int mmlSize = 0;
-    int readSize;
-    memset(mmlDataBuffer, 0, sizeof(mmlDataBuffer));
-    FILE *fp = fopen(mmlPath, "rb");
-    if (!fp) return;
-    do {
-        readSize = (int)fread(&mmlDataBuffer[mmlSize], 1, 1024, fp);
-        mmlSize += readSize;
-    } while (0 < readSize);
-    mmlSize++;
-    fclose(fp);
-    data = vgsmml_compile_from_memory(mmlDataBuffer, mmlSize, &err);
-    vgsdec_load_bgm_from_memory(_psg, data->data, data->size);
-    vgsmml_free_bgm_data(data);
-    vgsdec_set_value(_psg, VGSDEC_REG_RESET, 1);
-    vgsdec_set_value(_psg, VGSDEC_REG_SYNTHESIS_BUFFER, 1);
-    vgsdec_set_value(_psg, VGSDEC_REG_TIME, 0);
-    fs_bstop = 0;
+static const char* fs_mmlPath;
+static int fs_seekPosition;
+
+void vge_bplay(const char *mmlPath, int loop, int infinity) {
+    fs_mmlPath = mmlPath;
+    vgsplay_start(mmlPath, loop, infinity, 0);
+    _psg = vgsplay_getDecoder();
 }
 
 void vge_bstop(void) {
-    fs_bstop = 1;
+    if (_psg) {
+        fs_seekPosition = vgsdec_get_value(_psg, VGSDEC_REG_TIME);
+        vgsplay_stop();
+        _psg = NULL;
+    }
 }
 
-void vge_bresume(void) {
-    fs_bstop = 0;
+void vge_bresume(int loop, int infinity) {
+    vgsplay_start(fs_mmlPath, loop, infinity, fs_seekPosition);
+    _psg = vgsplay_getDecoder();
 }
 
 void vge_restartCurrentSong(void) {
     vgsdec_set_value(_psg, VGSDEC_REG_TIME, 0);
-}
-
-void vgsbuf(char *buf, size_t size) {
-    memset(buf, 0, size);
-    if (fs_bstop) return;
-    vgsdec_execute(_psg, buf, size);
 }
