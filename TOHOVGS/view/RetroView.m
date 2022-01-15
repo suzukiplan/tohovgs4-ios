@@ -138,6 +138,8 @@ static int _moveCur;
     _displayLink.preferredFramesPerSecond = 60;
     [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     _destroyed = NO;
+    UIApplication* application = [UIApplication sharedApplication];
+    application.idleTimerDisabled = YES;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -175,6 +177,8 @@ static int _moveCur;
         [_userDefaults setInteger:prf->localeId forKey:@"compat_locale_id"];
         tohovgs_cleanUp();
     }
+    UIApplication* application = [UIApplication sharedApplication];
+    application.idleTimerDisabled = NO;
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
