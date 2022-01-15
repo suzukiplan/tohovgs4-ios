@@ -257,8 +257,7 @@ int vge_tick(void) {
         playwait--;
         if (0 == playwait) {
             g_songChanged++;
-            vge_bplay(fs_list[fs_musicCursor].mmlPath, loop, infinity);
-            vgsdec_set_value(_psg, VGSDEC_REG_KOBUSHI, kobushi);
+            vge_bplay(fs_list[fs_musicCursor].mmlPath, loop, infinity, kobushi);
             focus = 1;
             whourai = 120;
             playing = 1;
@@ -941,7 +940,7 @@ int vge_tick(void) {
                 vge_putSP(0, 48, 32, 24, 12, 2 + ii, 112);
                 if (push) {
                     paused = 0;
-                    vge_bresume(loop, infinity);
+                    vge_bresume(loop, infinity, kobushi);
                     playing = 1;
                 }
             } else {

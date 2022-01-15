@@ -74,7 +74,12 @@ static void callback(void* context, AudioQueueRef queue, AudioQueueBufferRef buf
     pthread_mutex_unlock(&c->mutex);
 }
 
-static struct Context* internal_sound_create(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer)
+static struct Context* internal_sound_create(const char* mmlPath,
+                                             int loop,
+                                             int infinity,
+                                             int kobushi,
+                                             int seek,
+                                             int numberOfBuffer)
 {
     struct Context* result = (struct Context*)malloc(sizeof(struct Context));
     if (!result) return NULL;
@@ -102,6 +107,9 @@ static struct Context* internal_sound_create(const char* mmlPath, int loop, int 
     }
     if (seek) {
         vgsdec_set_value(result->vgsdec, VGSDEC_REG_TIME, seek);
+    }
+    if (kobushi) {
+        vgsdec_set_value(result->vgsdec, VGSDEC_REG_KOBUSHI, kobushi);
     }
     for (int i = 0; i < numberOfBuffer; i++) {
         AudioQueueAllocateBuffer(result->queue, BUFFER_SIZE, &result->buffers[i]);
@@ -133,19 +141,26 @@ struct CurrentPlayingData {
     char mmlPath[4096];
     int loop;
     int infinity;
+    int kobushi;
     int seek;
     int numberOfBuffer;
 };
 static struct CurrentPlayingData _currentPlayingData;
 
-void vgsplay_start(const char* mmlPath, int loop, int infinity, int seek, int numberOfBuffer)
+void vgsplay_start(const char* mmlPath,
+                   int loop,
+                   int infinity,
+                   int kobushi,
+                   int seek,
+                   int numberOfBuffer)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
-    fs_context = internal_sound_create(mmlPath, loop, infinity, seek, numberOfBuffer);
+    fs_context = internal_sound_create(mmlPath, loop, infinity, kobushi, seek, numberOfBuffer);
     strcpy(_currentPlayingData.mmlPath, mmlPath);
     _currentPlayingData.loop = loop;
     _currentPlayingData.infinity = infinity;
+    _currentPlayingData.kobushi = kobushi;
     _currentPlayingData.seek = seek;
     _currentPlayingData.numberOfBuffer = numberOfBuffer;
     pthread_mutex_unlock(&fs_mutex);
@@ -206,6 +221,7 @@ void vgsplay_seek(unsigned int time)
         vgsplay_start(_currentPlayingData.mmlPath,
                       _currentPlayingData.loop,
                       _currentPlayingData.infinity,
+                      _currentPlayingData.kobushi,
                       _currentPlayingData.seek,
                       _currentPlayingData.numberOfBuffer);
     }

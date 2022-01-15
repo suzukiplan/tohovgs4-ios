@@ -241,9 +241,9 @@ void vge_touch(int *s, int *cx, int *cy, int *dx, int *dy) {
 static const char* fs_mmlPath;
 static int fs_seekPosition;
 
-void vge_bplay(const char *mmlPath, int loop, int infinity) {
+void vge_bplay(const char *mmlPath, int loop, int infinity, int kobushi) {
     fs_mmlPath = mmlPath;
-    vgsplay_start(mmlPath, loop, infinity, 0, 2);
+    vgsplay_start(mmlPath, loop, infinity, kobushi, 0, 2);
     _psg = vgsplay_getDecoder();
 }
 
@@ -255,8 +255,8 @@ void vge_bstop(void) {
     }
 }
 
-void vge_bresume(int loop, int infinity) {
-    vgsplay_start(fs_mmlPath, loop, infinity, fs_seekPosition, 2);
+void vge_bresume(int loop, int infinity, int kobushi) {
+    vgsplay_start(fs_mmlPath, loop, infinity, kobushi, fs_seekPosition, 2);
     _psg = vgsplay_getDecoder();
 }
 
