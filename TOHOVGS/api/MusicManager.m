@@ -13,7 +13,7 @@ extern void* vgsdec;
 @property (nonatomic, weak) NSUserDefaults* userDefaults;
 @property (nonatomic, readwrite) NSArray<Album*>* albums;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
-@property (nonatomic, weak) Song* playingSong;
+@property (nonatomic, readwrite, weak) Song* playingSong;
 @property (nonatomic) NSTimer* monitoringTimer;
 @end
 

@@ -76,6 +76,10 @@
 {
     if ([_pageView isKindOfClass:[RetroView class]]) {
         [(RetroView*)_pageView enterForeground];
+    } else if ([_pageView isKindOfClass:[AlbumPagerView class]]) {
+        [(AlbumPagerView*)_pageView scrollToCurrentSong];
+    } else if ([_pageView isKindOfClass:[SongListView class]]) {
+        [(SongListView*)_pageView scrollToCurrentSong];
     }
 }
 

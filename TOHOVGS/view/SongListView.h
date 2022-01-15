@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
                infinity:(BOOL)infinity;
 - (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate;
 - (void)reload;
+- (void)scrollToCurrentSong;
 @end
 
 NS_ASSUME_NONNULL_END

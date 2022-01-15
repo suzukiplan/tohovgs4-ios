@@ -257,22 +257,33 @@
 
 - (void)_scrollToSong:(Song*)song
 {
-    NSIndexPath* indexPath;
-    NSInteger songIndex = [_songs indexOfObject:song];
-    if (_splitByAlbum) {
-        NSInteger s = [_splitAlbums indexOfObject:_songs[songIndex].parentAlbum];
-        NSInteger r = [_splitSongs[_songs[songIndex].parentAlbum.albumId] indexOfObject:_songs[songIndex]];
-        indexPath = [NSIndexPath indexPathForRow:r inSection:s];
-    } else {
-        indexPath = [NSIndexPath indexPathForRow:songIndex inSection:0];
-    }
-    [_table scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
-
+    __weak SongListView* weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSIndexPath* indexPath;
+        NSInteger songIndex = [weakSelf.songs indexOfObject:song];
+        if (songIndex == NSNotFound) return;
+        if (weakSelf.splitByAlbum) {
+            NSInteger s = [weakSelf.splitAlbums indexOfObject:weakSelf.songs[songIndex].parentAlbum];
+            NSInteger r = [weakSelf.splitSongs[weakSelf.songs[songIndex].parentAlbum.albumId] indexOfObject:weakSelf.songs[songIndex]];
+            indexPath = [NSIndexPath indexPathForRow:r inSection:s];
+        } else {
+            indexPath = [NSIndexPath indexPathForRow:songIndex inSection:0];
+        }
+        [weakSelf.table scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+    });
 }
 
 - (void)reload
 {
     [_table reloadData];
+}
+
+- (void)scrollToCurrentSong
+{
+    Song* target = _musicManager.playingSong;
+    if (target) {
+        [self _scrollToSong:target];
+    }
 }
 
 @end

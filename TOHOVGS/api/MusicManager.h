@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<MusicManagerDelegate> delegate;
 @property (nonatomic, readonly) NSArray<Album*>* albums;
 @property (nonatomic, readonly) NSArray<Song*>* allUnlockedSongs;
+@property (nonatomic, readonly, weak) Song* playingSong;
 @property (nonatomic) BOOL infinity;
 - (NSString*)mmlPathOfSong:(Song*)song;
 - (void)playSong:(Song*)song;

@@ -183,4 +183,15 @@
     }];
 }
 
+- (void)scrollToCurrentSong
+{
+    Song* target = _musicManager.playingSong;
+    if (target) {
+        NSInteger albumIndex = [_albums indexOfObject:target.parentAlbum];
+        if (albumIndex != NSNotFound) {
+            [_pages[albumIndex] scrollToCurrentSong];
+        }
+    }
+}
+
 @end

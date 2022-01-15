@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)refreshIsThereLockedSongWithAnimate:(BOOL)animate;
 - (void)requireNextSong:(Song*)song
                infinity:(BOOL)infinity;
+- (void)scrollToCurrentSong;
 @end
 
 NS_ASSUME_NONNULL_END
