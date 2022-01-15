@@ -1,6 +1,6 @@
 /**
  * ©2022, SUZUKI PLAN
- * License: https://github.com/suzukiplan/tohovgs4-android/blob/master/LICENSE.txt
+ * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
  */
 static int S[4410] = {
         0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9,

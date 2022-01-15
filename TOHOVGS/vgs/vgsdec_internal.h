@@ -1,6 +1,6 @@
 /**
  * ©2022, SUZUKI PLAN
- * License: https://github.com/suzukiplan/tohovgs4-android/blob/master/LICENSE.txt
+ * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
  */
 #ifndef INCLUDE_VGSDEC_INTERNAL_H
 #define INCLUDE_VGSDEC_INTERNAL_H

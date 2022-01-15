@@ -1,11 +1,7 @@
-//
-//  sound-ios
-//  Sound System for iOS (AudioQueue)
-//
-//  Created by 鈴木　洋司　 on 2018/02/28.
-//  Copyright © 2018年 SUZUKI PLAN. All rights reserved.
-//
-
+/**
+ * ©2022, SUZUKI PLAN
+ * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
+ */
 #ifndef sound_ios_h
 #define sound_ios_h
 #include <stdio.h>

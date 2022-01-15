@@ -1,9 +1,7 @@
-//
-//  AlbumPagerView.m
-//  TOHOVGS
-//
-//  Created by Yoji Suzuki on 2022/01/11.
-//
+/**
+ * ©2022, SUZUKI PLAN
+ * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
+ */
 
 #import "AlbumPagerView.h"
 #import "AlbumTabView.h"

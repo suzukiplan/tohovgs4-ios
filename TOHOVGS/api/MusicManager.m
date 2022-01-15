@@ -1,10 +1,7 @@
-//
-//  MusicManager.m
-//  TOHOVGS
-//
-//  Created by Yoji Suzuki on 2022/01/13.
-//
-
+/**
+ * ©2022, SUZUKI PLAN
+ * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
+ */
 #import <AVFoundation/AVFoundation.h>
 #import "MusicManager.h"
 #import "../ControlDelegate.h"
