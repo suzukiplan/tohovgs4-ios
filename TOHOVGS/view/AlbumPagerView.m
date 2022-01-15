@@ -8,9 +8,11 @@
 #import "AlbumPagerView.h"
 #import "AlbumTabView.h"
 #import "SongListView.h"
+#import "PushableView.h"
 #import "../api/MusicManager.h"
 
-@interface AlbumPagerView() <UIScrollViewDelegate, AlbumTabViewDelegate>
+@interface AlbumPagerView() <UIScrollViewDelegate, AlbumTabViewDelegate, PushableViewDelegate>
+@property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic, weak) NSArray<Album*>* albums;
 @property (nonatomic, weak) NSUserDefaults* userDefaults;
@@ -19,6 +21,9 @@
 @property (nonatomic) NSArray<SongListView*>* pages;
 @property (nonatomic) BOOL forceScrolling;
 @property (nonatomic) NSInteger initialPageIndex;
+@property (nonatomic) PushableView* unlockAllPushable;
+@property (nonatomic) UILabel* unlockAllLabel;
+@property (nonatomic) BOOL isThereLockedSong;
 @end
 
 @implementation AlbumPagerView
@@ -26,7 +31,9 @@
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
     if (self = [super init]) {
+        self.clipsToBounds = YES;
         _userDefaults = [NSUserDefaults standardUserDefaults];
+        _controlDelegate = controlDelegate;
         _musicManager = [controlDelegate getViewController].musicManager;
         _albums = _musicManager.albums;
         _pager = [[UIScrollView alloc] init];
@@ -57,15 +64,56 @@
             [self addSubview:_tabView];
         }
         _pages = pages;
+        _unlockAllPushable = [[PushableView alloc] initWithDelegate:self];
+        _unlockAllPushable.tapBoundAnimation = NO;
+        _unlockAllPushable.touchAlphaAnimation = YES;
+        [self addSubview:_unlockAllPushable];
+        _unlockAllLabel = [[UILabel alloc] init];
+        _unlockAllLabel.text = NSLocalizedString(@"unlock_all_songs", nil);
+        _unlockAllLabel.font = [UIFont boldSystemFontOfSize:12];
+        _unlockAllLabel.textColor = [UIColor whiteColor];
+        _unlockAllLabel.textAlignment = NSTextAlignmentCenter;
+        _unlockAllLabel.backgroundColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.5 alpha:0.5];
+        _unlockAllLabel.layer.borderColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.5 alpha:0.25].CGColor;
+        _unlockAllLabel.layer.borderWidth = 2;
+        _unlockAllLabel.layer.cornerRadius = 4.0;
+        _unlockAllLabel.clipsToBounds = YES;
+        [_unlockAllPushable addSubview:_unlockAllLabel];
+        [self refreshIsThereLockedSongWithAnimate:NO];
     }
     return self;
+}
+
+- (void)refreshIsThereLockedSongWithAnimate:(BOOL)animate
+{
+    BOOL previousStatus = _isThereLockedSong;
+    _isThereLockedSong = NO;
+    for (Album* album in _albums) {
+        for (Song* song in album.songs) {
+            if ([_musicManager isLockedSong:song]) {
+                _isThereLockedSong = YES;
+                break;
+            }
+        }
+    }
+    if (animate && previousStatus != _isThereLockedSong) {
+        __weak AlbumPagerView* weakSelf = self;
+        [UIView animateWithDuration:0.2 animations:^{
+            [weakSelf setFrame:weakSelf.frame];
+        }];
+    }
 }
 
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    _tabView.frame = CGRectMake(0, 0, frame.size.width, _tabView.height);
-    _pager.frame = CGRectMake(0, _tabView.height, frame.size.width, frame.size.height - _tabView.height);
+    CGFloat y = _isThereLockedSong ? 0 : -44;
+    _unlockAllPushable.frame = CGRectMake(0, y, frame.size.width, 44);
+    _unlockAllLabel.frame = CGRectMake(4, 4, frame.size.width - 8, 36);
+    y += 44;
+    _tabView.frame = CGRectMake(0, y, frame.size.width, _tabView.height);
+    y += _tabView.height;
+    _pager.frame = CGRectMake(0, y, frame.size.width, frame.size.height - y);
     CGFloat x = 0;
     for (SongListView* page in _pages) {
         page.frame = CGRectMake(x, 0, _pager.frame.size.width, _pager.frame.size.height);
@@ -73,6 +121,7 @@
     }
     _pager.contentSize = CGSizeMake(x, _pager.frame.size.height);
     if (0 < _initialPageIndex) {
+        NSLog(@"initial page index: %ld %f", _initialPageIndex, _pages[_initialPageIndex].frame.origin.x);
         [_pager scrollRectToVisible:_pages[_initialPageIndex].frame animated:NO];
         _initialPageIndex = -1;
     }
@@ -117,6 +166,17 @@
 {
     NSInteger index = [_albums indexOfObject:song.parentAlbum];
     [_pages[index] requireNextSong:song infinity:infinity];
+}
+
+- (void)didPushPushableView:(PushableView*)pushableView
+{
+    __weak AlbumPagerView* weakSelf = self;
+    [_controlDelegate askUnlockAllWithCallback:^{
+        [weakSelf refreshIsThereLockedSongWithAnimate:YES];
+        for (SongListView* page in weakSelf.pages) {
+            [page reload];
+        }
+    }];
 }
 
 @end

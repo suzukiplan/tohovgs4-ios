@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopProgress:(void(^)(void))done;
 - (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked;
 - (void)askUnlockWithAlbum:(Album*)album unlocked:(void(^)(void))unlocked;
+- (void)askUnlockAllWithCallback:(void(^)(void))unlocked;
 @end
 
 NS_ASSUME_NONNULL_END

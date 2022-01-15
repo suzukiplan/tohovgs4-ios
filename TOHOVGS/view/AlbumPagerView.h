@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AlbumPagerView : UIView
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate;
+- (void)refreshIsThereLockedSongWithAnimate:(BOOL)animate;
 - (void)requireNextSong:(Song*)song
                infinity:(BOOL)infinity;
 @end

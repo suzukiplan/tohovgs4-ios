@@ -255,4 +255,9 @@
 
 }
 
+- (void)reload
+{
+    [_table reloadData];
+}
+
 @end
