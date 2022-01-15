@@ -105,6 +105,11 @@
         _initialPosition = -1;
         CGFloat x = _pushables[initialPosition].frame.origin.x;
         x -= (frame.size.width - _pushables[initialPosition].frame.size.width) / 2;
+        if (self.contentSize.width < x + frame.size.width) {
+            x = self.contentSize.width - frame.size.width;
+        } else if (x < 0) {
+            x = 0;
+        }
         self.contentOffset = CGPointMake(x, 0);
         _labels[_position].font = _notSelectedFont;
         _labels[initialPosition].font = _selectedFont;
