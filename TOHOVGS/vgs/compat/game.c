@@ -972,6 +972,7 @@ int vge_tick(void) {
         vge_putSP(0, 168, 80, 24, 12, 28 + ii, 112);
         if (push) {
             infinity = 1 - infinity;
+            vgsplay_changeInfinity(infinity);
         }
     } else {
         vge_putSP(0, 144 + (1 - infinity) * 48, 80, 24, 12, 28 + ii, 112);
