@@ -15,12 +15,16 @@
 #import "view/ProgressView.h"
 #import "vgs/vgsplay-ios.h"
 #import "ControlDelegate.h"
+#include "AdSettings.h"
+@import GoogleMobileAds;
+@import AdSupport;
+@import AppTrackingTransparency;
 
 #define AD_HEIGHT 56
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIView* pageView;
@@ -29,6 +33,10 @@
 @property (nonatomic) NSInteger currentPageIndex;
 @property (nonatomic) BOOL pageMoving;
 @property (nonatomic, nullable) ProgressView* progressView;
+@property (nonatomic, strong) GADBannerView* bannerView;
+@property (nonatomic, strong) GADRewardedAd* rewardedAd;
+@property (nonatomic) BOOL bannerLoaded;
+@property (nonatomic) NSString* idfa;
 @end
 
 @implementation ViewController
@@ -49,6 +57,10 @@
     [self.view addSubview:_seekBar];
     _footer = [[FooterView alloc] initWithDelegate:self];
     [self.view addSubview:_footer];
+    _bannerView = [[GADBannerView alloc] initWithAdSize:GADAdSizeBanner];
+    _bannerView.adUnitID = ADS_ID_BANNER;
+    _bannerView.rootViewController = self;
+    [self.view addSubview:_bannerView];
     _currentPageIndex = 0;
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center addObserver:self
@@ -59,6 +71,7 @@
                selector:@selector(viewDidEnterBackground)
                    name:UIApplicationDidEnterBackgroundNotification
                  object:nil];
+    _bannerLoaded = NO;
 }
 
 - (void)viewWillEnterForeground
@@ -79,6 +92,33 @@
 {
     [super viewDidAppear:animated];
     [self _resizeAll:YES];
+
+    __weak ViewController* weakSelf = self;
+    switch ([ATTrackingManager trackingAuthorizationStatus]) {
+        case ATTrackingManagerAuthorizationStatusRestricted:
+            NSLog(@"IDFA Restricted");
+            break;
+        case ATTrackingManagerAuthorizationStatusDenied:
+            NSLog(@"IDFA Denied");
+            break;
+        case ATTrackingManagerAuthorizationStatusAuthorized: {
+            NSUUID* idfa = [ASIdentifierManager sharedManager].advertisingIdentifier;
+            NSLog(@"IDFA Authorized: %@", idfa);
+            _idfa = idfa.UUIDString;
+            break;
+        }
+        case ATTrackingManagerAuthorizationStatusNotDetermined:
+            NSLog(@"IDFA Determined");
+            [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+                if (ATTrackingManagerAuthorizationStatusAuthorized == status) {
+                    NSUUID* idfa = [ASIdentifierManager sharedManager].advertisingIdentifier;
+                    NSLog(@"IDFA Authorized: %@", idfa);
+                    weakSelf.idfa = idfa.UUIDString;
+                } else {
+                    NSLog(@"IDFA not authorized");
+                }
+            }];
+    }
 }
 
 - (void)_resizeAll:(BOOL)all
@@ -88,6 +128,11 @@
     const CGFloat sy = self.additionalSafeAreaInsets.top + bh;
     const CGFloat sw = self.view.frame.size.width - self.additionalSafeAreaInsets.left - self.additionalSafeAreaInsets.right;
     const CGFloat sh = self.view.frame.size.height - self.additionalSafeAreaInsets.top - self.additionalSafeAreaInsets.bottom - bh;
+    _bannerView.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
+    if (!_bannerLoaded) {
+        _bannerLoaded = YES;
+        [_bannerView loadRequest:[GADRequest request]];
+    }
     if (_currentPageIndex == 3) {
         CGFloat pageHeight = sh - AD_HEIGHT - FOOTER_HEIGHT;
         _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
@@ -291,15 +336,17 @@
     UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
                                                  style:UIAlertActionStyleDefault
                                                handler:^(UIAlertAction * _Nonnull action) {
-        for (Song* song in album.songs) {
-            if ([weakSelf.musicManager isLockedSong:song]) {
-                [weakSelf.musicManager lock:NO song:song];
+        [self requestReward:^{
+            for (Song* song in album.songs) {
+                if ([weakSelf.musicManager isLockedSong:song]) {
+                    [weakSelf.musicManager lock:NO song:song];
+                }
             }
-        }
-        if ([weakSelf.pageView isKindOfClass:[AlbumPagerView class]]) {
-            [(AlbumPagerView*)weakSelf.pageView refreshIsThereLockedSongWithAnimate:YES];
-        }
-        unlocked();
+            if ([weakSelf.pageView isKindOfClass:[AlbumPagerView class]]) {
+                [(AlbumPagerView*)weakSelf.pageView refreshIsThereLockedSongWithAnimate:YES];
+            }
+            unlocked();
+        }];
     }];
     [controller addAction:cancel];
     [controller addAction:ok];
@@ -321,19 +368,76 @@
     UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
                                                  style:UIAlertActionStyleDefault
                                                handler:^(UIAlertAction * _Nonnull action) {
-        for (Album* album in weakSelf.musicManager.albums) {
-            for (Song* song in album.songs) {
-                if ([weakSelf.musicManager isLockedSong:song]) {
-                    [weakSelf.musicManager lock:NO song:song];
+        [self requestReward:^{
+            for (Album* album in weakSelf.musicManager.albums) {
+                for (Song* song in album.songs) {
+                    if ([weakSelf.musicManager isLockedSong:song]) {
+                        [weakSelf.musicManager lock:NO song:song];
+                    }
                 }
             }
-        }
-        unlocked();
+            unlocked();
+        }];
     }];
     [controller addAction:cancel];
     [controller addAction:ok];
     [self presentViewController:controller animated:YES completion:nil];
+}
 
+- (void)showErrorMessage:(NSString*)message
+{
+    NSString* title = NSLocalizedString(@"error", nil);
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:nil];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+- (void)requestReward:(void(^)(void))earnReward
+{
+    __weak ViewController* weakSelf = self;
+    if (!_idfa) {
+        [self showErrorMessage:NSLocalizedString(@"error_idfa", nil)];
+        return;
+    }
+    [self startProgressWithMessage:NSLocalizedString(@"please_wait", nil)];
+    GADRequest *request = [GADRequest request];
+    [GADRewardedAd loadWithAdUnitID:ADS_ID_REWARD
+                            request:request
+                  completionHandler:^(GADRewardedAd* ad, NSError* error) {
+        if (error) {
+            NSLog(@"Rewarded ad failed to load with error: %@", [error localizedDescription]);
+            return;
+        }
+        weakSelf.rewardedAd = ad;
+        weakSelf.rewardedAd.fullScreenContentDelegate = self;
+        [weakSelf.rewardedAd presentFromRootViewController:weakSelf userDidEarnRewardHandler:^{
+            earnReward();
+        }];
+    }];
+}
+
+- (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(nonnull NSError*)error
+{
+    NSLog(@"Ad did fail to present full screen content.");
+    // TODO: show error message
+    [self stopProgress:^{}];
+}
+
+- (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
+{
+    NSLog(@"Ad did present full screen content.");
+    [self stopProgress:^{}];
+}
+
+- (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
+{
+    NSLog(@"Ad did dismiss full screen content.");
+    [self stopProgress:^{}];
 }
 
 @end

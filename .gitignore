@@ -68,6 +68,6 @@ fastlane/test_output
 iOSInjectionProject/
 
 TOHOVGS/GoogleService-Info.plist
+TOHOVGS/AdSettings.h
 Pods
 TOHOVGS.xcworkspace
-

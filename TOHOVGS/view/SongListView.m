@@ -8,6 +8,8 @@
 #import "SongListView.h"
 #import "SongCell.h"
 #import "../api/MusicManager.h"
+#import "../AdSettings.h"
+@import GoogleMobileAds;
 
 @interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
@@ -75,6 +77,17 @@
 - (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
     if (_songs.count < 1) return;
+    GADRequest *request = [GADRequest request];
+    [GADInterstitialAd loadWithAdUnitID:ADS_ID_INTERSTITIAL
+                                request:request
+                      completionHandler:^(GADInterstitialAd *ad, NSError *error) {
+        if (error) {
+            NSLog(@"Failed to load interstitial ad with error: %@", [error localizedDescription]);
+        } else {
+            NSLog(@"Succeed to load interstitial ad");
+            [ad presentFromRootViewController:[controlDelegate getViewController]];
+        }
+    }];
     [controlDelegate startProgressWithMessage:NSLocalizedString(@"generating_shuffle_play_list", nil)];
     __weak SongListView* weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

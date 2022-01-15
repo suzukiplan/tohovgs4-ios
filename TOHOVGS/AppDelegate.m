@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "vgs/vgsplay-ios.h"
 @import Firebase;
+@import GoogleMobileAds;
 
 @interface AppDelegate ()
 @end
@@ -17,6 +18,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [FIRApp configure];
+    [[GADMobileAds sharedInstance] startWithCompletionHandler:nil];
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
                                             mode:AVAudioSessionModeMoviePlayback

@@ -25,3 +25,5 @@
 "retro_ui" = "RETRO";
 "launch_emulator_error" = "Cannot launch the VGS emulator.\nALL SONGS ARE LOCKED.";
 "confirm" = "Confirmation";
+"error" = "Error";
+"error_idfa" = "You are not allowed to get an IDFA, so you cannot play ads.";

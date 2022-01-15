@@ -25,3 +25,5 @@
 "retro_ui" = "RETRO";
 "launch_emulator_error" = "Cannot launch the VGS emulator.\nALL SONGS ARE LOCKED.";
 "confirm" = "確認";
+"error" = "エラー";
+"error_idfa" = "IDFAの取得が許可されていないため、広告を再生することができません。";
