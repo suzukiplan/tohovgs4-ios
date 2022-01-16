@@ -131,8 +131,8 @@
 
 - (void)_resizeAll:(BOOL)all
 {
-    const CGFloat bh = self.view.window.windowScene.statusBarManager.statusBarFrame.size.height;
     UIEdgeInsets safe = [UIApplication sharedApplication].windows.firstObject.safeAreaInsets;
+    const CGFloat bh = safe.top ? 0 : self.view.window.windowScene.statusBarManager.statusBarFrame.size.height;
     const CGFloat sx = safe.left;
     const CGFloat sy = safe.top + bh;
     const CGFloat sw = self.view.frame.size.width - safe.left - safe.right;
