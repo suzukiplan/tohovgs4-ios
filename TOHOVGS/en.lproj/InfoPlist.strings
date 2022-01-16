@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  TOHOVGS
+
+  Created by Yoji Suzuki on 2022/01/16.
+  
+*/
+CFBundleDisplayName = "Touhou VGS";
+NSUserTrackingUsageDescription = "Used to select the appropriate ads to display.";
