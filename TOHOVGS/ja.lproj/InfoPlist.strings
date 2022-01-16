@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  TOHOVGS
+
+  Created by Yoji Suzuki on 2022/01/16.
+  
+*/
+CFBundleDisplayName = "東方VGS";
+NSUserTrackingUsageDescription = "表示する広告を適切に選択するために使用します。";

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7401A3102794267E00ECA917 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7401A3122794267E00ECA917 /* InfoPlist.strings */; };
 		74145BB52792B4C800E7F726 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74145BB42792B4C700E7F726 /* GoogleService-Info.plist */; };
 		7443D756278D161F002EF802 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D755278D161F002EF802 /* AppDelegate.m */; };
 		7443D759278D161F002EF802 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D758278D161F002EF802 /* SceneDelegate.m */; };
@@ -46,6 +47,10 @@
 /* Begin PBXFileReference section */
 		1727FD9EE99682870A0AEE2E /* Pods-TOHOVGS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOHOVGS.debug.xcconfig"; path = "Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS.debug.xcconfig"; sourceTree = "<group>"; };
 		1FF733F7CDA1A0A8CD323390 /* Pods-TOHOVGS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOHOVGS.release.xcconfig"; path = "Target Support Files/Pods-TOHOVGS/Pods-TOHOVGS.release.xcconfig"; sourceTree = "<group>"; };
+		7401A3112794267E00ECA917 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7401A3132794268600ECA917 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7401A31A27942B0200ECA917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7401A31B27942B0200ECA917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		74145BB42792B4C700E7F726 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7425DB332792BD330070B660 /* AdSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdSettings.h; sourceTree = "<group>"; };
 		7443D751278D161F002EF802 /* TOHOVGS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOHOVGS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,8 +81,6 @@
 		7443D785278D6002002EF802 /* RetroView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RetroView.m; sourceTree = "<group>"; };
 		7443D78C278D6C50002EF802 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7443D78E278D6D2A002EF802 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		7443D791278D6D8A002EF802 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		7443D792278D6D8A002EF802 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7443D793278D828A002EF802 /* SeekBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SeekBarView.h; sourceTree = "<group>"; };
 		7443D794278D828A002EF802 /* SeekBarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SeekBarView.m; sourceTree = "<group>"; };
 		7443D799278ED62B002EF802 /* PushableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PushableView.h; sourceTree = "<group>"; };
@@ -173,9 +176,10 @@
 				7443D75D278D161F002EF802 /* Main.storyboard */,
 				7443D760278D1620002EF802 /* Assets.xcassets */,
 				7443D762278D1620002EF802 /* LaunchScreen.storyboard */,
-				7443D765278D1620002EF802 /* Info.plist */,
 				74145BB42792B4C700E7F726 /* GoogleService-Info.plist */,
 				7443D766278D1620002EF802 /* main.m */,
+				7443D765278D1620002EF802 /* Info.plist */,
+				7401A3122794267E00ECA917 /* InfoPlist.strings */,
 			);
 			path = TOHOVGS;
 			sourceTree = "<group>";
@@ -331,6 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7443D7AB278FB6A3002EF802 /* assets in Resources */,
+				7401A3102794267E00ECA917 /* InfoPlist.strings in Resources */,
 				7443D764278D1620002EF802 /* LaunchScreen.storyboard in Resources */,
 				7443D78B278D6C50002EF802 /* Localizable.strings in Resources */,
 				7443D761278D1620002EF802 /* Assets.xcassets in Resources */,
@@ -420,10 +425,19 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		7401A3122794267E00ECA917 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7401A3112794267E00ECA917 /* ja */,
+				7401A3132794268600ECA917 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		7443D75D278D161F002EF802 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				7443D791278D6D8A002EF802 /* Base */,
+				7401A31A27942B0200ECA917 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -431,7 +445,7 @@
 		7443D762278D1620002EF802 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				7443D792278D6D8A002EF802 /* Base */,
+				7401A31B27942B0200ECA917 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
