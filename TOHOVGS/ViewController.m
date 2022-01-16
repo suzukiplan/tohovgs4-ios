@@ -411,10 +411,6 @@
 - (void)requestReward:(void(^)(void))earnReward
 {
     __weak ViewController* weakSelf = self;
-    if (!_idfa) {
-        [self showErrorMessage:NSLocalizedString(@"error_idfa", nil)];
-        return;
-    }
     [self startProgressWithMessage:NSLocalizedString(@"please_wait", nil)];
     GADRequest *request = [GADRequest request];
     [GADRewardedAd loadWithAdUnitID:ADS_ID_REWARD
