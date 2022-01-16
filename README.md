@@ -1,4 +1,4 @@
-# 東方BGM on VGS version 4.x for iOS 
+# 東方BGM on VGS
 
 ## About
 
