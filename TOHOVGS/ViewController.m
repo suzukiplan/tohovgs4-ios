@@ -294,15 +294,17 @@
 {
     if (_progressView) {
         __weak ViewController* weakSelf = self;
-        [UIView animateWithDuration:0.2 animations:^{
-            weakSelf.progressView.alpha = 0;
-        } completion:^(BOOL finished) {
-            if (finished) {
-                [weakSelf.progressView removeFromSuperview];
-                weakSelf.progressView = nil;
-                done();
-            }
-        }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.2 animations:^{
+                weakSelf.progressView.alpha = 0;
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    [weakSelf.progressView removeFromSuperview];
+                    weakSelf.progressView = nil;
+                    done();
+                }
+            }];
+        });
     }
 }
 
@@ -420,6 +422,10 @@
                   completionHandler:^(GADRewardedAd* ad, NSError* error) {
         if (error) {
             NSLog(@"Rewarded ad failed to load with error: %@", [error localizedDescription]);
+            [weakSelf stopProgress:^{
+                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+                [weakSelf showErrorMessage:message];
+            }];
             return;
         }
         weakSelf.rewardedAd = ad;
@@ -433,8 +439,11 @@
 - (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(nonnull NSError*)error
 {
     NSLog(@"Ad did fail to present full screen content.");
-    [self stopProgress:^{}];
-    [self showErrorMessage:NSLocalizedString(@"error_ads", nil)];
+    __weak ViewController* weakSelf = self;
+    [self stopProgress:^{
+        NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+        [weakSelf showErrorMessage:message];
+    }];
 }
 
 - (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
