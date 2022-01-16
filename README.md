@@ -17,3 +17,8 @@
 - 本リポジトリで公開しているソースコードのライセンスは [GPLv3](LICENSE.txt) です
 - 楽曲の MML のライセンスは [tohovgs-cli](https://github.com/suzukiplan/tohovgs-cli) のライセンスに基づきます
 
+## EULA
+
+- [Privacy Policy](privacy.html)
+- [Terms and Conditions](terms.html)
+
