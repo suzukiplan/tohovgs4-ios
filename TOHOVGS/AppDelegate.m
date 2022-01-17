@@ -4,6 +4,7 @@
  */
 
 #import <AVFoundation/AVFoundation.h>
+#import "AdSettings.h"
 #import "AppDelegate.h"
 #import "vgs/vgsplay-ios.h"
 @import Firebase;
@@ -16,7 +17,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [FIRApp configure];
-    [[GADMobileAds sharedInstance] startWithCompletionHandler:nil];
+    [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus * _Nonnull status) {
+        GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ ADS_TEST_DEVICE_IDENTIFIERS ];
+    }];
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
                                             mode:AVAudioSessionModeMoviePlayback
