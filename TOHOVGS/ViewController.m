@@ -22,7 +22,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
@@ -33,6 +33,7 @@
 @property (nonatomic) NSInteger currentPageIndex;
 @property (nonatomic) BOOL pageMoving;
 @property (nonatomic, nullable) ProgressView* progressView;
+@property (nonatomic) UIView* bannerBgView;
 @property (nonatomic, strong) GADBannerView* bannerView;
 @property (nonatomic, strong) GADRewardedAd* rewardedAd;
 @property (nonatomic) BOOL bannerLoaded;
@@ -65,9 +66,14 @@
     [self.view addSubview:_seekBar];
     _footer = [[FooterView alloc] initWithDelegate:self];
     [self.view addSubview:_footer];
+    _bannerBgView = [[UIView alloc] init];
+    _bannerBgView.backgroundColor = [UIColor blackColor];
+    _bannerBgView.hidden = YES;
+    [_adContainer addSubview:_bannerBgView];
     _bannerView = [[GADBannerView alloc] initWithAdSize:GADAdSizeBanner];
     _bannerView.adUnitID = ADS_ID_BANNER;
     _bannerView.rootViewController = self;
+    _bannerView.delegate = self;
     [_adContainer addSubview:_bannerView];
     _currentPageIndex = 0;
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
@@ -149,6 +155,7 @@
     const CGFloat sh = self.view.frame.size.height - safe.top - safe.bottom - bh;
     _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
     _bannerView.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
+    _bannerBgView.frame = _bannerView.frame;
     _tohovgsImage.frame = _bannerView.frame;
     _tohovgsLabel.frame = _bannerView.frame;
     if (!_bannerLoaded) {
@@ -221,10 +228,12 @@
     BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
     BOOL nextPageIsRetro = [nextPage isKindOfClass:[RetroView class]];
     _bannerView.alpha = currentPageIsRetro ? 0 : 1;
+    _bannerBgView.alpha = _bannerView.alpha;
     [UIView animateWithDuration:0.2 animations:^{
         weakSelf.pageView.frame = CGRectMake(moveToRight ? -w : w, y, w, weakSelf.pageView.frame.size.height);
         nextPage.frame = CGRectMake(0, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
         weakSelf.bannerView.alpha = nextPageIsRetro ? 0 : 1;
+        weakSelf.bannerBgView.alpha = weakSelf.bannerView.alpha;
         weakSelf.currentPageIndex = nextPageIndex;
         [weakSelf _resizeAll:NO];
     } completion:^(BOOL finished) {
@@ -258,6 +267,11 @@
 - (ViewController*)getViewController
 {
     return self;
+}
+
+- (void)bannerViewDidReceiveAd:(GADBannerView*)bannerView
+{
+    _bannerBgView.hidden = NO;
 }
 
 - (void)musicManager:(MusicManager*)manager didStartPlayingSong:(Song*)song
