@@ -17,9 +17,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [FIRApp configure];
-    [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus * _Nonnull status) {
-        GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ ADS_TEST_DEVICE_IDENTIFIERS ];
-    }];
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ ADS_TEST_DEVICE_IDENTIFIERS ];
+    [[GADMobileAds sharedInstance] startWithCompletionHandler:nil];
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
                                             mode:AVAudioSessionModeMoviePlayback
