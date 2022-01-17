@@ -114,7 +114,11 @@ static struct Context* internal_sound_create(const char* mmlPath,
     for (int i = 0; i < numberOfBuffer; i++) {
         AudioQueueAllocateBuffer(result->queue, BUFFER_SIZE, &result->buffers[i]);
         result->buffers[i]->mAudioDataByteSize = BUFFER_SIZE;
-        executeDecode(result, result->rawBuffers[0]); // pre-enqueue
+        if (numberOfBuffer < MAX_BUFFER_NUM || 1 < i) {
+            executeDecode(result, result->rawBuffers[0]); // pre-enqueue
+        } else {
+            memset(result->rawBuffers[0], 0, BUFFER_SIZE);
+        }
         memcpy(result->buffers[i]->mAudioData, result->rawBuffers[0], BUFFER_SIZE);
         AudioQueueEnqueueBuffer(result->queue, result->buffers[i], 0, NULL);
     }
