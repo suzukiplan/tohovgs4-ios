@@ -25,7 +25,6 @@
 @interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
-@property (nonatomic) UIView* tohovgs;
 @property (nonatomic) UIImageView* tohovgsImage;
 @property (nonatomic) UILabel* tohovgsLabel;
 @property (nonatomic) UIView* pageView;
@@ -48,19 +47,17 @@
     _musicManager = [[MusicManager alloc] init];
     _musicManager.delegate = self;
     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
-    _tohovgs = [[UIView alloc] init];
-    [self.view addSubview:_tohovgs];
+    _adContainer = [[UIView alloc] init];
+    _adContainer.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
+    [self.view addSubview:_adContainer];
     _tohovgsImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tohovgs"]];
-    [_tohovgs addSubview:_tohovgsImage];
+    [_adContainer addSubview:_tohovgsImage];
     _tohovgsLabel = [[UILabel alloc] init];
     _tohovgsLabel.text = @"東方BGM on VGS";
     _tohovgsLabel.textColor = [UIColor colorWithWhite:1 alpha:0.3];
     _tohovgsLabel.font = [UIFont fontWithName:@"AmericanTypewriter-Bold" size:24];
     _tohovgsLabel.textAlignment = NSTextAlignmentCenter;
-    [_tohovgs addSubview:_tohovgsLabel];
-    _adContainer = [[UIView alloc] init];
-    _adContainer.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
-    [self.view addSubview:_adContainer];
+    [_adContainer addSubview:_tohovgsLabel];
     _pageView = [[AlbumPagerView alloc] initWithControlDelegate:self];
     [self.view addSubview:_pageView];
     _seekBar = [[SeekBarView alloc] init];
@@ -152,9 +149,8 @@
     const CGFloat sh = self.view.frame.size.height - safe.top - safe.bottom - bh;
     _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
     _bannerView.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
-    _tohovgs.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
-    _tohovgsImage.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
-    _tohovgsLabel.frame = _tohovgsImage.frame;
+    _tohovgsImage.frame = _bannerView.frame;
+    _tohovgsLabel.frame = _bannerView.frame;
     if (!_bannerLoaded) {
         _bannerLoaded = YES;
         [_bannerView loadRequest:[GADRequest request]];
@@ -224,11 +220,11 @@
     _bannerView.hidden = NO;
     BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
     BOOL nextPageIsRetro = [nextPage isKindOfClass:[RetroView class]];
-    _adContainer.alpha = currentPageIsRetro ? 0 : 1;
+    _bannerView.alpha = currentPageIsRetro ? 0 : 1;
     [UIView animateWithDuration:0.2 animations:^{
         weakSelf.pageView.frame = CGRectMake(moveToRight ? -w : w, y, w, weakSelf.pageView.frame.size.height);
         nextPage.frame = CGRectMake(0, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
-        weakSelf.adContainer.alpha = nextPageIsRetro ? 0 : 1;
+        weakSelf.bannerView.alpha = nextPageIsRetro ? 0 : 1;
         weakSelf.currentPageIndex = nextPageIndex;
         [weakSelf _resizeAll:NO];
     } completion:^(BOOL finished) {
