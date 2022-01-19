@@ -27,3 +27,11 @@
 "confirm" = "確認";
 "error" = "エラー";
 "error_idfa" = "IDFAの取得が許可されていないため、広告を再生することができません。";
+"contents" = "コンテンツ";
+"download_latest_songs" = "サーバーから最新楽曲をダウンロード";
+"sound" = "サウンド";
+"master_volume" = "マスターボリューム: %ld%%";
+"support" = "サポート";
+"support_store" = "AppStoreで最新バージョンを確認";
+"support_twitter" = "Twitter: @suzukiplan";
+"support_github" = "GitHub: suzukiplan/tohovgs4-ios";

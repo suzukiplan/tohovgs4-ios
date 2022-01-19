@@ -11,6 +11,7 @@
 #import "view/SongListView.h"
 #import "view/RetroView.h"
 #import "view/ProgressView.h"
+#import "view/SettingView.h"
 #import "vgs/vgsplay-ios.h"
 #import "ControlDelegate.h"
 #include "AdSettings.h"
@@ -162,7 +163,7 @@
         _bannerLoaded = YES;
         [_bannerView loadRequest:[GADRequest request]];
     }
-    if (_currentPageIndex == 3) {
+    if (3 <= _currentPageIndex) {
         CGFloat pageHeight = sh - AD_HEIGHT - FOOTER_HEIGHT;
         _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
         if (all) _pageView.frame = CGRectMake(sx, sy + AD_HEIGHT, sw, pageHeight);
@@ -213,6 +214,10 @@
             nextPage = [[RetroView alloc] initWithControlDelegate:self];
             nextPageIndex = 3;
             break;
+        case FooterButtonTypeSettings:
+            nextPage = [[SettingView alloc] initWithControlDelegate:self];
+            nextPageIndex = 4;
+            break;
     }
     [self.view addSubview:nextPage];
     if (_progressView) {
@@ -220,9 +225,9 @@
     }
     const CGFloat y = _pageView.frame.origin.y;
     const CGFloat w = _pageView.frame.size.width;
-    const CGFloat h = _pageView.frame.size.height - (3 == _currentPageIndex ? SEEKBAR_HEIGHT : 0);
+    const CGFloat h = _pageView.frame.size.height - (3 <= _currentPageIndex ? SEEKBAR_HEIGHT : 0);
     const BOOL moveToRight = _currentPageIndex < nextPageIndex;
-    nextPage.frame = CGRectMake(moveToRight ? w : -w, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
+    nextPage.frame = CGRectMake(moveToRight ? w : -w, y, w, h + (3 <= nextPageIndex ? SEEKBAR_HEIGHT : 0));
     __weak ViewController* weakSelf = self;
     _bannerView.hidden = NO;
     BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
@@ -231,7 +236,7 @@
     _bannerBgView.alpha = _bannerView.alpha;
     [UIView animateWithDuration:0.2 animations:^{
         weakSelf.pageView.frame = CGRectMake(moveToRight ? -w : w, y, w, weakSelf.pageView.frame.size.height);
-        nextPage.frame = CGRectMake(0, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
+        nextPage.frame = CGRectMake(0, y, w, h + (3 <= nextPageIndex ? SEEKBAR_HEIGHT : 0));
         weakSelf.bannerView.alpha = nextPageIsRetro ? 0 : 1;
         weakSelf.bannerBgView.alpha = weakSelf.bannerView.alpha;
         weakSelf.currentPageIndex = nextPageIndex;

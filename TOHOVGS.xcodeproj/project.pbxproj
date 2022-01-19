@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7401A3102794267E00ECA917 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7401A3122794267E00ECA917 /* InfoPlist.strings */; };
+		7401A31E2797D1E700ECA917 /* SettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7401A31D2797D1E600ECA917 /* SettingView.m */; };
 		74145BB52792B4C800E7F726 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74145BB42792B4C700E7F726 /* GoogleService-Info.plist */; };
 		7443D756278D161F002EF802 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D755278D161F002EF802 /* AppDelegate.m */; };
 		7443D759278D161F002EF802 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D758278D161F002EF802 /* SceneDelegate.m */; };
@@ -51,6 +52,8 @@
 		7401A3132794268600ECA917 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7401A31A27942B0200ECA917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7401A31B27942B0200ECA917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7401A31C2797D1E600ECA917 /* SettingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingView.h; sourceTree = "<group>"; };
+		7401A31D2797D1E600ECA917 /* SettingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingView.m; sourceTree = "<group>"; };
 		74145BB42792B4C700E7F726 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7425DB332792BD330070B660 /* AdSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdSettings.h; sourceTree = "<group>"; };
 		7443D751278D161F002EF802 /* TOHOVGS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOHOVGS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -213,6 +216,8 @@
 				7443D7A1278F97C2002EF802 /* SliderView.m */,
 				7443D7D32791A91D002EF802 /* ProgressView.h */,
 				7443D7D42791A91D002EF802 /* ProgressView.m */,
+				7401A31C2797D1E600ECA917 /* SettingView.h */,
+				7401A31D2797D1E600ECA917 /* SettingView.m */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -416,6 +421,7 @@
 				7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */,
 				7443D777278D1855002EF802 /* Album.m in Sources */,
 				7443D759278D161F002EF802 /* SceneDelegate.m in Sources */,
+				7401A31E2797D1E700ECA917 /* SettingView.m in Sources */,
 				7443D7DA27926C6D002EF802 /* vgeapi.c in Sources */,
 				7443D7CD279069A7002EF802 /* vgsplay-ios.cpp in Sources */,
 				7443D7D52791A91D002EF802 /* ProgressView.m in Sources */,

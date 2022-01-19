@@ -27,7 +27,8 @@
         _buttons = @[[self _makeButton:FooterButtonTypeHome],
                      [self _makeButton:FooterButtonTypeAll],
                      [self _makeButton:FooterButtonTypeShuffle],
-                     [self _makeButton:FooterButtonTypeRetro]];
+                     [self _makeButton:FooterButtonTypeRetro],
+                     [self _makeButton:FooterButtonTypeSettings]];
         for (UIView* view in _buttons) {
             [self addSubview:view];
         }
@@ -37,7 +38,11 @@
 
 - (FooterButton*)_makeButton:(FooterButtonType)type
 {
-    return [[FooterButton alloc] initWithType:type delegate:self];
+    if (type == FooterButtonTypeSettings) {
+        return [[FooterButton alloc] initWithType:type budge:YES delegate:self];
+    } else {
+        return [[FooterButton alloc] initWithType:type delegate:self];
+    }
 }
 
 - (void)setFrame:(CGRect)frame

@@ -34,6 +34,8 @@ extern void* vgsdec;
                                                              options:NSJSONReadingAllowFragments
                                                                error:&error];
         _albums = [Album parseJsonArray:json[@"albums"]];
+        _masterVolume = 100 - [_userDefaults integerForKey:@"master_volume"];
+        vgsplay_changeMasterVolume((int)_masterVolume);
         [self _refreshAllUnlockedSongs];
     }
     return self;
@@ -150,6 +152,13 @@ extern void* vgsdec;
     NSString* locked = lock ? @"L" : @"U";
     [_userDefaults setObject:locked forKey:[self _keyForSong:song]];
     [self _refreshAllUnlockedSongs];
+}
+
+- (void)setMasterVolume:(NSInteger)masterVolume
+{
+    _masterVolume = masterVolume;
+    [_userDefaults setInteger:(100 - masterVolume) forKey:@"master_volume"];
+    vgsplay_changeMasterVolume((int)masterVolume);
 }
 
 @end

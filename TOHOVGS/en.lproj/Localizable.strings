@@ -27,3 +27,11 @@
 "confirm" = "Confirmation";
 "error" = "Error";
 "error_idfa" = "You are not allowed to get an IDFA, so you cannot play ads.";
+"contents" = "Content";
+"download_latest_songs" = "Download latest songs from server";
+"sound" = "Sound";
+"master_volume" = "Master Volume: %ld%%";
+"support" = "Support";
+"support_store" = "Check the AppStore for the latest version";
+"support_twitter" = "Twitter: @suzukiplan";
+"support_github" = "GitHub: suzukiplan/tohovgs4-ios";

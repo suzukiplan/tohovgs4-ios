@@ -40,6 +40,7 @@ struct Context {
 
 static struct Context* fs_context;
 static pthread_mutex_t fs_mutex = PTHREAD_MUTEX_INITIALIZER;
+static int fs_masterVolume = 100;
 
 static void executeDecode(Context* c, void* buffer)
 {
@@ -95,6 +96,7 @@ static struct Context* internal_sound_create(const char* mmlPath,
     result->format.mBytesPerPacket = result->format.mBytesPerFrame * result->format.mFramesPerPacket;
     result->format.mReserved = 0;
     AudioQueueNewOutput(&result->format, callback, result, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &result->queue);
+    AudioQueueSetParameter(result->queue, kAudioQueueParam_Volume, fs_masterVolume / 100.0);
     result->loop = loop;
     result->infinity = infinity;
     result->fadeout = false;
@@ -271,4 +273,16 @@ void* vgsplay_getDecoder(void)
     }
     pthread_mutex_unlock(&fs_mutex);
     return result;
+}
+
+void vgsplay_changeMasterVolume(int masterVolume)
+{
+    fs_masterVolume = masterVolume;
+    if (fs_context) {
+        pthread_mutex_lock(&fs_context->mutex);
+        if (fs_context->queue) {
+            AudioQueueSetParameter(fs_context->queue, kAudioQueueParam_Volume, fs_masterVolume / 100.0);
+        }
+        pthread_mutex_unlock(&fs_context->mutex);
+    }
 }
