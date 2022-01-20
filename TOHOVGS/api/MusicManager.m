@@ -156,9 +156,11 @@ extern void* vgsdec;
 
 - (void)setMasterVolume:(NSInteger)masterVolume
 {
-    _masterVolume = masterVolume;
-    [_userDefaults setInteger:(100 - masterVolume) forKey:@"master_volume"];
-    vgsplay_changeMasterVolume((int)masterVolume);
+    if (_masterVolume != masterVolume) {
+        _masterVolume = masterVolume;
+        [_userDefaults setInteger:(100 - masterVolume) forKey:@"master_volume"];
+        vgsplay_changeMasterVolume((int)masterVolume);
+    }
 }
 
 @end

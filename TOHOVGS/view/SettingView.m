@@ -29,6 +29,7 @@
 @property (nonatomic) UILabel* twitterLabel;
 @property (nonatomic) PushableView* github;
 @property (nonatomic) UILabel* githubLabel;
+@property (nonatomic) BOOL initialized;
 @end
 
 @implementation SettingView
@@ -57,6 +58,7 @@
         _masterVolumeSlider.max = 100;
         _masterVolume = _musicManager.masterVolume;
         _masterVolumeSlider.progress = _masterVolume;
+        _masterVolumeLabel.text = self.masterVolumeText;
         [self addSubview:_masterVolumeSlider];
         _supportLabel = [self _makeHeader:NSLocalizedString(@"support", nil)];
         [self addSubview:_supportLabel];
@@ -75,6 +77,7 @@
         [self addSubview:_github];
         _githubLabel = [self _makeButton:NSLocalizedString(@"support_github", nil)];
         [_github addSubview:_githubLabel];
+        _initialized = YES;
     }
     return self;
 }
@@ -175,6 +178,7 @@
 
 - (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress max:(NSInteger)max
 {
+    if (!_initialized) return;
     _masterVolume = progress;
     _masterVolumeLabel.text = self.masterVolumeText;
     _musicManager.masterVolume = _masterVolume;
