@@ -10,8 +10,6 @@
 
 #define REQUEST_TIMEDOUT_SECONDS 5
 
-static pthread_mutex_t fs_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 @interface WebAPI() <NSURLSessionDelegate>
 @property (nonatomic) NSURLSession* session;
 @end
@@ -67,6 +65,7 @@ static pthread_mutex_t fs_mutex = PTHREAD_MUTEX_INITIALIZER;
             NSLog(@"acquireSongList failed: %@", error);
             done(error, nil);
         } else {
+            NSLog(@"download mml succeed: %ld bytes", response.length);
             done(nil, response);
         }
     }];
@@ -84,12 +83,10 @@ static pthread_mutex_t fs_mutex = PTHREAD_MUTEX_INITIALIZER;
                                                  cachePolicy:NSURLRequestReloadIgnoringCacheData
                                              timeoutInterval:REQUEST_TIMEDOUT_SECONDS];
         NSURLSessionDataTask* task;
-        pthread_mutex_lock(&fs_mutex); // pending multiple request
         task = [weakSelf.session dataTaskWithRequest:request
                                    completionHandler:^(NSData* _Nullable data,
                                                        NSURLResponse* _Nullable response,
                                                        NSError* _Nullable error) {
-            pthread_mutex_unlock(&fs_mutex);
             if (error || !data || !response || ![response isKindOfClass:[NSHTTPURLResponse class]]) {
                 if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
                     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;

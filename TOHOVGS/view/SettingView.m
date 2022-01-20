@@ -170,6 +170,7 @@
                     [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"update_list_only", nil)];
                     return;
                 }
+                weakSelf.downloadBadge.hidden = YES;
                 [weakSelf.controlDelegate showUpdateSongs:downloaded];
             }];
         }];

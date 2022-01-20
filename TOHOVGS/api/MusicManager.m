@@ -18,8 +18,6 @@ extern void* vgsdec;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
 @property (nonatomic, readwrite, weak) Song* playingSong;
 @property (nonatomic) NSTimer* monitoringTimer;
-@property (nonatomic) NSInteger mmlDownloadNumber;
-@property (nonatomic) NSInteger mmlDownloadedCounter;
 @property (nonatomic) NSError* mmlDownloadError;
 @end
 
@@ -237,8 +235,6 @@ extern void* vgsdec;
 {
     NSLog(@"Updating songlist...");
     __weak MusicManager* weakSelf = self;
-    _mmlDownloadedCounter = 0;
-    _mmlDownloadNumber = 0;
     _mmlDownloadError = nil;
     [_api checkUpdateWithCurrentSHA1:_songList.sha1 done:^(NSError* error, BOOL updatable) {
         usleep(1000000);
@@ -252,34 +248,37 @@ extern void* vgsdec;
                 } else {
                     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
                     NSMutableArray<Song*>* downloaded = [NSMutableArray array];
-                    for (Song* song in songList.enumAllSongs) {
-                        if (![weakSelf _checkExistMmlWithSong:song]) {
-                            weakSelf.mmlDownloadNumber++;
-                            [weakSelf.api acquireMmlWithSong:song done:^(NSError* error, NSString * _Nonnull mml) {
-                                if (!mml) {
-                                    NSLog(@"failed download %@: %@", song.name, error);
-                                    weakSelf.mmlDownloadError = error;
-                                }
-                                NSString* path = [paths[0] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mml", song.mml]];
-                                [mml writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
-                                [downloaded addObject:song];
-                                weakSelf.mmlDownloadedCounter++;
-                            }];
-                        }
-                    }
-                    NSLog(@"waiting for MML download tasks");
-                    while (weakSelf.mmlDownloadNumber != weakSelf.mmlDownloadedCounter) {
-                        usleep(10000);
-                    }
-                    NSLog(@"Completed all MML file download tasks");
-                    BOOL updated = NO;
-                    if (!weakSelf.mmlDownloadError) {
-                        weakSelf.songList = songList;
-                        NSString* path = [paths[0] stringByAppendingPathComponent:@"songlist.json"];
-                        [songList.jsonString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
-                        updated = YES;
-                    }
                     dispatch_async(dispatch_get_main_queue(), ^{
+                        for (Song* song in songList.enumAllSongs) {
+                            if (![weakSelf _checkExistMmlWithSong:song]) {
+                                dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+                                [weakSelf.api acquireMmlWithSong:song done:^(NSError* error, NSString * _Nonnull mml) {
+                                    if (!mml) {
+                                        NSLog(@"failed download %@: %@", song.name, error);
+                                        weakSelf.mmlDownloadError = error;
+                                    } else {
+                                        NSString* path = [paths[0] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mml", song.mml]];
+                                        [mml writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                                        [downloaded addObject:song];
+                                    }
+                                    dispatch_semaphore_signal(semaphore);
+                                }];
+                                while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW)) {
+                                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
+                                }
+                                if (weakSelf.mmlDownloadError) {
+                                    break;
+                                }
+                            }
+                        }
+                        NSLog(@"Completed all MML file download tasks");
+                        BOOL updated = NO;
+                        if (!weakSelf.mmlDownloadError) {
+                            weakSelf.songList = songList;
+                            NSString* path = [paths[0] stringByAppendingPathComponent:@"songlist.json"];
+                            [songList.jsonString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                            updated = YES;
+                        }
                         done(weakSelf.mmlDownloadError, updated, downloaded);
                     });
                 }
