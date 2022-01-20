@@ -522,6 +522,7 @@
 {
     SongListViewController* vc = [[SongListViewController alloc] init];
     vc.songs = songs;
+    vc.modalPresentationStyle = UIModalPresentationPopover;
     [self presentViewController:vc animated:YES completion:^{
         ;
     }];

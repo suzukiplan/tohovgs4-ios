@@ -164,8 +164,12 @@
                 }
                 weakSelf.alreadyChecked = YES; // ignore next check at the current SettingView
                 [weakSelf.settingDelegate didChangeSongListFromSettingView:weakSelf];
-                if (!updated || !downloaded || downloaded.count < 1) {
+                if (!updated || !downloaded) {
                     [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"list_is_latest", nil)];
+                    return;
+                }
+                if (downloaded.count < 1) {
+                    [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"update_list_only", nil)];
                     return;
                 }
                 [weakSelf.controlDelegate showUpdateSongs:downloaded];

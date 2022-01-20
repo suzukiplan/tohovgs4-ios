@@ -38,3 +38,6 @@
 "communication_error" = "Communication with the server has failed. (status code: %ld)";
 "information" = "Information";
 "list_is_latest" = "All songs are up to date.\nThe first update information for new songs will be posted on my Twitter, so please follow me if you like.";
+"added_songs" = "Added Following Songs";
+"close" = "Close";
+"update_list_only" = "Only the song list has been updated. No new songs have been added.";
