@@ -8,7 +8,6 @@
 @interface SongList()
 @property (nonatomic, readwrite) NSString* version;
 @property (nonatomic, readwrite) NSArray<Album*>* albums;
-@property (nonatomic, readwrite) NSString* sha1;
 @property (nonatomic, readwrite) NSString* jsonString;
 @property (nonatomic, readwrite) NSInteger numberOfSongs;
 @property (nonatomic, readwrite) BOOL songRemoved;
@@ -45,20 +44,11 @@
     result.version = json[@"version"];
     result.jsonString = jsonString;
     result.albums = [Album parseJsonArray:json[@"albums"]];
-    unsigned char digest[CC_SHA1_DIGEST_LENGTH];
-    if (CC_SHA1(jsonData.bytes, (int)jsonData.length, digest)) {
-        NSMutableString* sha1 = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
-        for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
-            [sha1 appendFormat:@"%02x", digest[i]];
-        }
-        NSLog(@"sha1: %@", sha1);
-        result.sha1 = sha1;
-    }
     result.numberOfSongs = 0;
     for (Album* album in result.albums) {
         result.numberOfSongs += album.songs.count;
     }
-    NSLog(@"read songlist.json: version=%@ sha1=%@ songs=%ld", result.version, result.sha1, result.numberOfSongs);
+    NSLog(@"read songlist.json: version=%@ songs=%ld", result.version, result.numberOfSongs);
     return result;
 }
 

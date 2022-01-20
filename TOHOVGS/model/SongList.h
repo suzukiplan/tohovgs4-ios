@@ -10,7 +10,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SongList : NSObject
 @property (nonatomic, readonly) NSString* version;
 @property (nonatomic, readonly) NSArray<Album*>* albums;
-@property (nonatomic, readonly) NSString* sha1;
 @property (nonatomic, readonly) NSString* jsonString;
 @property (nonatomic, readonly) NSInteger numberOfSongs;
 @property (nonatomic, readonly) NSArray<Song*>* enumAllSongs;

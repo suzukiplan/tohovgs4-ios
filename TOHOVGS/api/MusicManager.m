@@ -222,7 +222,7 @@ extern void* vgsdec;
             done(YES);
         });
     }
-    [_api checkUpdateWithCurrentSHA1:_songList.sha1 done:^(NSError* error, BOOL updatable) {
+    [_api checkUpdateWithCurrentVersion:_songList.version done:^(NSError* error, BOOL updatable) {
         dispatch_async(dispatch_get_main_queue(), ^{
             done(updatable);
         });
@@ -236,7 +236,7 @@ extern void* vgsdec;
     NSLog(@"Updating songlist...");
     __weak MusicManager* weakSelf = self;
     _mmlDownloadError = nil;
-    [_api checkUpdateWithCurrentSHA1:_songList.sha1 done:^(NSError* error, BOOL updatable) {
+    [_api checkUpdateWithCurrentVersion:_songList.version done:^(NSError* error, BOOL updatable) {
         usleep(1000000);
         if (updatable) {
             [weakSelf.api acquireSongList:^(NSError* error, SongList * _Nullable songList) {

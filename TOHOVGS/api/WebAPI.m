@@ -29,17 +29,17 @@
     return self;
 }
 
-- (void)checkUpdateWithCurrentSHA1:(NSString *)sha1
-                              done:(void(^)(NSError * _Nullable, BOOL))done
+- (void)checkUpdateWithCurrentVersion:(NSString*)version
+                                 done:(void(^)(NSError* _Nullable, BOOL))done
 {
-    [self _httpGet:@"songlist.sha1" done:^(NSError* error, NSString* response) {
+    [self _httpGet:@"songlist.ver" done:^(NSError* error, NSString* response) {
         if (error || !response) {
             NSLog(@"checkUpdateWithCurrentSHA1 failed: %@", error);
             done(error, NO);
         } else {
-            NSLog(@"client SHA1: %@", sha1);
-            NSLog(@"server SHA1: %@", response);
-            done(nil, 0 != strncasecmp(sha1.UTF8String, response.UTF8String, CC_SHA1_DIGEST_LENGTH * 2));
+            NSLog(@"client version: %@", version);
+            NSLog(@"server version: %@", response);
+            done(nil, strncmp(version.UTF8String, response.UTF8String, 10) < 0);
         }
     }];
 }
