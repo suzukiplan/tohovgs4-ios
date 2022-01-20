@@ -23,9 +23,9 @@ typedef NS_ENUM(NSInteger, FooterButtonType) {
 @end
 
 @interface FooterButton : PushableView
-@property (nonatomic) BOOL budge;
+@property (nonatomic) BOOL badge;
 - (instancetype)initWithType:(FooterButtonType)type
-                       budge:(BOOL)budge
+                       badge:(BOOL)badge
                     delegate:(id<FooterButtonDelegate>)delegate;
 - (instancetype)initWithType:(FooterButtonType)type
                     delegate:(id<FooterButtonDelegate>)delegate;

@@ -32,6 +32,9 @@
 "sound" = "Sound";
 "master_volume" = "Master Volume: %ld%%";
 "support" = "Support";
-"support_store" = "Check the AppStore for the latest version";
 "support_twitter" = "Twitter: @suzukiplan";
-"support_github" = "GitHub: suzukiplan/tohovgs4-ios";
+"support_github" = "Web: suzukiplan.github.io";
+"connecting_server" = "Connecting Server...";
+"communication_error" = "Communication with the server has failed. (status code: %ld)";
+"information" = "Information";
+"list_is_latest" = "All songs are up to date.\nThe first update information for new songs will be posted on my Twitter, so please follow me if you like.";

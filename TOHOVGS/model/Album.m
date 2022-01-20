@@ -12,7 +12,7 @@
 @property (nonatomic, readwrite) NSString* copyright;
 @property (nonatomic, readwrite) NSInteger compatColor;
 @property (nonatomic, readwrite) BOOL defaultLocked;
-@property (nonatomic, readwrite) NSArray<Song*>* songs;
+@property (nonatomic, readwrite) NSMutableArray<Song*>* songs;
 @end
 
 @implementation Album

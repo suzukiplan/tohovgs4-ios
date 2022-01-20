@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString* name;
 @property (nonatomic, readonly, nullable) NSString* english;
 @property (nonatomic) BOOL isPlaying;
-+ (NSArray<Song*>*)parseJsonArray:(NSArray*)array album:(Album*)album;
++ (NSMutableArray<Song*>*)parseJsonArray:(NSArray*)array album:(Album*)album;
 @end
 
 NS_ASSUME_NONNULL_END

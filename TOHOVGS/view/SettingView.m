@@ -8,10 +8,10 @@
 #import "SettingView.h"
 #import "PushableView.h"
 #import "SliderView.h"
-#import <StoreKit/StoreKit.h>
 
 @interface SettingView() <PushableViewDelegate, SliderViewDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
+@property (nonatomic, weak) id<SettingViewDelegate> settingDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic, readonly) NSString* masterVolumeText;
 @property (nonatomic) UILabel* contentLabel;
@@ -23,21 +23,22 @@
 @property (nonatomic) UILabel* masterVolumeLabel;
 @property (nonatomic) SliderView* masterVolumeSlider;
 @property (nonatomic) UILabel* supportLabel;
-@property (nonatomic) PushableView* store;
-@property (nonatomic) UILabel* storeLabel;
 @property (nonatomic) PushableView* twitter;
 @property (nonatomic) UILabel* twitterLabel;
 @property (nonatomic) PushableView* github;
 @property (nonatomic) UILabel* githubLabel;
 @property (nonatomic) BOOL initialized;
+@property (nonatomic) BOOL alreadyChecked;
 @end
 
 @implementation SettingView
 
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
+                               delegate:(nonnull id<SettingViewDelegate>)delegate
 {
     if (self = [super init]) {
         _controlDelegate = controlDelegate;
+        _settingDelegate = delegate;
         _musicManager = [_controlDelegate getViewController].musicManager;
         self.backgroundColor = [UIColor blackColor];
         _contentLabel = [self _makeHeader:NSLocalizedString(@"contents", nil)];
@@ -47,7 +48,8 @@
         [self addSubview:_download];
         _downloadLabel = [self _makeButton:NSLocalizedString(@"download_latest_songs", nil)];
         [_download addSubview:_downloadLabel];
-        _downloadBadge = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_budge"]];
+        _downloadBadge = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_badge"]];
+        _downloadBadge.hidden = ![[NSUserDefaults standardUserDefaults] boolForKey:@"badge"];
         [_download addSubview:_downloadBadge];
         _soundLabel = [self _makeHeader:NSLocalizedString(@"sound", nil)];
         [self addSubview:_soundLabel];
@@ -62,11 +64,6 @@
         [self addSubview:_masterVolumeSlider];
         _supportLabel = [self _makeHeader:NSLocalizedString(@"support", nil)];
         [self addSubview:_supportLabel];
-        _store = [[PushableView alloc] initWithDelegate:self];
-        _store.touchAlphaAnimation = YES;
-        [self addSubview:_store];
-        _storeLabel = [self _makeButton:NSLocalizedString(@"support_store", nil)];
-        [_store addSubview:_storeLabel];
         _twitter = [[PushableView alloc] initWithDelegate:self];
         _twitter.touchAlphaAnimation = YES;
         [self addSubview:_twitter];
@@ -137,9 +134,6 @@
     y += 44 + 32;
     _supportLabel.frame = CGRectMake(8, y, frame.size.width - 16, th);
     y += th + 12;
-    _store.frame = CGRectMake(8, y, frame.size.width - 16, 44);
-    _storeLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
-    y += 44 + 8;
     _twitter.frame = CGRectMake(8, y, frame.size.width - 16, 44);
     _twitterLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
     y += 44 + 8;
@@ -152,14 +146,30 @@
 - (void)didPushPushableView:(PushableView*)pushableView
 {
     NSURL* url = nil;
-    if (pushableView == _store) {
-        SKStoreProductViewController* vc = [[SKStoreProductViewController alloc] init];
-        NSDictionary* params = @{ SKStoreProductParameterITunesItemIdentifier: @(680248037) };
-        [vc loadProductWithParameters:params completionBlock:^(BOOL result, NSError * _Nullable error) {
-            ;
-        }];
-        [[_controlDelegate getViewController] presentViewController:vc animated:YES completion:^{
-            ;
+    if (pushableView == _download) {
+        if (_alreadyChecked) {
+            [_controlDelegate showInfoMessage:NSLocalizedString(@"list_is_latest", nil)];
+            return;
+        }
+        [_controlDelegate startProgressWithMessage:NSLocalizedString(@"connecting_server", nil)];
+        __weak SettingView* weakSelf = self;
+        [_musicManager updateSongListWithCallback:^(NSError* error,
+                                                    BOOL updated,
+                                                    NSArray<Song*>* _Nullable downloaded) {
+            [weakSelf.controlDelegate stopProgress:^{
+                if (error) {
+                    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"communication_error", nil), error.code];
+                    [weakSelf.controlDelegate showErrorMessage:message];
+                    return;
+                }
+                weakSelf.alreadyChecked = YES; // ignore next check at the current SettingView
+                [weakSelf.settingDelegate didChangeSongListFromSettingView:weakSelf];
+                if (!updated || !downloaded || downloaded.count < 1) {
+                    [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"list_is_latest", nil)];
+                    return;
+                }
+                [weakSelf.controlDelegate showUpdateSongs:downloaded];
+            }];
         }];
         return;
     } else if (pushableView == _twitter) {

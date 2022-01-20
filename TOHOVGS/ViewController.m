@@ -13,6 +13,7 @@
 #import "view/ProgressView.h"
 #import "view/SettingView.h"
 #import "vgs/vgsplay-ios.h"
+#import "SongListViewController.h"
 #import "ControlDelegate.h"
 #include "AdSettings.h"
 @import GoogleMobileAds;
@@ -23,7 +24,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
@@ -98,6 +99,10 @@
     } else if ([_pageView isKindOfClass:[SongListView class]]) {
         [(SongListView*)_pageView scrollToCurrentSong];
     }
+    __weak ViewController* weakSelf = self;
+    [_musicManager checkUpdateWithCallback:^(BOOL updateExist) {
+        weakSelf.footer.badge = updateExist;
+    }];
 }
 
 - (void)viewDidEnterBackground
@@ -138,6 +143,9 @@
                 }
             }];
     }
+    [_musicManager checkUpdateWithCallback:^(BOOL updateExist) {
+        weakSelf.footer.badge = updateExist;
+    }];
 }
 
 - (void)viewSafeAreaInsetsDidChange
@@ -215,7 +223,7 @@
             nextPageIndex = 3;
             break;
         case FooterButtonTypeSettings:
-            nextPage = [[SettingView alloc] initWithControlDelegate:self];
+            nextPage = [[SettingView alloc] initWithControlDelegate:self delegate:self];
             nextPageIndex = 4;
             break;
     }
@@ -446,6 +454,19 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
+- (void)showInfoMessage:(NSString*)message
+{
+    NSString* title = NSLocalizedString(@"information", nil);
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:nil];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
 - (void)requestReward:(void(^)(void))earnReward
 {
     __weak ViewController* weakSelf = self;
@@ -490,6 +511,20 @@
 {
     NSLog(@"Ad did dismiss full screen content.");
     [self stopProgress:^{}];
+}
+
+- (void)didChangeSongListFromSettingView:(SettingView*)view
+{
+    _footer.badge = NO;
+}
+
+- (void)showUpdateSongs:(NSArray<Song*>*)songs
+{
+    SongListViewController* vc = [[SongListViewController alloc] init];
+    vc.songs = songs;
+    [self presentViewController:vc animated:YES completion:^{
+        ;
+    }];
 }
 
 @end

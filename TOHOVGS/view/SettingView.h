@@ -10,8 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SettingView;
+
+@protocol SettingViewDelegate <NSObject>
+- (void)didChangeSongListFromSettingView:(SettingView*)view;
+@end
+
 @interface SettingView : UIScrollView
-- (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate;
+- (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
+                               delegate:(id<SettingViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

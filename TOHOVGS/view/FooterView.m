@@ -39,7 +39,8 @@
 - (FooterButton*)_makeButton:(FooterButtonType)type
 {
     if (type == FooterButtonTypeSettings) {
-        return [[FooterButton alloc] initWithType:type budge:YES delegate:self];
+        _badge = [[NSUserDefaults standardUserDefaults] boolForKey:@"badge"];
+        return [[FooterButton alloc] initWithType:type badge:_badge delegate:self];
     } else {
         return [[FooterButton alloc] initWithType:type delegate:self];
     }
@@ -73,6 +74,18 @@
         }
     }];
     [_delegate footerButton:button didTapWithType:type];
+}
+
+- (void)setBadge:(BOOL)badge
+{
+    if (badge != _badge) {
+        _badge = badge;
+        __weak FooterView* weakSelf = self;
+        [[NSUserDefaults standardUserDefaults] setBool:badge forKey:@"badge"];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.buttons[4].badge = badge;
+        });
+    }
 }
 
 @end

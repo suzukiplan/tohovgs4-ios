@@ -3,7 +3,7 @@
  * License: https://github.com/suzukiplan/tohovgs4-ios/blob/master/LICENSE.txt
  */
 #import <Foundation/Foundation.h>
-#import "../model/Album.h"
+#import "../model/SongList.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MusicManager : NSObject
 @property (nonatomic, weak) id<MusicManagerDelegate> delegate;
-@property (nonatomic, readonly) NSArray<Album*>* albums;
+@property (nonatomic, readonly) SongList* songList;
+@property (nonatomic, readonly, weak) NSArray<Album*>* albums;
 @property (nonatomic, readonly) NSArray<Song*>* allUnlockedSongs;
 @property (nonatomic, readonly, weak) Song* playingSong;
 @property (nonatomic) BOOL infinity;
@@ -29,6 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)seekTo:(NSInteger)progress;
 - (BOOL)isLockedSong:(Song*)song;
 - (void)lock:(BOOL)lock song:(Song*)song;
+- (void)checkUpdateWithCallback:(void(^)(BOOL updateExist))done;
+- (void)updateSongListWithCallback:(void(^)(NSError* _Nullable error,
+                                            BOOL updated,
+                                            NSArray<Song*>* _Nullable downloaded))done;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -11,7 +11,7 @@
 @property (nonatomic, weak) id<FooterButtonDelegate> footerDelegate;
 @property (nonatomic) UIImageView* image;
 @property (nonatomic) UIImageView* label;
-@property (nonatomic, nullable) UIImageView* budgeView;
+@property (nonatomic, nullable) UIImageView* badgeView;
 @end
 
 @implementation FooterButton
@@ -19,16 +19,16 @@
 - (instancetype)initWithType:(FooterButtonType)type
                     delegate:(id<FooterButtonDelegate>)delegate
 {
-    return [self initWithType:type budge:NO delegate:delegate];
+    return [self initWithType:type badge:NO delegate:delegate];
 }
 
 - (instancetype)initWithType:(FooterButtonType)type
-                       budge:(BOOL)budge
+                       badge:(BOOL)badge
                     delegate:(nonnull id<FooterButtonDelegate>)delegate
 {
     if (self = [super initWithDelegate:self]) {
         _type = type;
-        _budge = budge;
+        _badge = badge;
         _footerDelegate = delegate;
         self.touchAlphaAnimation = YES;
         self.tapBoundAnimation = YES;
@@ -56,8 +56,8 @@
             case FooterButtonTypeSettings:
                 _image.image = [UIImage imageNamed:@"ic_settings_white_18pt"];
                 _label.image = [UIImage imageNamed:@"footer_settings"];
-                _budgeView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_budge"]];
-                [self addSubview:_budgeView];
+                _badgeView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_badge"]];
+                [self addSubview:_badgeView];
                 break;
         }
     }
@@ -69,8 +69,8 @@
     [super setFrame:frame];
     CGFloat y = (frame.size.height - 12 - 4 - 18) / 2;
     _image.frame = CGRectMake((frame.size.width - 18) / 2, y, 18, 18);
-    _budgeView.frame = CGRectMake(_image.frame.origin.x + 14, _image.frame.origin.y - 4, 8, 8);
-    _budgeView.hidden = !_budge;
+    _badgeView.frame = CGRectMake(_image.frame.origin.x + 14, _image.frame.origin.y - 4, 8, 8);
+    _badgeView.hidden = !_badge;
     y += 18 + 4;
     _label.frame = CGRectMake((frame.size.width - 40) / 2, y, 40, 12);
 }
@@ -80,9 +80,9 @@
     [_footerDelegate footerButton:self didTapWithType:_type];
 }
 
-- (void)setBudge:(BOOL)budge
+- (void)setBadge:(BOOL)badge
 {
-    _budge = budge;
+    _badge = badge;
     [self setFrame:self.frame];
 }
 

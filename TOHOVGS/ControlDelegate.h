@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (ViewController*)getViewController;
 - (void)startProgressWithMessage:(NSString*)message;
 - (void)stopProgress:(void(^)(void))done;
+- (void)showErrorMessage:(NSString*)message;
+- (void)showInfoMessage:(NSString*)message;
+- (void)showUpdateSongs:(NSArray<Song*>*)songs;
 - (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked;
 - (void)askUnlockWithAlbum:(Album*)album unlocked:(void(^)(void))unlocked;
 - (void)askUnlockAllWithCallback:(void(^)(void))unlocked;

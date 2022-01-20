@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString* copyright;
 @property (nonatomic, readonly) NSInteger compatColor;
 @property (nonatomic, readonly) BOOL defaultLocked;
-@property (nonatomic, readonly) NSArray<Song*>* songs;
+@property (nonatomic, readonly) NSMutableArray<Song*>* songs;
 + (NSArray<Album*>*)parseJsonArray:(NSArray*)array;
 @end
 
