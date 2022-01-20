@@ -51,7 +51,7 @@ extern void* vgsdec;
         // remove MML download failed songs if exist
         NSArray<Song*>* allSongs = _songList.enumAllSongs;
         for (Song* song in allSongs) {
-            if (![self _checkExistMmlWithSong:song]) {
+            if (![self _getMmlPathWithSong:song]) {
                 NSLog(@"remove song: %@ (MML file not found)", song.name);
                 [_songList removeSong:song];
             }
@@ -67,21 +67,21 @@ extern void* vgsdec;
     return self;
 }
 
-- (BOOL)_checkExistMmlWithSong:(Song*)song
+- (NSString*)_getMmlPathWithSong:(Song*)song
 {
     NSFileManager* fileManager = [NSFileManager defaultManager];
     NSString* bunndleMmlName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
     NSString* bundlePath = [[NSBundle mainBundle] pathForResource:bunndleMmlName ofType:@"mml"];
     if ([fileManager fileExistsAtPath:bundlePath isDirectory:nil]) {
-        return YES;
+        return bundlePath;
     }
     NSString* downloadMmlPath = [NSString stringWithFormat:@"%@.mml", song.mml];
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString* downloadPath = [paths[0] stringByAppendingPathComponent:downloadMmlPath];
     if ([fileManager fileExistsAtPath:downloadPath isDirectory:nil]) {
-        return YES;
+        return downloadPath;
     }
-    return NO;
+    return nil;
 }
 
 - (NSArray<Song*>*)enumUndownloadedMmlSongs
@@ -111,8 +111,7 @@ extern void* vgsdec;
 
 - (NSString*)mmlPathOfSong:(Song*)song
 {
-    NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
-    return [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
+    return [self _getMmlPathWithSong:song];
 }
 
 - (void)_active:(BOOL)active
@@ -250,7 +249,7 @@ extern void* vgsdec;
                     NSMutableArray<Song*>* downloaded = [NSMutableArray array];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         for (Song* song in songList.enumAllSongs) {
-                            if (![weakSelf _checkExistMmlWithSong:song]) {
+                            if (![weakSelf _getMmlPathWithSong:song]) {
                                 dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
                                 [weakSelf.api acquireMmlWithSong:song done:^(NSError* error, NSString * _Nonnull mml) {
                                     if (!mml) {
@@ -275,6 +274,8 @@ extern void* vgsdec;
                         BOOL updated = NO;
                         if (!weakSelf.mmlDownloadError) {
                             weakSelf.songList = songList;
+                            weakSelf.albums = songList.albums;
+                            [weakSelf _refreshAllUnlockedSongs];
                             NSString* path = [paths[0] stringByAppendingPathComponent:@"songlist.json"];
                             [songList.jsonString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
                             updated = YES;
