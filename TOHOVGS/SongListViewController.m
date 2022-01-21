@@ -31,7 +31,7 @@
         _albumName.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:_albumName];
         _songName = [[UILabel alloc] init];
-        _songName.font = [UIFont systemFontOfSize:16];
+        _songName.font = [UIFont systemFontOfSize:12];
         _songName.textColor = [UIColor whiteColor];
         _songName.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_songName];
@@ -63,7 +63,7 @@
     _container.layer.cornerRadius = 4.0;
     [self.view addSubview:_container];
     _titleLabel = [[UILabel alloc] init];
-    _titleLabel.font = [UIFont systemFontOfSize:12];
+    _titleLabel.font = [UIFont systemFontOfSize:14];
     _titleLabel.textColor = [UIColor whiteColor];
     _titleLabel.text = NSLocalizedString(@"added_songs", nil);
     _titleLabel.textAlignment = NSTextAlignmentCenter;
