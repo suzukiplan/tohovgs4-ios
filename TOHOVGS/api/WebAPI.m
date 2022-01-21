@@ -32,6 +32,10 @@
 - (void)checkUpdateWithCurrentVersion:(NSString*)version
                                  done:(void(^)(NSError* _Nullable, BOOL))done
 {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"badge"]) {
+        done(nil, YES);
+        return;
+    }
     [self _httpGet:@"songlist.ver" done:^(NSError* error, NSString* response) {
         if (error || !response) {
             NSLog(@"checkUpdateWithCurrentSHA1 failed: %@", error);

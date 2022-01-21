@@ -216,11 +216,6 @@ extern void* vgsdec;
 
 - (void)checkUpdateWithCallback:(void(^)(BOOL updateExist))done
 {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"badge"]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            done(YES);
-        });
-    }
     [_api checkUpdateWithCurrentVersion:_songList.version done:^(NSError* error, BOOL updatable) {
         dispatch_async(dispatch_get_main_queue(), ^{
             done(updatable);
