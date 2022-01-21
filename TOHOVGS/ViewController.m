@@ -290,6 +290,10 @@
 
 - (void)musicManager:(MusicManager*)manager didStopPlayingSong:(Song*)song
 {
+}
+
+- (void)resetSeekBar
+{
     _seekBar.max = 0;
 }
 
@@ -313,6 +317,11 @@
 - (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress
 {
     [_musicManager seekTo:progress];
+    if ([_pageView isKindOfClass:[AlbumPagerView class]]) {
+        [(AlbumPagerView*)_pageView reloadCurrentPage];
+    } else if ([_pageView isKindOfClass:[SongListView class]]) {
+        [(SongListView*)_pageView reload];
+    }
 }
 
 - (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity

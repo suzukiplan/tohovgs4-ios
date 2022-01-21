@@ -140,6 +140,7 @@
     if (_tabView.position != position) {
         NSLog(@"position changed by swipe: %@", _albums[position].albumId);
         [_userDefaults setObject:_albums[position].albumId forKey:@"initial_album_id"];
+        [[_controlDelegate getViewController].musicManager purgeKeepInfo];
     }
     _tabView.position = position;
 }
@@ -150,6 +151,7 @@
     [_pager scrollRectToVisible:_pages[position].frame animated:YES];
     NSLog(@"position changed by tab: %@", _albums[position].albumId);
     [_userDefaults setObject:_albums[position].albumId forKey:@"initial_album_id"];
+    [[_controlDelegate getViewController].musicManager purgeKeepInfo];
 }
 
 - (void)albumTabViewDidMoveEnd
@@ -192,6 +194,11 @@
             [_pages[albumIndex] scrollToCurrentSong];
         }
     }
+}
+
+- (void)reloadCurrentPage
+{
+    [_pages[_tabView.position] reload];
 }
 
 @end

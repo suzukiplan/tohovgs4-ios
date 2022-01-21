@@ -7,6 +7,7 @@
 #import "SongCell.h"
 #import "../api/MusicManager.h"
 #import "../AdSettings.h"
+#import "../vgs/vgsplay-ios.h"
 @import GoogleMobileAds;
 
 @interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
@@ -174,9 +175,10 @@
 
 - (void)songCell:(SongCell*)songCell didTapSong:(Song*)song
 {
-    if (song.isPlaying) {
-        song.isPlaying = NO;
-        [_musicManager stopPlaying];
+    if (![_musicManager isPlayingSong:song]) {
+        [self _play:song];
+    } else if (vgsplay_isPlaying()) {
+        [_musicManager stopPlayingWithKeep:YES];
         [_table reloadData];
     } else {
         [self _play:song];
@@ -198,7 +200,15 @@
 
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song
 {
+    if ([_musicManager isPlayingSong:song] || [_musicManager isKeepingSong:song]) {
+        [self stopSong];
+        [_musicManager purgeKeepInfo];
+        [_table reloadData];
+        [_controlDelegate resetSeekBar];
+        return;
+    }
     [self stopSong];
+    [_musicManager purgeKeepInfo];
     __weak SongListView* weakSelf = self;
     [_controlDelegate askLockWithSong:song locked:^{
         [weakSelf.table reloadData];

@@ -27,6 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)mmlPathOfSong:(Song*)song;
 - (void)playSong:(Song*)song;
 - (void)stopPlaying;
+- (BOOL)isPlayingSong:(Song*)song;
+- (BOOL)isKeepingSong:(Song*)song;
+- (void)stopPlayingWithKeep:(BOOL)keep;
+- (void)purgeKeepInfo;
 - (void)seekTo:(NSInteger)progress;
 - (BOOL)isLockedSong:(Song*)song;
 - (void)lock:(BOOL)lock song:(Song*)song;

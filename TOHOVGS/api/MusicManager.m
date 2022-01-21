@@ -17,6 +17,8 @@ extern void* vgsdec;
 @property (nonatomic, readwrite, weak) NSArray<Album*>* albums;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
 @property (nonatomic, readwrite, weak) Song* playingSong;
+@property (nonatomic, readwrite, weak) Song* keepSong;
+@property (nonatomic) int keepDuration;
 @property (nonatomic) NSTimer* monitoringTimer;
 @property (nonatomic) NSError* mmlDownloadError;
 @end
@@ -125,9 +127,14 @@ extern void* vgsdec;
 
 - (void)playSong:(Song*)song
 {
+    int seek = 0;
+    if ([_keepSong.mml isEqualToString:song.mml]) {
+        seek = _keepDuration;
+    }
+    _keepSong = nil;
     _playingSong = song;
     NSString* mmlPath = [self mmlPathOfSong:song];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, 0, 16);
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, seek, 16);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
@@ -156,10 +163,32 @@ extern void* vgsdec;
 
 - (void)stopPlaying
 {
+    [self stopPlayingWithKeep:NO];
+}
+
+- (BOOL)isPlayingSong:(Song*)song
+{
+    return _playingSong && [song.mml isEqualToString:_playingSong.mml];
+}
+
+- (BOOL)isKeepingSong:(Song*)song
+{
+    return _keepSong && [song.mml isEqualToString:_keepSong.mml];
+}
+
+- (void)stopPlayingWithKeep:(BOOL)keep
+{
     if (_playingSong) {
         BOOL isPlaying = vgsplay_isPlaying() ? YES : NO;
+        if (isPlaying && keep) {
+            _keepDuration = vgsplay_getCurrentTime();
+            _keepSong = _playingSong;
+        } else {
+            _keepDuration = 0;
+            _keepSong = nil;
+        }
         vgsplay_stop();
-        _playingSong.isPlaying = NO;
+        _playingSong.isPlaying = keep;
         if (isPlaying) {
             [_delegate musicManager:self didStopPlayingSong:_playingSong];
         }
@@ -172,10 +201,22 @@ extern void* vgsdec;
     }
 }
 
+- (void)purgeKeepInfo
+{
+    _keepSong = nil;
+    _keepDuration = 0;
+    [self stopPlaying];
+}
+
 - (void)seekTo:(NSInteger)progress
 {
     NSLog(@"seekTo: %ld", progress);
-    vgsplay_seek((unsigned int)progress);
+    if (vgsplay_isPlaying()) {
+        vgsplay_seek((unsigned int)progress);
+    } else if (_keepSong) {
+        _keepDuration = (int)progress;
+        [self playSong:_keepSong];
+    }
 }
 
 - (void)setInfinity:(BOOL)infinity
