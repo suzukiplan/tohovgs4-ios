@@ -99,10 +99,9 @@
             [sequential removeObjectAtIndex:index];
         }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [controlDelegate stopProgress:^{
-                weakSelf.songs = weakSelf.shuffleSongs;
-                [weakSelf.table reloadData];
-            }];
+            weakSelf.songs = weakSelf.shuffleSongs;
+            [weakSelf.table reloadData];
+            [controlDelegate stopProgress];
         });
     });
 }

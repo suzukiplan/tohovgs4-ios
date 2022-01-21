@@ -336,7 +336,7 @@
     }];
 }
 
-- (void)stopProgress:(void(^)(void))done
+- (void)stopProgress
 {
     if (_progressView) {
         __weak ViewController* weakSelf = self;
@@ -345,9 +345,10 @@
                 weakSelf.progressView.alpha = 0;
             } completion:^(BOOL finished) {
                 if (finished) {
-                    [weakSelf.progressView removeFromSuperview];
-                    weakSelf.progressView = nil;
-                    done();
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.progressView removeFromSuperview];
+                        weakSelf.progressView = nil;
+                    });
                 }
             }];
         });
@@ -477,10 +478,9 @@
                   completionHandler:^(GADRewardedAd* ad, NSError* error) {
         if (error) {
             NSLog(@"Rewarded ad failed to load with error: %@", [error localizedDescription]);
-            [weakSelf stopProgress:^{
-                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
-                [weakSelf showErrorMessage:message];
-            }];
+            [weakSelf stopProgress];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+            [weakSelf showErrorMessage:message];
             return;
         }
         weakSelf.rewardedAd = ad;
@@ -494,23 +494,21 @@
 - (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(nonnull NSError*)error
 {
     NSLog(@"Ad did fail to present full screen content.");
-    __weak ViewController* weakSelf = self;
-    [self stopProgress:^{
-        NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
-        [weakSelf showErrorMessage:message];
-    }];
+    [self stopProgress];
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+    [self showErrorMessage:message];
 }
 
 - (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
 {
     NSLog(@"Ad did present full screen content.");
-    [self stopProgress:^{}];
+    [self stopProgress];
 }
 
 - (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
 {
     NSLog(@"Ad did dismiss full screen content.");
-    [self stopProgress:^{}];
+    [self stopProgress];
 }
 
 - (void)didChangeSongListFromSettingView:(SettingView*)view

@@ -154,25 +154,24 @@
         [_musicManager updateSongListWithCallback:^(NSError* error,
                                                     BOOL updated,
                                                     NSArray<Song*>* _Nullable downloaded) {
-            [weakSelf.controlDelegate stopProgress:^{
-                if (error) {
-                    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"communication_error", nil), error.code];
-                    [weakSelf.controlDelegate showErrorMessage:message];
-                    return;
-                }
-                weakSelf.alreadyChecked = YES; // ignore next check at the current SettingView
-                [weakSelf.settingDelegate didChangeSongListFromSettingView:weakSelf];
-                if (!updated || !downloaded) {
-                    [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"list_is_latest", nil)];
-                    return;
-                }
-                if (downloaded.count < 1) {
-                    [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"update_list_only", nil)];
-                    return;
-                }
-                weakSelf.downloadBadge.hidden = YES;
-                [weakSelf.controlDelegate showUpdateSongs:downloaded];
-            }];
+            [weakSelf.controlDelegate stopProgress];
+            if (error) {
+                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"communication_error", nil), error.code];
+                [weakSelf.controlDelegate showErrorMessage:message];
+                return;
+            }
+            weakSelf.alreadyChecked = YES; // ignore next check at the current SettingView
+            [weakSelf.settingDelegate didChangeSongListFromSettingView:weakSelf];
+            if (!updated || !downloaded) {
+                [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"list_is_latest", nil)];
+                return;
+            }
+            if (downloaded.count < 1) {
+                [weakSelf.controlDelegate showInfoMessage:NSLocalizedString(@"update_list_only", nil)];
+                return;
+            }
+            weakSelf.downloadBadge.hidden = YES;
+            [weakSelf.controlDelegate showUpdateSongs:downloaded];
         }];
         return;
     } else if (pushableView == _twitter) {
