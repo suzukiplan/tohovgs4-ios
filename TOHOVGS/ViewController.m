@@ -99,10 +99,6 @@
     } else if ([_pageView isKindOfClass:[SongListView class]]) {
         [(SongListView*)_pageView scrollToCurrentSong];
     }
-    __weak ViewController* weakSelf = self;
-    [_musicManager checkUpdateWithCallback:^(BOOL updateExist) {
-        weakSelf.footer.badge = updateExist;
-    }];
 }
 
 - (void)viewDidEnterBackground
