@@ -10,7 +10,6 @@
 @property (nonatomic) FooterButtonType type;
 @property (nonatomic, weak) id<FooterButtonDelegate> footerDelegate;
 @property (nonatomic) UIImageView* image;
-@property (nonatomic) UIImageView* label;
 @property (nonatomic, nullable) UIImageView* badgeView;
 @end
 
@@ -34,28 +33,21 @@
         self.tapBoundAnimation = YES;
         _image = [[UIImageView alloc] init];
         [self addSubview:_image];
-        _label = [[UIImageView alloc] init];
-        [self addSubview:_label];
         switch (type) {
             case FooterButtonTypeHome:
-                _image.image = [UIImage imageNamed:@"ic_home_white_18pt"];
-                _label.image = [UIImage imageNamed:@"footer_home"];
+                _image.image = [UIImage imageNamed:@"footer_home"];
                 break;
             case FooterButtonTypeAll:
-                _image.image = [UIImage imageNamed:@"ic_view_list_white_18pt"];
-                _label.image = [UIImage imageNamed:@"footer_all"];
+                _image.image = [UIImage imageNamed:@"footer_all"];
                 break;
             case FooterButtonTypeShuffle:
-                _image.image = [UIImage imageNamed:@"ic_shuffle_white_18pt"];
-                _label.image = [UIImage imageNamed:@"footer_shuffle"];
+                _image.image = [UIImage imageNamed:@"footer_shuffle"];
                 break;
             case FooterButtonTypeRetro:
-                _image.image = [UIImage imageNamed:@"ic_apps_white_18pt"];
-                _label.image = [UIImage imageNamed:@"footer_retro"];
+                _image.image = [UIImage imageNamed:@"footer_retro"];
                 break;
             case FooterButtonTypeSettings:
-                _image.image = [UIImage imageNamed:@"ic_settings_white_18pt"];
-                _label.image = [UIImage imageNamed:@"footer_settings"];
+                _image.image = [UIImage imageNamed:@"footer_settings"];
                 _badgeView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_badge"]];
                 [self addSubview:_badgeView];
                 break;
@@ -67,12 +59,9 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    CGFloat y = (frame.size.height - 12 - 4 - 18) / 2;
-    _image.frame = CGRectMake((frame.size.width - 18) / 2, y, 18, 18);
-    _badgeView.frame = CGRectMake(_image.frame.origin.x + 14, _image.frame.origin.y - 4, 8, 8);
+    _image.frame = CGRectMake((frame.size.width - 32) / 2, (frame.size.height - 44) / 2, 32, 44);
+    _badgeView.frame = CGRectMake(_image.frame.origin.x + 22, _image.frame.origin.y + 2, 8, 8);
     _badgeView.hidden = !_badge;
-    y += 18 + 4;
-    _label.frame = CGRectMake((frame.size.width - 40) / 2, y, 40, 12);
 }
 
 - (void)didPushPushableView:(PushableView*)pushableView
