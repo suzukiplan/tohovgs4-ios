@@ -232,13 +232,10 @@
 - (void)stopSong
 {
     for (Song* song in _songs) {
-        if (song.isPlaying) {
-            song.isPlaying = NO;
-            [_table reloadData];
-            [_musicManager stopPlaying];
-            break;
-        }
+        song.isPlaying = NO;
     }
+    [_table reloadData];
+    [_musicManager stopPlaying];
 }
 
 - (void)requireNextSong:(Song*)song
