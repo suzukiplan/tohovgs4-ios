@@ -157,6 +157,7 @@
 - (void)albumTabViewDidMoveEnd
 {
     [self _stopSong];
+    [_controlDelegate resetSeekBar];
 }
 
 - (void)_stopSong
