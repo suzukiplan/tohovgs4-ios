@@ -7,6 +7,7 @@
 #import "SongCell.h"
 #import "../api/MusicManager.h"
 #import "../AdSettings.h"
+#import "../vgs/vgsplay-ios.h"
 @import GoogleMobileAds;
 
 @interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
@@ -99,10 +100,9 @@
             [sequential removeObjectAtIndex:index];
         }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [controlDelegate stopProgress:^{
-                weakSelf.songs = weakSelf.shuffleSongs;
-                [weakSelf.table reloadData];
-            }];
+            weakSelf.songs = weakSelf.shuffleSongs;
+            [weakSelf.table reloadData];
+            [controlDelegate stopProgress];
         });
     });
 }
@@ -175,9 +175,10 @@
 
 - (void)songCell:(SongCell*)songCell didTapSong:(Song*)song
 {
-    if (song.isPlaying) {
-        song.isPlaying = NO;
-        [_musicManager stopPlaying];
+    if (![_musicManager isPlayingSong:song]) {
+        [self _play:song];
+    } else if (vgsplay_isPlaying()) {
+        [_musicManager stopPlayingWithKeep:YES];
         [_table reloadData];
     } else {
         [self _play:song];
@@ -199,7 +200,15 @@
 
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song
 {
+    if ([_musicManager isPlayingSong:song] || [_musicManager isKeepingSong:song]) {
+        [self stopSong];
+        [_musicManager purgeKeepInfo];
+        [_table reloadData];
+        [_controlDelegate resetSeekBar];
+        return;
+    }
     [self stopSong];
+    [_musicManager purgeKeepInfo];
     __weak SongListView* weakSelf = self;
     [_controlDelegate askLockWithSong:song locked:^{
         [weakSelf.table reloadData];
@@ -223,13 +232,10 @@
 - (void)stopSong
 {
     for (Song* song in _songs) {
-        if (song.isPlaying) {
-            song.isPlaying = NO;
-            [_table reloadData];
-            [_musicManager stopPlaying];
-            break;
-        }
+        song.isPlaying = NO;
     }
+    [_table reloadData];
+    [_musicManager stopPlaying];
 }
 
 - (void)requireNextSong:(Song*)song

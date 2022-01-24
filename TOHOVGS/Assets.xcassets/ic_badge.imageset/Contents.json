@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "ic_home_white_18pt.png",
+      "filename" : "ic_badge.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "ic_home_white_18pt_2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "ic_home_white_18pt_3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

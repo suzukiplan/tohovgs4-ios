@@ -11,7 +11,9 @@
 #import "view/SongListView.h"
 #import "view/RetroView.h"
 #import "view/ProgressView.h"
+#import "view/SettingView.h"
 #import "vgs/vgsplay-ios.h"
+#import "SongListViewController.h"
 #import "ControlDelegate.h"
 #include "AdSettings.h"
 @import GoogleMobileAds;
@@ -22,7 +24,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
@@ -137,6 +139,9 @@
                 }
             }];
     }
+    [_musicManager checkUpdateWithCallback:^(BOOL updateExist) {
+        weakSelf.footer.badge = updateExist;
+    }];
 }
 
 - (void)viewSafeAreaInsetsDidChange
@@ -162,7 +167,7 @@
         _bannerLoaded = YES;
         [_bannerView loadRequest:[GADRequest request]];
     }
-    if (_currentPageIndex == 3) {
+    if (3 <= _currentPageIndex) {
         CGFloat pageHeight = sh - AD_HEIGHT - FOOTER_HEIGHT;
         _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
         if (all) _pageView.frame = CGRectMake(sx, sy + AD_HEIGHT, sw, pageHeight);
@@ -213,6 +218,10 @@
             nextPage = [[RetroView alloc] initWithControlDelegate:self];
             nextPageIndex = 3;
             break;
+        case FooterButtonTypeSettings:
+            nextPage = [[SettingView alloc] initWithControlDelegate:self delegate:self];
+            nextPageIndex = 4;
+            break;
     }
     [self.view addSubview:nextPage];
     if (_progressView) {
@@ -220,9 +229,9 @@
     }
     const CGFloat y = _pageView.frame.origin.y;
     const CGFloat w = _pageView.frame.size.width;
-    const CGFloat h = _pageView.frame.size.height - (3 == _currentPageIndex ? SEEKBAR_HEIGHT : 0);
+    const CGFloat h = _pageView.frame.size.height - (3 <= _currentPageIndex ? SEEKBAR_HEIGHT : 0);
     const BOOL moveToRight = _currentPageIndex < nextPageIndex;
-    nextPage.frame = CGRectMake(moveToRight ? w : -w, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
+    nextPage.frame = CGRectMake(moveToRight ? w : -w, y, w, h + (3 <= nextPageIndex ? SEEKBAR_HEIGHT : 0));
     __weak ViewController* weakSelf = self;
     _bannerView.hidden = NO;
     BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
@@ -231,7 +240,7 @@
     _bannerBgView.alpha = _bannerView.alpha;
     [UIView animateWithDuration:0.2 animations:^{
         weakSelf.pageView.frame = CGRectMake(moveToRight ? -w : w, y, w, weakSelf.pageView.frame.size.height);
-        nextPage.frame = CGRectMake(0, y, w, h + (3 == nextPageIndex ? SEEKBAR_HEIGHT : 0));
+        nextPage.frame = CGRectMake(0, y, w, h + (3 <= nextPageIndex ? SEEKBAR_HEIGHT : 0));
         weakSelf.bannerView.alpha = nextPageIsRetro ? 0 : 1;
         weakSelf.bannerBgView.alpha = weakSelf.bannerView.alpha;
         weakSelf.currentPageIndex = nextPageIndex;
@@ -281,6 +290,10 @@
 
 - (void)musicManager:(MusicManager*)manager didStopPlayingSong:(Song*)song
 {
+}
+
+- (void)resetSeekBar
+{
     _seekBar.max = 0;
 }
 
@@ -304,6 +317,11 @@
 - (void)seekBarView:(SeekBarView*)seek didRequestSeekTo:(NSInteger)progress
 {
     [_musicManager seekTo:progress];
+    if ([_pageView isKindOfClass:[AlbumPagerView class]]) {
+        [(AlbumPagerView*)_pageView reloadCurrentPage];
+    } else if ([_pageView isKindOfClass:[SongListView class]]) {
+        [(SongListView*)_pageView reload];
+    }
 }
 
 - (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity
@@ -323,7 +341,7 @@
     }];
 }
 
-- (void)stopProgress:(void(^)(void))done
+- (void)stopProgress
 {
     if (_progressView) {
         __weak ViewController* weakSelf = self;
@@ -332,9 +350,10 @@
                 weakSelf.progressView.alpha = 0;
             } completion:^(BOOL finished) {
                 if (finished) {
-                    [weakSelf.progressView removeFromSuperview];
-                    weakSelf.progressView = nil;
-                    done();
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.progressView removeFromSuperview];
+                        weakSelf.progressView = nil;
+                    });
                 }
             }];
         });
@@ -441,6 +460,19 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
+- (void)showInfoMessage:(NSString*)message
+{
+    NSString* title = NSLocalizedString(@"information", nil);
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:nil];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
 - (void)requestReward:(void(^)(void))earnReward
 {
     __weak ViewController* weakSelf = self;
@@ -451,10 +483,9 @@
                   completionHandler:^(GADRewardedAd* ad, NSError* error) {
         if (error) {
             NSLog(@"Rewarded ad failed to load with error: %@", [error localizedDescription]);
-            [weakSelf stopProgress:^{
-                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
-                [weakSelf showErrorMessage:message];
-            }];
+            [weakSelf stopProgress];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+            [weakSelf showErrorMessage:message];
             return;
         }
         weakSelf.rewardedAd = ad;
@@ -468,23 +499,36 @@
 - (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(nonnull NSError*)error
 {
     NSLog(@"Ad did fail to present full screen content.");
-    __weak ViewController* weakSelf = self;
-    [self stopProgress:^{
-        NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
-        [weakSelf showErrorMessage:message];
-    }];
+    [self stopProgress];
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+    [self showErrorMessage:message];
 }
 
 - (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
 {
     NSLog(@"Ad did present full screen content.");
-    [self stopProgress:^{}];
+    [self stopProgress];
 }
 
 - (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
 {
     NSLog(@"Ad did dismiss full screen content.");
-    [self stopProgress:^{}];
+    [self stopProgress];
+}
+
+- (void)didChangeSongListFromSettingView:(SettingView*)view
+{
+    _footer.badge = NO;
+}
+
+- (void)showUpdateSongs:(NSArray<Song*>*)songs
+{
+    SongListViewController* vc = [[SongListViewController alloc] init];
+    vc.songs = songs;
+    vc.modalPresentationStyle = UIModalPresentationPopover;
+    [self presentViewController:vc animated:YES completion:^{
+        ;
+    }];
 }
 
 @end

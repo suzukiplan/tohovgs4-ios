@@ -6,15 +6,21 @@
 #import "MusicManager.h"
 #import "../ControlDelegate.h"
 #import "../vgs/vgsplay-ios.h"
+#import "WebAPI.h"
 
 extern void* vgsdec;
 
 @interface MusicManager()
+@property (nonatomic) WebAPI* api;
 @property (nonatomic, weak) NSUserDefaults* userDefaults;
-@property (nonatomic, readwrite) NSArray<Album*>* albums;
+@property (nonatomic, readwrite) SongList* songList;
+@property (nonatomic, readwrite, weak) NSArray<Album*>* albums;
 @property (nonatomic, readwrite) NSMutableArray<Song*>* allUnlockedSongs;
 @property (nonatomic, readwrite, weak) Song* playingSong;
+@property (nonatomic, readwrite, weak) Song* keepSong;
+@property (nonatomic) int keepDuration;
 @property (nonatomic) NSTimer* monitoringTimer;
+@property (nonatomic) NSError* mmlDownloadError;
 @end
 
 @implementation MusicManager
@@ -22,21 +28,71 @@ extern void* vgsdec;
 - (instancetype)init
 {
     if (self = [super init]) {
+        _api = [[WebAPI alloc] init];
         _userDefaults = [NSUserDefaults standardUserDefaults];
-        NSError* error = nil;
-        NSString* path = [[NSBundle mainBundle] pathForResource:@"assets/songlist" ofType:@"json"];
-        NSLog(@"songlist: %@", path);
-        NSString* jsonString = [[NSString alloc] initWithContentsOfFile:path
-                                                               encoding:NSUTF8StringEncoding
-                                                                  error:&error];
-        NSData* jsonData = [jsonString dataUsingEncoding:NSUnicodeStringEncoding];
-        NSDictionary* json = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                             options:NSJSONReadingAllowFragments
-                                                               error:&error];
-        _albums = [Album parseJsonArray:json[@"albums"]];
+        // Choose a latest songlist.json from AppBundle or Downloaded
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString* downloadPath = [paths[0] stringByAppendingPathComponent:@"songlist.json"];
+        NSString* bundlePath = [[NSBundle mainBundle] pathForResource:@"assets/songlist" ofType:@"json"];
+        SongList* downloadSongList = [SongList fromFile:downloadPath];
+        SongList* bundleSongList = [SongList fromFile:bundlePath];
+        if (!downloadSongList) {
+            NSLog(@"Use AppBundle songlist.json (not downloaded)");
+            _songList = bundleSongList;
+        } else {
+            if ([downloadSongList.version compare:bundleSongList.version] < 0) {
+                // NOTE: May be rare case
+                NSLog(@"Use AppBundle songlist.json (newer than downloaded)");
+                _songList = bundleSongList;
+            } else {
+                NSLog(@"Use downloaded songlist.json");
+                _songList = downloadSongList;
+            }
+        }
+
+        // remove MML download failed songs if exist
+        NSArray<Song*>* allSongs = _songList.enumAllSongs;
+        for (Song* song in allSongs) {
+            if (![self _getMmlPathWithSong:song]) {
+                NSLog(@"remove song: %@ (MML file not found)", song.name);
+                [_songList removeSong:song];
+            }
+        }
+        _albums = _songList.albums;
+
+        // reset master volume
+        _masterVolume = 100 - [_userDefaults integerForKey:@"master_volume"];
+        vgsplay_changeMasterVolume((int)_masterVolume);
+
         [self _refreshAllUnlockedSongs];
     }
     return self;
+}
+
+- (NSString*)_getMmlPathWithSong:(Song*)song
+{
+    NSFileManager* fileManager = [NSFileManager defaultManager];
+    NSString* bunndleMmlName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
+    NSString* bundlePath = [[NSBundle mainBundle] pathForResource:bunndleMmlName ofType:@"mml"];
+    if ([fileManager fileExistsAtPath:bundlePath isDirectory:nil]) {
+        return bundlePath;
+    }
+    NSString* downloadMmlPath = [NSString stringWithFormat:@"%@.mml", song.mml];
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* downloadPath = [paths[0] stringByAppendingPathComponent:downloadMmlPath];
+    if ([fileManager fileExistsAtPath:downloadPath isDirectory:nil]) {
+        return downloadPath;
+    }
+    return nil;
+}
+
+- (NSArray<Song*>*)enumUndownloadedMmlSongs
+{
+    NSMutableArray<Song*>* result = [NSMutableArray arrayWithCapacity:_songList.numberOfSongs];
+    for (Album* album in _songList.albums) {
+        [result addObjectsFromArray:album.songs];
+    }
+    return result;
 }
 
 - (void)_refreshAllUnlockedSongs
@@ -57,8 +113,7 @@ extern void* vgsdec;
 
 - (NSString*)mmlPathOfSong:(Song*)song
 {
-    NSString* resourceName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
-    return [[NSBundle mainBundle] pathForResource:resourceName ofType:@"mml"];
+    return [self _getMmlPathWithSong:song];
 }
 
 - (void)_active:(BOOL)active
@@ -72,9 +127,14 @@ extern void* vgsdec;
 
 - (void)playSong:(Song*)song
 {
+    int seek = 0;
+    if ([_keepSong.mml isEqualToString:song.mml]) {
+        seek = _keepDuration;
+    }
+    _keepSong = nil;
     _playingSong = song;
     NSString* mmlPath = [self mmlPathOfSong:song];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, 0, 16);
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, seek, 16);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
@@ -103,10 +163,32 @@ extern void* vgsdec;
 
 - (void)stopPlaying
 {
+    [self stopPlayingWithKeep:NO];
+}
+
+- (BOOL)isPlayingSong:(Song*)song
+{
+    return _playingSong && [song.mml isEqualToString:_playingSong.mml];
+}
+
+- (BOOL)isKeepingSong:(Song*)song
+{
+    return _keepSong && [song.mml isEqualToString:_keepSong.mml];
+}
+
+- (void)stopPlayingWithKeep:(BOOL)keep
+{
     if (_playingSong) {
         BOOL isPlaying = vgsplay_isPlaying() ? YES : NO;
+        if (isPlaying && keep) {
+            _keepDuration = vgsplay_getCurrentTime();
+            _keepSong = _playingSong;
+        } else {
+            _keepDuration = 0;
+            _keepSong = nil;
+        }
         vgsplay_stop();
-        _playingSong.isPlaying = NO;
+        _playingSong.isPlaying = keep;
         if (isPlaying) {
             [_delegate musicManager:self didStopPlayingSong:_playingSong];
         }
@@ -119,10 +201,22 @@ extern void* vgsdec;
     }
 }
 
+- (void)purgeKeepInfo
+{
+    _keepSong = nil;
+    _keepDuration = 0;
+    [self stopPlaying];
+}
+
 - (void)seekTo:(NSInteger)progress
 {
     NSLog(@"seekTo: %ld", progress);
-    vgsplay_seek((unsigned int)progress);
+    if (vgsplay_isPlaying()) {
+        vgsplay_seek((unsigned int)progress);
+    } else if (_keepSong) {
+        _keepDuration = (int)progress;
+        [self playSong:_keepSong];
+    }
 }
 
 - (void)setInfinity:(BOOL)infinity
@@ -150,6 +244,95 @@ extern void* vgsdec;
     NSString* locked = lock ? @"L" : @"U";
     [_userDefaults setObject:locked forKey:[self _keyForSong:song]];
     [self _refreshAllUnlockedSongs];
+}
+
+- (void)setMasterVolume:(NSInteger)masterVolume
+{
+    if (_masterVolume != masterVolume) {
+        _masterVolume = masterVolume;
+        [_userDefaults setInteger:(100 - masterVolume) forKey:@"master_volume"];
+        vgsplay_changeMasterVolume((int)masterVolume);
+    }
+}
+
+- (void)checkUpdateWithCallback:(void(^)(BOOL updateExist))done
+{
+    [_api checkUpdateWithCurrentVersion:_songList.version done:^(NSError* error, BOOL updatable) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            done(updatable);
+        });
+    }];
+}
+
+- (void)updateSongListWithCallback:(void(^)(NSError* _Nullable error,
+                                            BOOL updated,
+                                            NSArray<Song*>* _Nullable downloaded))done
+{
+    NSLog(@"Updating songlist...");
+    __weak MusicManager* weakSelf = self;
+    _mmlDownloadError = nil;
+    [_api checkUpdateWithCurrentVersion:_songList.version done:^(NSError* error, BOOL updatable) {
+        usleep(1000000);
+        if (updatable) {
+            [weakSelf.api acquireSongList:^(NSError* error, SongList * _Nullable songList) {
+                if (!songList) {
+                    NSLog(@"failed download songlist.json: %@", error);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        done(error, NO, nil);
+                    });
+                } else {
+                    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                    NSMutableArray<Song*>* downloaded = [NSMutableArray array];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        for (Song* song in songList.enumAllSongs) {
+                            if (![weakSelf _getMmlPathWithSong:song]) {
+                                dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+                                [weakSelf.api acquireMmlWithSong:song done:^(NSError* error, NSString * _Nonnull mml) {
+                                    if (!mml) {
+                                        NSLog(@"failed download %@: %@", song.name, error);
+                                        weakSelf.mmlDownloadError = error;
+                                    } else {
+                                        NSString* path = [paths[0] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mml", song.mml]];
+                                        [mml writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                                        [downloaded addObject:song];
+                                    }
+                                    dispatch_semaphore_signal(semaphore);
+                                }];
+                                while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW)) {
+                                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
+                                }
+                                if (weakSelf.mmlDownloadError) {
+                                    break;
+                                }
+                            }
+                        }
+                        NSLog(@"Completed all MML file download tasks");
+                        BOOL updated = NO;
+                        if (!weakSelf.mmlDownloadError) {
+                            weakSelf.songList = songList;
+                            weakSelf.albums = songList.albums;
+                            [weakSelf _refreshAllUnlockedSongs];
+                            NSString* path = [paths[0] stringByAppendingPathComponent:@"songlist.json"];
+                            [songList.jsonString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                            updated = YES;
+                        }
+                        done(weakSelf.mmlDownloadError, updated, downloaded);
+                    });
+                }
+            }];
+        } else {
+            if (error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    done(error, NO, nil);
+                });
+            } else {
+                NSLog(@"songlist.json is already latest");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    done(nil, NO, @[]);
+                });
+            }
+        }
+    }];
 }
 
 @end

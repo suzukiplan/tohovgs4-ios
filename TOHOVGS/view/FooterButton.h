@@ -12,7 +12,8 @@ typedef NS_ENUM(NSInteger, FooterButtonType) {
     FooterButtonTypeHome,
     FooterButtonTypeAll,
     FooterButtonTypeShuffle,
-    FooterButtonTypeRetro
+    FooterButtonTypeRetro,
+    FooterButtonTypeSettings,
 };
 
 @class FooterButton;
@@ -22,7 +23,12 @@ typedef NS_ENUM(NSInteger, FooterButtonType) {
 @end
 
 @interface FooterButton : PushableView
-- (instancetype)initWithType:(FooterButtonType)type delegate:(id<FooterButtonDelegate>)delegate;
+@property (nonatomic) BOOL badge;
+- (instancetype)initWithType:(FooterButtonType)type
+                       badge:(BOOL)badge
+                    delegate:(id<FooterButtonDelegate>)delegate;
+- (instancetype)initWithType:(FooterButtonType)type
+                    delegate:(id<FooterButtonDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

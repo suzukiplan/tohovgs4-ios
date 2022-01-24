@@ -15,8 +15,8 @@
 
 @implementation Song
 
-+ (NSArray<Song*>*)parseJsonArray:(NSArray*)array
-                            album:(Album*)album
++ (NSMutableArray<Song*>*)parseJsonArray:(NSArray*)array
+                                   album:(Album*)album
 {
     NSMutableArray<Song*>* result = [NSMutableArray arrayWithCapacity:array.count];
     for (NSDictionary* data in array) {

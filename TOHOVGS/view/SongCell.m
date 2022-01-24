@@ -5,12 +5,14 @@
 
 #import "SongCell.h"
 #import "PushableView.h"
+#import "../vgs/vgsplay-ios.h"
 
 @interface SongCell() <PushableViewDelegate, LongPressDelegate>
 @property (nonatomic, weak) Song* song;
 @property (nonatomic) PushableView* pushable;
 @property (nonatomic) UILabel* titleLabel;
 @property (nonatomic, nullable) UILabel* englishLabel;
+@property (nonatomic) UIImageView* pauseLabel;
 @property (nonatomic) PushableView* lockedCover;
 @property (nonatomic) UIImageView* lockedImage;
 @end
@@ -30,6 +32,8 @@
         _titleLabel.textColor = [UIColor whiteColor];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         [_pushable addSubview:_titleLabel];
+        _pauseLabel = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"label_pause"]];
+        [_pushable addSubview:_pauseLabel];
         if (![[NSLocale currentLocale].languageCode isEqualToString:@"ja"]) {
             _englishLabel = [[UILabel alloc] init];
             _englishLabel.textColor = [UIColor colorWithWhite:1 alpha:0.75];
@@ -61,6 +65,7 @@
     } else {
         _titleLabel.frame = CGRectMake(8, 0, frame.size.width - 16, frame.size.height);
     }
+    _pauseLabel.frame = CGRectMake(4, 4, 28, 8);
     if ([_delegate songCell:self didRequestCheckLockedSong:_song]) {
         _titleLabel.font = [UIFont systemFontOfSize:14.5];
         self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
@@ -68,14 +73,17 @@
         _lockedImage.frame = CGRectMake((frame.size.width - 18) / 2, (frame.size.height - 18) / 2, 18, 18);
         _lockedCover.hidden = NO;
         _lockedImage.hidden = NO;
+        _pauseLabel.hidden = YES;
     } else {
         _lockedCover.hidden = YES;
         _lockedImage.hidden = YES;
         if (_song.isPlaying) {
             _titleLabel.font = [UIFont boldSystemFontOfSize:14.5];
+            _pauseLabel.hidden = vgsplay_isPlaying() ? YES : NO;
             self.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
         } else {
             _titleLabel.font = [UIFont systemFontOfSize:14.5];
+            _pauseLabel.hidden = YES;
             self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
         }
     }

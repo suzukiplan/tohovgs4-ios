@@ -27,3 +27,17 @@
 "confirm" = "Confirmation";
 "error" = "Error";
 "error_idfa" = "You are not allowed to get an IDFA, so you cannot play ads.";
+"contents" = "Content";
+"download_latest_songs" = "Download latest songs from server";
+"sound" = "Sound";
+"master_volume" = "Master Volume: %ld%%";
+"support" = "Support";
+"support_twitter" = "Twitter: @suzukiplan";
+"support_github" = "Web: suzukiplan.github.io";
+"connecting_server" = "Connecting Server...";
+"communication_error" = "Communication with the server has failed. (status code: %ld)";
+"information" = "Information";
+"list_is_latest" = "All songs are up to date.\nThe first update information for new songs will be posted on my Twitter, so please follow me if you like.";
+"added_songs" = "Added Following Songs";
+"close" = "Close";
+"update_list_only" = "Only the song list has been updated. No new songs have been added.";

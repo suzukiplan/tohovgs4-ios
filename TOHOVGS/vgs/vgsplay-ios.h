@@ -24,6 +24,7 @@ void vgsplay_changeLoopCount(int loop);
 int vgsplay_isPlaying(void);
 void vgsplay_changeInfinity(int infinity);
 void* vgsplay_getDecoder(void);
+void vgsplay_changeMasterVolume(int masterVolume);
 
 #ifdef __cplusplus
 };

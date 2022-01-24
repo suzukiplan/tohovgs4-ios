@@ -69,5 +69,6 @@ iOSInjectionProject/
 
 TOHOVGS/GoogleService-Info.plist
 TOHOVGS/AdSettings.h
+TOHOVGS/ServerSettings.h
 Pods
 TOHOVGS.xcworkspace

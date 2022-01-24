@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)requireNextSong:(Song*)song
                infinity:(BOOL)infinity;
 - (void)scrollToCurrentSong;
+- (void)reloadCurrentPage;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -10,44 +10,48 @@
 @property (nonatomic) FooterButtonType type;
 @property (nonatomic, weak) id<FooterButtonDelegate> footerDelegate;
 @property (nonatomic) UIImageView* image;
-@property (nonatomic) UILabel* label;
+@property (nonatomic, nullable) UIImageView* badgeView;
 @end
 
 @implementation FooterButton
 
 - (instancetype)initWithType:(FooterButtonType)type
+                    delegate:(id<FooterButtonDelegate>)delegate
+{
+    return [self initWithType:type badge:NO delegate:delegate];
+}
+
+- (instancetype)initWithType:(FooterButtonType)type
+                       badge:(BOOL)badge
                     delegate:(nonnull id<FooterButtonDelegate>)delegate
 {
     if (self = [super initWithDelegate:self]) {
         _type = type;
+        _badge = badge;
         _footerDelegate = delegate;
         self.touchAlphaAnimation = YES;
         self.tapBoundAnimation = YES;
         _image = [[UIImageView alloc] init];
         [self addSubview:_image];
-        _label = [[UILabel alloc] init];
-        _label.font = [UIFont boldSystemFontOfSize:12];
         switch (type) {
             case FooterButtonTypeHome:
-                _image.image = [UIImage imageNamed:@"ic_home_white_18pt"];
-                _label.text = NSLocalizedString(@"home", nil);
+                _image.image = [UIImage imageNamed:@"footer_home"];
                 break;
             case FooterButtonTypeAll:
-                _image.image = [UIImage imageNamed:@"ic_view_list_white_18pt"];
-                _label.text = NSLocalizedString(@"all", nil);
+                _image.image = [UIImage imageNamed:@"footer_all"];
                 break;
             case FooterButtonTypeShuffle:
-                _image.image = [UIImage imageNamed:@"ic_shuffle_white_18pt"];
-                _label.text = NSLocalizedString(@"shuffle", nil);
+                _image.image = [UIImage imageNamed:@"footer_shuffle"];
                 break;
             case FooterButtonTypeRetro:
-                _image.image = [UIImage imageNamed:@"ic_apps_white_18pt"];
-                _label.text = NSLocalizedString(@"retro", nil);
+                _image.image = [UIImage imageNamed:@"footer_retro"];
+                break;
+            case FooterButtonTypeSettings:
+                _image.image = [UIImage imageNamed:@"footer_settings"];
+                _badgeView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_badge"]];
+                [self addSubview:_badgeView];
                 break;
         }
-        _label.textAlignment = NSTextAlignmentCenter;
-        _label.textColor = [UIColor colorWithWhite:1 alpha:1];
-        [self addSubview:_label];
     }
     return self;
 }
@@ -55,17 +59,20 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    const CGFloat w = _label.intrinsicContentSize.width;
-    const CGFloat h = _label.intrinsicContentSize.height;
-    CGFloat y = (frame.size.height - h - 4 - 18) / 2;
-    _image.frame = CGRectMake((frame.size.width - 18) / 2, y, 18, 18);
-    y += 18 + 4;
-    _label.frame = CGRectMake((frame.size.width - w) / 2, y, w, h);
+    _image.frame = CGRectMake((frame.size.width - 32) / 2, (frame.size.height - 44) / 2, 32, 44);
+    _badgeView.frame = CGRectMake(_image.frame.origin.x + 22, _image.frame.origin.y + 2, 8, 8);
+    _badgeView.hidden = !_badge;
 }
 
 - (void)didPushPushableView:(PushableView*)pushableView
 {
     [_footerDelegate footerButton:self didTapWithType:_type];
+}
+
+- (void)setBadge:(BOOL)badge
+{
+    _badge = badge;
+    [self setFrame:self.frame];
 }
 
 @end

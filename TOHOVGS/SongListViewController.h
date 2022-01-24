@@ -4,13 +4,12 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "FooterButton.h"
+#import "model/Song.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FooterView : UIView
-@property (nonatomic) BOOL badge;
-- (instancetype)initWithDelegate:(id<FooterButtonDelegate>)delegate;
+@interface SongListViewController : UIViewController
+@property (nonatomic) NSArray<Song*>* songs;
 @end
 
 NS_ASSUME_NONNULL_END
