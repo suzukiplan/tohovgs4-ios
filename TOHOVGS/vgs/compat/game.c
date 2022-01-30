@@ -469,7 +469,7 @@ int vge_tick(void) {
 
     /* Auto focus */
     if (focus) {
-        if (0 == PRF.listType && fs_list[fs_musicCursor].id != fs_title[fs_currentTitle].id) {
+        if (0 == PRF.listType && 0 <= fs_musicCursor && fs_list[fs_musicCursor].id != fs_title[fs_currentTitle].id) {
             playingTitle = fs_list[fs_musicCursor].id;
             if (playingTitle != fs_title[fs_currentTitle].id) {
                 /* check pop count of right */
