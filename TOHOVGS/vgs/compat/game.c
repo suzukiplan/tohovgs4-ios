@@ -271,7 +271,9 @@ int vge_tick(void) {
         focus = 0;
         pflag = 1;
         if (0 == touching) {
-            if (HIT_CHECK(ci.cx - 4, ci.cy - 4, 8, 8, 0, 300, 240, 20)) {
+            if (PRF.listType && HIT_CHECK(ci.cx - 4, ci.cy - 4, 8, 8, 224, 130, 16, 190)) {
+                touching = 1;
+            } else if (HIT_CHECK(ci.cx - 4, ci.cy - 4, 8, 8, 0, 300, 240, 20)) {
                 touching = 3;
             } else {
                 touching = 2;
@@ -469,7 +471,7 @@ int vge_tick(void) {
 
     /* Auto focus */
     if (focus) {
-        if (0 == PRF.listType && fs_list[fs_musicCursor].id != fs_title[fs_currentTitle].id) {
+        if (0 == PRF.listType && 0 <= fs_musicCursor && fs_list[fs_musicCursor].id != fs_title[fs_currentTitle].id) {
             playingTitle = fs_list[fs_musicCursor].id;
             if (playingTitle != fs_title[fs_currentTitle].id) {
                 /* check pop count of right */
