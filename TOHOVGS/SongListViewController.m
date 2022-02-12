@@ -15,6 +15,7 @@
 @end
 
 @interface AddSongCell : UITableViewCell
+@property (nonatomic) UILabel* kind;
 @property (nonatomic) UILabel* albumName;
 @property (nonatomic) UILabel* songName;
 @end
@@ -35,6 +36,11 @@
         _songName.textColor = [UIColor whiteColor];
         _songName.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_songName];
+        _kind = [[UILabel alloc] init];
+        _kind.font = [UIFont systemFontOfSize:12];
+        _kind.textColor = [UIColor colorWithRed:0 green:0.6 blue:0.8 alpha:0.9];
+        _kind.textAlignment = NSTextAlignmentRight;
+        [self.contentView addSubview:_kind];
     }
     return self;
 }
@@ -42,11 +48,13 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    CGFloat h = _albumName.intrinsicContentSize.height + _songName.intrinsicContentSize.height + 4;
+    CGFloat h = _albumName.intrinsicContentSize.height + _songName.intrinsicContentSize.height + 4 + _kind.intrinsicContentSize.height + 4;
     CGFloat y = (frame.size.height - h) / 2;
     _albumName.frame = CGRectMake(8, y, frame.size.width - 16, _albumName.intrinsicContentSize.height);
     y += _albumName.intrinsicContentSize.height + 4;
     _songName.frame = CGRectMake(8, y, frame.size.width - 16, _songName.intrinsicContentSize.height);
+    y += _songName.intrinsicContentSize.height + 4;
+    _kind.frame = CGRectMake(8, y, frame.size.width - 16, _kind.intrinsicContentSize.height);
 }
 
 @end
@@ -131,6 +139,7 @@
     }
     cell.albumName.text = _songs[indexPath.row].parentAlbum.name;
     cell.songName.text = _songs[indexPath.row].name;
+    cell.kind.text = _songs[indexPath.row].primaryUseType == SongPrimaryUseTypeDownloaded ? NSLocalizedString(@"updated", nil) : NSLocalizedString(@"added", nil);
     return cell;
 }
 

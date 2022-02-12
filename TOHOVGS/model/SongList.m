@@ -72,4 +72,16 @@
     }
 }
 
+- (Song*)searchSongOfMML:(NSString*)mml
+{
+    for (Album* album in _albums) {
+        for (Song* song in album.songs) {
+            if ([song.mml isEqualToString:mml]) {
+                return song;
+            }
+        }
+    }
+    return nil;
+}
+
 @end

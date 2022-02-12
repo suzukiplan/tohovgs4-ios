@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (SongList* __nullable)fromFile:(NSString*)filePath;
 + (SongList* __nullable)fromJsonString:(NSString*)jsonString;
 - (void)removeSong:(Song*)song;
+- (nullable Song*)searchSongOfMML:(NSString*)mml;
 @end
 
 NS_ASSUME_NONNULL_END

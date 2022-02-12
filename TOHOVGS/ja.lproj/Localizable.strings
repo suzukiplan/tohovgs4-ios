@@ -38,6 +38,8 @@
 "communication_error" = "サーバーとの通信に失敗しました (状態コード: %ld)";
 "information" = "情報";
 "list_is_latest" = "楽曲は全て最新の状態です。\n新曲のアップデート情報は Twitter でお知らせするので、よろしければフォローしてください。";
-"added_songs" = "以下の楽曲が追加されました";
+"added_songs" = "楽曲リストを最新状態に更新しました";
 "close" = "閉じる";
 "update_list_only" = "楽曲リストの更新のみ行いました。追加された楽曲はありません。";
+"added" = "追加";
+"updated" = "更新";
