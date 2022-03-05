@@ -88,4 +88,20 @@
     }
 }
 
+- (void)moveToType:(FooterButtonType)type
+{
+    [self footerButton:[self buttonWithType:type] didTapWithType:type];
+}
+
+- (FooterButton*)buttonWithType:(FooterButtonType)type
+{
+    switch (type) {
+        case FooterButtonTypeHome: return _buttons[0];
+        case FooterButtonTypeAll: return _buttons[1];
+        case FooterButtonTypeShuffle: return _buttons[2];
+        case FooterButtonTypeRetro: return _buttons[3];
+        case FooterButtonTypeSettings: return _buttons[4];
+    }
+}
+
 @end
