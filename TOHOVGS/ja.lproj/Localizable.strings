@@ -45,3 +45,5 @@
 "ask_download_before_unlock" = "未ダウンロードの楽曲があります。ダウンロード後に再度アンロックが必要になってしまうため、先にダウンロードしますか？";
 "download_ahead" = "先にダウンロード";
 "unlock_soon" = "気にせずアンロック";
+"info" = "お知らせ";
+"check_apple_music" = "Apple Music で原曲をチェック";

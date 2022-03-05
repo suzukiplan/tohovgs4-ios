@@ -45,3 +45,5 @@
 "ask_download_before_unlock" = "There are songs that have not yet been downloaded. Do you want to download them first because you will need to unlock them again after downloading?";
 "download_ahead" = "Download ahead";
 "unlock_soon" = "Unlock";
+"info" = "Information";
+"check_apple_music" = "Check original songs (Apple Music)";
