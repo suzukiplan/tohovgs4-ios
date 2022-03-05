@@ -453,6 +453,11 @@
                 }
             }
         }
+        if ([weakSelf.pageView isKindOfClass:[AlbumPagerView class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [(AlbumPagerView*)weakSelf.pageView refreshIsThereLockedSongWithAnimate:YES];
+            });
+        }
         unlocked();
     }];
 }

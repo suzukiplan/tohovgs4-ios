@@ -179,7 +179,6 @@
     __weak AlbumPagerView* weakSelf = self;
     [self _stopSong];
     [_controlDelegate askUnlockAllWithCallback:^{
-        [weakSelf refreshIsThereLockedSongWithAnimate:YES];
         for (SongListView* page in weakSelf.pages) {
             [page reload];
         }
