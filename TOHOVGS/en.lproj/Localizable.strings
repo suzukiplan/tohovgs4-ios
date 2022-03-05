@@ -12,7 +12,6 @@
 "please_wait" = "Please wait…";
 "ok" = "OK";
 "cancel" = "Cancel";
-"ask_unlock" = "You can unlock all songs in %@ by playing reward ads.\nAre you sure you want to play it?";
 "ask_unlock_all" = "You can unlock all songs by playing reward ads.\nAre you sure you want to play it?";
 "ask_lock" = "Are you sure you want to lock the %@?\n\nNote: You will need to play the reward ad when you unlock it again.";
 "generating_shuffle_play_list" = "Generating shuffle play list…";

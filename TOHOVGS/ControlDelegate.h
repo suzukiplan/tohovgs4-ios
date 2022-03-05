@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showInfoMessage:(NSString*)message;
 - (void)showUpdateSongs:(NSArray<Song*>*)songs;
 - (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked;
-- (void)askUnlockWithAlbum:(Album*)album unlocked:(void(^)(void))unlocked;
 - (void)askUnlockAllWithCallback:(void(^)(void))unlocked;
 - (void)resetSeekBar;
 @end

@@ -224,7 +224,7 @@
 {
     [self stopSong];
     __weak SongListView* weakSelf = self;
-    [_controlDelegate askUnlockWithAlbum:song.parentAlbum unlocked:^{
+    [_controlDelegate askUnlockAllWithCallback:^{
         [weakSelf.table reloadData];
     }];
 }
