@@ -100,6 +100,11 @@
     [self _resize];
 }
 
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [self.delegate didDissmissSongListViewController:self];
+}
+
 - (void)_resize
 {
     CGFloat width = self.view.frame.size.width * 0.8;

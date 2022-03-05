@@ -24,7 +24,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
@@ -541,9 +541,20 @@
     SongListViewController* vc = [[SongListViewController alloc] init];
     vc.songs = songs;
     vc.modalPresentationStyle = UIModalPresentationPopover;
+    vc.delegate = self;
     [self presentViewController:vc animated:YES completion:^{
         ;
     }];
+}
+
+- (void)didDissmissSongListViewController:(SongListViewController*)viewController
+{
+    __weak ViewController* weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf askUnlockAllWithCallback:^{
+            NSLog(@"unlocked");
+        }];
+    });
 }
 
 @end
