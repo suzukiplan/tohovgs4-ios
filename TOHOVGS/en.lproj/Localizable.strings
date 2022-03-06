@@ -12,7 +12,6 @@
 "please_wait" = "Please wait…";
 "ok" = "OK";
 "cancel" = "Cancel";
-"ask_unlock" = "You can unlock all songs in %@ by playing reward ads.\nAre you sure you want to play it?";
 "ask_unlock_all" = "You can unlock all songs by playing reward ads.\nAre you sure you want to play it?";
 "ask_lock" = "Are you sure you want to lock the %@?\n\nNote: You will need to play the reward ad when you unlock it again.";
 "generating_shuffle_play_list" = "Generating shuffle play list…";
@@ -38,6 +37,13 @@
 "communication_error" = "Communication with the server has failed. (status code: %ld)";
 "information" = "Information";
 "list_is_latest" = "All songs are up to date.\nThe first update information for new songs will be posted on my Twitter, so please follow me if you like.";
-"added_songs" = "Added Following Songs";
+"added_songs" = "Updated Following Songs";
 "close" = "Close";
 "update_list_only" = "Only the song list has been updated. No new songs have been added.";
+"added" = "Added";
+"updated" = "Updated";
+"ask_download_before_unlock" = "There are songs that have not yet been downloaded. Do you want to download them first because you will need to unlock them again after downloading?";
+"download_ahead" = "Download ahead";
+"unlock_soon" = "Unlock";
+"info" = "Information";
+"check_apple_music" = "Check original songs (Apple Music)";

@@ -40,6 +40,22 @@ extern void* vgsdec;
             NSLog(@"Use AppBundle songlist.json (not downloaded)");
             _songList = bundleSongList;
         } else {
+            NSArray<Song*>* downloadSongs = downloadSongList.enumAllSongs;
+            NSArray<Song*>* bundleSongs = bundleSongList.enumAllSongs;
+            for (Song* bundleSong in bundleSongs) {
+                for (Song* downloadSong in downloadSongs) {
+                    if ([bundleSong.mml isEqualToString:downloadSong.mml]) {
+                        if (bundleSong.ver < downloadSong.ver) {
+                            NSLog(@"%@.mml will be preferentially used downloaded data.", bundleSong.mml);
+                            bundleSong.primaryUseType = SongPrimaryUseTypeDownloaded;
+                            downloadSong.primaryUseType = SongPrimaryUseTypeDownloaded;
+                        } else {
+                            bundleSong.primaryUseType = SongPrimaryUseTypePreset;
+                            downloadSong.primaryUseType = SongPrimaryUseTypePreset;
+                        }
+                    }
+                }
+            }
             if ([downloadSongList.version compare:bundleSongList.version] < 0) {
                 // NOTE: May be rare case
                 NSLog(@"Use AppBundle songlist.json (newer than downloaded)");
@@ -72,16 +88,30 @@ extern void* vgsdec;
 - (NSString*)_getMmlPathWithSong:(Song*)song
 {
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    NSString* bunndleMmlName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
-    NSString* bundlePath = [[NSBundle mainBundle] pathForResource:bunndleMmlName ofType:@"mml"];
-    if ([fileManager fileExistsAtPath:bundlePath isDirectory:nil]) {
-        return bundlePath;
-    }
-    NSString* downloadMmlPath = [NSString stringWithFormat:@"%@.mml", song.mml];
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* downloadPath = [paths[0] stringByAppendingPathComponent:downloadMmlPath];
-    if ([fileManager fileExistsAtPath:downloadPath isDirectory:nil]) {
-        return downloadPath;
+    if (song.primaryUseType == SongPrimaryUseTypeDownloaded) {
+        NSString* downloadMmlPath = [NSString stringWithFormat:@"%@.mml", song.mml];
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString* downloadPath = [paths[0] stringByAppendingPathComponent:downloadMmlPath];
+        if ([fileManager fileExistsAtPath:downloadPath isDirectory:nil]) {
+            return downloadPath;
+        }
+        NSString* bunndleMmlName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
+        NSString* bundlePath = [[NSBundle mainBundle] pathForResource:bunndleMmlName ofType:@"mml"];
+        if ([fileManager fileExistsAtPath:bundlePath isDirectory:nil]) {
+            return bundlePath;
+        }
+    } else {
+        NSString* bunndleMmlName = [NSString stringWithFormat:@"assets/mml/%@", song.mml];
+        NSString* bundlePath = [[NSBundle mainBundle] pathForResource:bunndleMmlName ofType:@"mml"];
+        if ([fileManager fileExistsAtPath:bundlePath isDirectory:nil]) {
+            return bundlePath;
+        }
+        NSString* downloadMmlPath = [NSString stringWithFormat:@"%@.mml", song.mml];
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString* downloadPath = [paths[0] stringByAppendingPathComponent:downloadMmlPath];
+        if ([fileManager fileExistsAtPath:downloadPath isDirectory:nil]) {
+            return downloadPath;
+        }
     }
     return nil;
 }
@@ -285,7 +315,11 @@ extern void* vgsdec;
                     NSMutableArray<Song*>* downloaded = [NSMutableArray array];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         for (Song* song in songList.enumAllSongs) {
-                            if (![weakSelf _getMmlPathWithSong:song]) {
+                            Song* currentSong = [weakSelf.songList searchSongOfMML:song.mml];
+                            if (!currentSong || currentSong.ver < song.ver) {
+                                if (currentSong) {
+                                    song.primaryUseType = SongPrimaryUseTypeDownloaded;
+                                }
                                 dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
                                 [weakSelf.api acquireMmlWithSong:song done:^(NSError* error, NSString * _Nonnull mml) {
                                     if (!mml) {

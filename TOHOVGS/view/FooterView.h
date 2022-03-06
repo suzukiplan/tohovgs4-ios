@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FooterView : UIView
 @property (nonatomic) BOOL badge;
 - (instancetype)initWithDelegate:(id<FooterButtonDelegate>)delegate;
+- (void)moveToType:(FooterButtonType)type;
 @end
 
 NS_ASSUME_NONNULL_END

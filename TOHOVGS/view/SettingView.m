@@ -25,6 +25,9 @@
 @property (nonatomic) UILabel* twitterLabel;
 @property (nonatomic) PushableView* github;
 @property (nonatomic) UILabel* githubLabel;
+@property (nonatomic) UILabel* infoLabel;
+@property (nonatomic) UILabel* appleMusicLabel;
+@property (nonatomic) PushableView* appleMusic;
 @property (nonatomic) BOOL initialized;
 @property (nonatomic) BOOL alreadyChecked;
 @end
@@ -72,6 +75,13 @@
         [self addSubview:_github];
         _githubLabel = [self _makeButton:NSLocalizedString(@"support_github", nil)];
         [_github addSubview:_githubLabel];
+        _infoLabel = [self _makeHeader:NSLocalizedString(@"info", nil)];
+        [self addSubview:_infoLabel];
+        _appleMusic = [[PushableView alloc] initWithDelegate:self];
+        _appleMusic.touchAlphaAnimation = YES;
+        [self addSubview:_appleMusic];
+        _appleMusicLabel = [self _makeButton:NSLocalizedString(@"check_apple_music", nil)];
+        [_appleMusic addSubview:_appleMusicLabel];
         _initialized = YES;
     }
     return self;
@@ -137,6 +147,11 @@
     y += 44 + 8;
     _github.frame = CGRectMake(8, y, frame.size.width - 16, 44);
     _githubLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
+    y += 44 + 32;
+    _infoLabel.frame = CGRectMake(8, y, frame.size.width - 16, th);
+    y += th + 12;
+    _appleMusic.frame = CGRectMake(8, y, frame.size.width - 16, 44);
+    _appleMusicLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
     y += 44 + 8;
     self.contentSize = CGSizeMake(frame.size.width, y);
 }
@@ -178,6 +193,8 @@
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://twitter.com/suzukiplan"]];
     } else if (pushableView == _github) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://suzukiplan.github.io/tohovgs4-ios/"]];
+    } else if (pushableView == _appleMusic) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://music.apple.com/jp/artist/1190977068"]];
     }
     if (url) {
         [[UIApplication sharedApplication] openURL:url

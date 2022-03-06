@@ -24,7 +24,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
@@ -181,6 +181,14 @@
         _footer.frame = CGRectMake(sx, sy + sh - FOOTER_HEIGHT, sw, FOOTER_HEIGHT);
     }
     _progressView.frame = CGRectMake(sx, sy, sw, sh);
+}
+
+- (void)_moveTo:(FooterButtonType)type
+{
+    __weak ViewController* weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf.footer moveToType:FooterButtonTypeSettings];
+    });
 }
 
 - (void)footerButton:(FooterButton*)button didTapWithType:(FooterButtonType)type
@@ -385,38 +393,6 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
-- (void)askUnlockWithAlbum:(Album*)album unlocked:(void(^)(void))unlocked
-{
-    __weak ViewController* weakSelf = self;
-    NSString* title = NSLocalizedString(@"confirm", nil);
-    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_unlock", nil), album.name];
-    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
-                                                                        message:message
-                                                                 preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil)
-                                                     style:UIAlertActionStyleCancel
-                                                   handler:nil];
-    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
-                                                 style:UIAlertActionStyleDefault
-                                               handler:^(UIAlertAction * _Nonnull action) {
-        [self requestReward:^{
-            for (Song* song in album.songs) {
-                if ([weakSelf.musicManager isLockedSong:song]) {
-                    [weakSelf.musicManager lock:NO song:song];
-                }
-            }
-            if ([weakSelf.pageView isKindOfClass:[AlbumPagerView class]]) {
-                [(AlbumPagerView*)weakSelf.pageView refreshIsThereLockedSongWithAnimate:YES];
-            }
-            unlocked();
-        }];
-    }];
-    [controller addAction:cancel];
-    [controller addAction:ok];
-    [self presentViewController:controller animated:YES completion:nil];
-
-}
-
 - (void)askUnlockAllWithCallback:(void(^)(void))unlocked
 {
     __weak ViewController* weakSelf = self;
@@ -431,20 +407,59 @@
     UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
                                                  style:UIAlertActionStyleDefault
                                                handler:^(UIAlertAction * _Nonnull action) {
-        [self requestReward:^{
-            for (Album* album in weakSelf.musicManager.albums) {
-                for (Song* song in album.songs) {
-                    if ([weakSelf.musicManager isLockedSong:song]) {
-                        [weakSelf.musicManager lock:NO song:song];
-                    }
-                }
-            }
-            unlocked();
-        }];
+        if (weakSelf.footer.badge) {
+            [weakSelf confirmDownloadBeforeUnlockWithCallback:unlocked];
+        } else {
+            [weakSelf doUnlockWithCallback:unlocked];
+        }
     }];
     [controller addAction:cancel];
     [controller addAction:ok];
     [self presentViewController:controller animated:YES completion:nil];
+}
+
+- (void)confirmDownloadBeforeUnlockWithCallback:(void(^)(void))unlocked
+{
+    __weak ViewController* weakSelf = self;
+    NSString* title = NSLocalizedString(@"confirm", nil);
+    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_download_before_unlock", nil)];
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"unlock_soon", nil)
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * _Nonnull action) {
+        [weakSelf doUnlockWithCallback:unlocked];
+    }];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"download_ahead", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction * _Nonnull action) {
+        [weakSelf _moveTo:FooterButtonTypeSettings];
+    }];
+    [controller addAction:cancel];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:YES completion:nil];
+
+}
+
+- (void)doUnlockWithCallback:(void(^)(void))unlocked
+{
+    __weak ViewController* weakSelf = self;
+    [self requestReward:^{
+        for (Album* album in weakSelf.musicManager.albums) {
+            for (Song* song in album.songs) {
+                if ([weakSelf.musicManager isLockedSong:song]) {
+                    [weakSelf.musicManager lock:NO song:song];
+                }
+            }
+        }
+        if ([weakSelf.pageView isKindOfClass:[AlbumPagerView class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [(AlbumPagerView*)weakSelf.pageView refreshIsThereLockedSongWithAnimate:YES];
+            });
+        }
+        unlocked();
+    }];
 }
 
 - (void)showErrorMessage:(NSString*)message
@@ -526,9 +541,20 @@
     SongListViewController* vc = [[SongListViewController alloc] init];
     vc.songs = songs;
     vc.modalPresentationStyle = UIModalPresentationPopover;
+    vc.delegate = self;
     [self presentViewController:vc animated:YES completion:^{
         ;
     }];
+}
+
+- (void)didDissmissSongListViewController:(SongListViewController*)viewController
+{
+    __weak ViewController* weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf askUnlockAllWithCallback:^{
+            NSLog(@"unlocked");
+        }];
+    });
 }
 
 @end

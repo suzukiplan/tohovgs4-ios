@@ -8,6 +8,7 @@
 @interface Song()
 @property (nonatomic, readwrite) Album* parentAlbum;
 @property (nonatomic, readwrite) NSString* mml;
+@property (nonatomic, readwrite) NSInteger ver;
 @property (nonatomic, readwrite) NSInteger loop;
 @property (nonatomic, readwrite) NSString* name;
 @property (nonatomic, readwrite, nullable) NSString* english;
@@ -23,9 +24,11 @@
         Song* song = [[Song alloc] init];
         song.parentAlbum = album;
         song.mml = data[@"mml"];
+        song.ver = data[@"ver"] != [NSNull null] ? [data[@"ver"] integerValue] : 0;
         song.loop = [data[@"loop"] integerValue];
         song.name = data[@"name"];
         song.english = data[@"english"] != [NSNull null] ? data[@"english"] : nil;
+        song.primaryUseType = SongPrimaryUseTypePreset;
         [result addObject:song];
     }
     return result;
