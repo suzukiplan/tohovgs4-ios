@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 #import "ViewController.h"
 #import "model/Song.h"
+#import "api/PurchaseDelegate.h"
 
 @class ViewController;
 
@@ -21,6 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked;
 - (void)askUnlockAllWithCallback:(void(^)(void))unlocked;
 - (void)resetSeekBar;
+- (NSString*)priceWithProductId:(NSString*)productId;
+- (BOOL)isPurchasedWithProductId:(NSString*)productId;
+- (void)purchaseWithProductId:(NSString*)productId purchaseDelegate:(id<PurchaseDelegate>)purchaseDelegate;
+- (void)restorePurchaseWithPurchaseDelegate:(id<PurchaseDelegate>)purchaseDelegate;
+- (void)presentViewController:(UIViewController*)viewController;
 @end
 
 NS_ASSUME_NONNULL_END
