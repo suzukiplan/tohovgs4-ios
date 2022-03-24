@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Album : NSObject
 @property (nonatomic, readonly) NSString* albumId;
+@property (nonatomic, readonly, nullable) NSString* appleId;
 @property (nonatomic, readonly) NSString* name;
 @property (nonatomic, readonly) NSString* formalName;
 @property (nonatomic, readonly) NSString* copyright;

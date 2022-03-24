@@ -24,8 +24,9 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate, ProductManagerDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
+@property (nonatomic, readwrite) ProductManager* productManager;
 @property (nonatomic) UIView* adContainer;
 @property (nonatomic) UIImageView* tohovgsImage;
 @property (nonatomic) UILabel* tohovgsLabel;
@@ -49,6 +50,8 @@
     self.view.clipsToBounds = YES;
     _musicManager = [[MusicManager alloc] init];
     _musicManager.delegate = self;
+    _productManager = [[ProductManager alloc] init];
+    _productManager.delegate = self;
     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
     _adContainer = [[UIView alloc] init];
     _adContainer.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
@@ -68,15 +71,17 @@
     [self.view addSubview:_seekBar];
     _footer = [[FooterView alloc] initWithDelegate:self];
     [self.view addSubview:_footer];
-    _bannerBgView = [[UIView alloc] init];
-    _bannerBgView.backgroundColor = [UIColor blackColor];
-    _bannerBgView.hidden = YES;
-    [_adContainer addSubview:_bannerBgView];
-    _bannerView = [[GADBannerView alloc] initWithAdSize:GADAdSizeBanner];
-    _bannerView.adUnitID = ADS_ID_BANNER;
-    _bannerView.rootViewController = self;
-    _bannerView.delegate = self;
-    [_adContainer addSubview:_bannerView];
+    if (![_productManager isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+        _bannerBgView = [[UIView alloc] init];
+        _bannerBgView.backgroundColor = [UIColor blackColor];
+        _bannerBgView.hidden = YES;
+        [_adContainer addSubview:_bannerBgView];
+        _bannerView = [[GADBannerView alloc] initWithAdSize:GADAdSizeBanner];
+        _bannerView.adUnitID = ADS_ID_BANNER;
+        _bannerView.rootViewController = self;
+        _bannerView.delegate = self;
+        [_adContainer addSubview:_bannerView];
+    }
     _currentPageIndex = 0;
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center addObserver:self
@@ -159,11 +164,13 @@
     const CGFloat sw = self.view.frame.size.width - safe.left - safe.right;
     const CGFloat sh = self.view.frame.size.height - safe.top - safe.bottom - bh;
     _adContainer.frame = CGRectMake(sx, sy, sw, AD_HEIGHT);
-    _bannerView.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
-    _bannerBgView.frame = _bannerView.frame;
-    _tohovgsImage.frame = _bannerView.frame;
-    _tohovgsLabel.frame = _bannerView.frame;
-    if (!_bannerLoaded) {
+    if (_bannerView) {
+        _bannerView.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
+        _bannerBgView.frame = _bannerView.frame;
+    }
+    _tohovgsImage.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
+    _tohovgsLabel.frame = CGRectMake(0, 0, sw, AD_HEIGHT);
+    if (_bannerView && !_bannerLoaded) {
         _bannerLoaded = YES;
         [_bannerView loadRequest:[GADRequest request]];
     }
@@ -370,16 +377,16 @@
 
 - (void)askLockWithSong:(Song*)song locked:(void(^)(void))locked
 {
+    NSString* title = song.name;
+    NSString* message = NSLocalizedString(@"choose_operation", nil);
     __weak ViewController* weakSelf = self;
-    NSString* title = NSLocalizedString(@"confirm", nil);
-    NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_lock", nil), song.name];
     UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
                                                                         message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil)
                                                      style:UIAlertActionStyleCancel
                                                    handler:nil];
-    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil)
+    UIAlertAction* lockSong = [UIAlertAction actionWithTitle:NSLocalizedString(@"lock_song", nil)
                                                  style:UIAlertActionStyleDefault
                                                handler:^(UIAlertAction * _Nonnull action) {
         [weakSelf.musicManager lock:YES song:song];
@@ -388,13 +395,31 @@
         }
         locked();
     }];
+    UIAlertAction* appleMusic = [UIAlertAction actionWithTitle:NSLocalizedString(@"check_apple_music", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction * _Nonnull action) {
+        if (song.appleMusicURL) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:song.appleMusicURL]
+                                               options:@{}
+                                     completionHandler:^(BOOL success){
+                                         // nothing to do
+                                     }];
+        } else {
+            [self showErrorMessage:NSLocalizedString(@"apple_music_not_found", nil)];
+        }
+    }];
     [controller addAction:cancel];
-    [controller addAction:ok];
+    [controller addAction:lockSong];
+    [controller addAction:appleMusic];
     [self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)askUnlockAllWithCallback:(void(^)(void))unlocked
 {
+    if ([_productManager isPurchasedWithProductId:PRODUCT_ID_REWARD]) {
+        [self doUnlockWithCallback:unlocked];
+        return;
+    }
     __weak ViewController* weakSelf = self;
     NSString* title = NSLocalizedString(@"confirm", nil);
     NSString* message = [NSString stringWithFormat:NSLocalizedString(@"ask_unlock_all", nil)];
@@ -490,6 +515,10 @@
 
 - (void)requestReward:(void(^)(void))earnReward
 {
+    if ([_productManager isPurchasedWithProductId:PRODUCT_ID_REWARD]) {
+        earnReward();
+        return;
+    }
     __weak ViewController* weakSelf = self;
     [self startProgressWithMessage:NSLocalizedString(@"please_wait", nil)];
     GADRequest *request = [GADRequest request];
@@ -555,6 +584,43 @@
             NSLog(@"unlocked");
         }];
     });
+}
+
+- (NSString*)priceWithProductId:(NSString*)productId
+{
+    return [_productManager priceWithProductId:productId];
+}
+
+- (BOOL)isPurchasedWithProductId:(NSString*)productId
+{
+    return [_productManager isPurchasedWithProductId:productId];
+}
+
+- (void)purchaseWithProductId:(NSString*)productId
+             purchaseDelegate:(id<PurchaseDelegate>)purchaseDelegate
+{
+    [_productManager purchaseWithProductId:productId purchaseDelegate:purchaseDelegate];
+}
+
+- (void)restorePurchaseWithPurchaseDelegate:(id<PurchaseDelegate>)purchaseDelegate
+{
+    [_productManager restoreWithPurchaseDelegate:purchaseDelegate];
+}
+
+- (void)presentViewController:(UIViewController *)viewController
+{
+    [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void)productManagerDidRequestRemoveBannerAds:(ProductManager*)manager
+{
+    if (_bannerView && [_productManager isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+        [_bannerView removeFromSuperview];
+        _bannerView = nil;
+        [_bannerBgView removeFromSuperview];
+        _bannerBgView = nil;
+        [self _resizeAll:YES];
+    }
 }
 
 @end

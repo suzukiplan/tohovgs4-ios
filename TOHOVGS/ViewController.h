@@ -5,8 +5,10 @@
 
 #import <UIKit/UIKit.h>
 #import "api/MusicManager.h"
+#import "api/ProductManager.h"
 
 @interface ViewController : UIViewController
 @property (nonatomic, readonly) MusicManager* musicManager;
+@property (nonatomic, readonly) ProductManager* productManager;
 @end
 

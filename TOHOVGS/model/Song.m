@@ -7,6 +7,7 @@
 
 @interface Song()
 @property (nonatomic, readwrite) Album* parentAlbum;
+@property (nonatomic, readwrite, nullable) NSString* appleId;
 @property (nonatomic, readwrite) NSString* mml;
 @property (nonatomic, readwrite) NSInteger ver;
 @property (nonatomic, readwrite) NSInteger loop;
@@ -23,6 +24,7 @@
     for (NSDictionary* data in array) {
         Song* song = [[Song alloc] init];
         song.parentAlbum = album;
+        song.appleId = data[@"appleId"] != [NSNull null] ? data[@"appleId"] : nil;
         song.mml = data[@"mml"];
         song.ver = data[@"ver"] != [NSNull null] ? [data[@"ver"] integerValue] : 0;
         song.loop = [data[@"loop"] integerValue];
@@ -32,6 +34,16 @@
         [result addObject:song];
     }
     return result;
+}
+
+- (NSString*)appleMusicURL
+{
+    if (_parentAlbum.appleId) {
+        if (_appleId) {
+            return [NSString stringWithFormat:@"https://music.apple.com/jp/album/%@?i=%@", _parentAlbum.appleId, _appleId];
+        }
+    }
+    return nil;
 }
 
 @end

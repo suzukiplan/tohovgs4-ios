@@ -7,6 +7,7 @@
 
 @interface Album()
 @property (nonatomic, readwrite) NSString* albumId;
+@property (nonatomic, readwrite, nullable) NSString* appleId;
 @property (nonatomic, readwrite) NSString* name;
 @property (nonatomic, readwrite) NSString* formalName;
 @property (nonatomic, readwrite) NSString* copyright;
@@ -23,6 +24,7 @@
     for (NSDictionary* data in array) {
         Album* album = [[Album alloc] init];
         album.albumId = data[@"albumId"];
+        album.appleId = data[@"appleId"] != [NSNull null] ? data[@"appleId"] : nil;
         album.name = data[@"name"];
         album.formalName = data[@"formalName"];
         album.copyright = data[@"copyright"];

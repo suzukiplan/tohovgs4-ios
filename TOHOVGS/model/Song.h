@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, SongPrimaryUseType) {
 
 @interface Song : NSObject
 @property (nonatomic, readonly) Album* parentAlbum;
+@property (nonatomic, readonly, nullable) NSString* appleId;
 @property (nonatomic, readonly) NSString* mml;
 @property (nonatomic, readonly) NSInteger ver;
 @property (nonatomic, readonly) NSInteger loop;
@@ -24,6 +25,7 @@ typedef NS_ENUM(NSInteger, SongPrimaryUseType) {
 @property (nonatomic, readonly, nullable) NSString* english;
 @property (nonatomic) SongPrimaryUseType primaryUseType;
 @property (nonatomic) BOOL isPlaying;
+@property (nonatomic, readonly, nullable) NSString* appleMusicURL;
 + (NSMutableArray<Song*>*)parseJsonArray:(NSArray*)array album:(Album*)album;
 @end
 

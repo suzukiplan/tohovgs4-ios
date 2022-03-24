@@ -12,6 +12,7 @@
 "please_wait" = "しばらくお待ち下さい…";
 "ok" = "OK";
 "cancel" = "キャンセル";
+"purchase" = "購入";
 "ask_unlock_all" = "リワード広告を再生することで全楽曲をアンロックすることができます。";
 "ask_lock" = "「%@」をロックしてもよろしいですか?";
 "generating_shuffle_play_list" = "シャッフル・プレイリストを生成中…";
@@ -34,6 +35,7 @@
 "support_twitter" = "Twitter: @suzukiplan";
 "support_github" = "Web: suzukiplan.github.io";
 "connecting_server" = "サーバーと通信中...";
+"connecting_appstore" = "AppStoreと通信中...";
 "communication_error" = "サーバーとの通信に失敗しました (状態コード: %ld)";
 "information" = "情報";
 "list_is_latest" = "楽曲は全て最新の状態です。\n新曲のアップデート情報は Twitter でお知らせするので、よろしければフォローしてください。";
@@ -47,3 +49,14 @@
 "unlock_soon" = "気にせずアンロック";
 "info" = "お知らせ";
 "check_apple_music" = "Apple Music で原曲をチェック";
+"remove_ads" = "広告削除";
+"remove_ads_reward" = "リワード広告を削除\n(価格: %@)";
+"remove_ads_reward_about" = "本商品を購入すると、リワード動画広告を再生せずに楽曲をアンロックできるようになります。本商品は一度購入するとご使用中のAppleIDで永続的に利用できます。";
+"remove_ads_banner" = "バナーとシャッフル広告を削除\n(価格: %@)";
+"remove_ads_banner_about" = "本商品を購入すると、画面上部のバナー広告とシャッフル再生時の全画面広告が表示されなくなります。赤字運営を避けるためにこれらの広告は重要なため、やや高額な価格設定がされています。本商品は一度購入するとご使用中のAppleIDで永続的に利用できます。";
+"restore_purchases" = "リストア（購入を復元）";
+"already_purchased" = "この商品は既に購入済みです。";
+"already_restored" = "商品情報は既にリストア済みです。";
+"choose_operation" = "この楽曲に対する操作を選択してください";
+"lock_song" = "ロックする";
+"apple_music_not_found" = "この楽曲はまだAppleMusicでは配信されていません。";

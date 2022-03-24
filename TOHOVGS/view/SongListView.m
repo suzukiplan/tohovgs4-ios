@@ -76,6 +76,10 @@
 - (void)shuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
 {
     if (_songs.count < 1) return;
+    if ([controlDelegate isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+        [self _doShuffleWithControlDelegate:controlDelegate];
+        return;
+    }
     GADRequest *request = [GADRequest request];
     [GADInterstitialAd loadWithAdUnitID:ADS_ID_INTERSTITIAL
                                 request:request
@@ -91,19 +95,25 @@
     __weak SongListView* weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         sleep(2);
-        NSMutableArray<Song*>* sequential = [weakSelf.songs mutableCopy];
-        weakSelf.shuffleSongs = [NSMutableArray arrayWithCapacity:weakSelf.songs.count];
-        srand((unsigned int)time(NULL));
-        while (0 < sequential.count) {
-            NSInteger index = abs(rand()) % sequential.count;
-            [weakSelf.shuffleSongs addObject:sequential[index]];
-            [sequential removeObjectAtIndex:index];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.songs = weakSelf.shuffleSongs;
-            [weakSelf.table reloadData];
-            [controlDelegate stopProgress];
-        });
+        [weakSelf _doShuffleWithControlDelegate:controlDelegate];
+    });
+}
+
+- (void)_doShuffleWithControlDelegate:(id<ControlDelegate>)controlDelegate
+{
+    NSMutableArray<Song*>* sequential = [_songs mutableCopy];
+    _shuffleSongs = [NSMutableArray arrayWithCapacity:_songs.count];
+    srand((unsigned int)time(NULL));
+    while (0 < sequential.count) {
+        NSInteger index = abs(rand()) % sequential.count;
+        [_shuffleSongs addObject:sequential[index]];
+        [sequential removeObjectAtIndex:index];
+    }
+    __weak SongListView* weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        weakSelf.songs = weakSelf.shuffleSongs;
+        [weakSelf.table reloadData];
+        [controlDelegate stopProgress];
     });
 }
 

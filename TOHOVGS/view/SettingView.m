@@ -7,7 +7,7 @@
 #import "PushableView.h"
 #import "SliderView.h"
 
-@interface SettingView() <PushableViewDelegate, SliderViewDelegate>
+@interface SettingView() <PushableViewDelegate, SliderViewDelegate, PurchaseDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) id<SettingViewDelegate> settingDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
@@ -28,8 +28,16 @@
 @property (nonatomic) UILabel* infoLabel;
 @property (nonatomic) UILabel* appleMusicLabel;
 @property (nonatomic) PushableView* appleMusic;
+@property (nonatomic) UILabel* removeAdsLabel;
+@property (nonatomic) UILabel* removeRewardAdsLabel;
+@property (nonatomic) PushableView* removeRewardAds;
+@property (nonatomic) UILabel* removeBannerAdsLabel;
+@property (nonatomic) PushableView* removeBannerAds;
+@property (nonatomic) UILabel* restorePurchasesLabel;
+@property (nonatomic) PushableView* restorePurchases;
 @property (nonatomic) BOOL initialized;
 @property (nonatomic) BOOL alreadyChecked;
+@property (nonatomic) NSString* purchaseProductId;
 @end
 
 @implementation SettingView
@@ -82,6 +90,25 @@
         [self addSubview:_appleMusic];
         _appleMusicLabel = [self _makeButton:NSLocalizedString(@"check_apple_music", nil)];
         [_appleMusic addSubview:_appleMusicLabel];
+        _removeAdsLabel = [self _makeHeader:NSLocalizedString(@"remove_ads", nil)];
+        [self addSubview:_removeAdsLabel];
+        _removeRewardAds = [[PushableView alloc] initWithDelegate:self];
+        _removeRewardAds.touchAlphaAnimation = YES;
+        [self addSubview:_removeRewardAds];
+        _removeRewardAdsLabel = [self _makeButton:[NSString stringWithFormat:NSLocalizedString(@"remove_ads_reward", nil), [_controlDelegate priceWithProductId:PRODUCT_ID_REWARD]]];
+        _removeRewardAdsLabel.numberOfLines = 2;
+        [_removeRewardAds addSubview:_removeRewardAdsLabel];
+        _removeBannerAds = [[PushableView alloc] initWithDelegate:self];
+        _removeBannerAds.touchAlphaAnimation = YES;
+        [self addSubview:_removeBannerAds];
+        _removeBannerAdsLabel = [self _makeButton:[NSString stringWithFormat:NSLocalizedString(@"remove_ads_banner", nil), [_controlDelegate priceWithProductId:PRODUCT_ID_BANNER]]];
+        _removeBannerAdsLabel.numberOfLines = 2;
+        [_removeBannerAds addSubview:_removeBannerAdsLabel];
+        _restorePurchases = [[PushableView alloc] initWithDelegate:self];
+        _restorePurchases.touchAlphaAnimation = YES;
+        [self addSubview:_restorePurchases];
+        _restorePurchasesLabel = [self _makeButton:NSLocalizedString(@"restore_purchases", nil)];
+        [_restorePurchases addSubview:_restorePurchasesLabel];
         _initialized = YES;
     }
     return self;
@@ -152,7 +179,31 @@
     y += th + 12;
     _appleMusic.frame = CGRectMake(8, y, frame.size.width - 16, 44);
     _appleMusicLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
-    y += 44 + 8;
+    y += 44 + 32;
+    _removeAdsLabel.frame = CGRectMake(8, y, frame.size.width - 16, th);
+    y += th + 12;
+    _removeRewardAds.frame = CGRectMake(8, y, frame.size.width - 16, 52);
+    _removeRewardAdsLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 52);
+    if ([_controlDelegate isPurchasedWithProductId:PRODUCT_ID_REWARD]) {
+        _removeRewardAdsLabel.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _removeRewardAdsLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
+    }
+    y += 52 + 8;
+    _removeBannerAds.frame = CGRectMake(8, y, frame.size.width - 16, 52);
+    _removeBannerAdsLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 52);
+    if ([_controlDelegate isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+        _removeBannerAdsLabel.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _removeBannerAdsLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
+    }
+    y += 52 + 8;
+    _restorePurchases.frame = CGRectMake(8, y, frame.size.width - 16, 44);
+    _restorePurchasesLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
+    if ([_controlDelegate isPurchasedWithProductId:PRODUCT_ID_REWARD] &&
+        [_controlDelegate isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+        _restorePurchasesLabel.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _restorePurchasesLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
+    }
+    y += 44 + 32;
     self.contentSize = CGSizeMake(frame.size.width, y);
 }
 
@@ -195,6 +246,21 @@
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://suzukiplan.github.io/tohovgs4-ios/"]];
     } else if (pushableView == _appleMusic) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://music.apple.com/jp/artist/1190977068"]];
+    } else if (pushableView == _removeRewardAds) {
+        [self _confirmPurchase:PRODUCT_ID_REWARD];
+        return;
+    } else if (pushableView == _removeBannerAds) {
+        [self _confirmPurchase:PRODUCT_ID_BANNER];
+        return;
+    } else if (pushableView == _restorePurchases) {
+        if ([_controlDelegate isPurchasedWithProductId:PRODUCT_ID_REWARD] &&
+            [_controlDelegate isPurchasedWithProductId:PRODUCT_ID_BANNER]) {
+            [_controlDelegate showInfoMessage:NSLocalizedString(@"already_restored", nil)];
+        } else {
+            [_controlDelegate startProgressWithMessage:NSLocalizedString(@"connecting_appstore", nil)];
+            [_controlDelegate restorePurchaseWithPurchaseDelegate:self];
+        }
+        return;
     }
     if (url) {
         [[UIApplication sharedApplication] openURL:url
@@ -221,6 +287,65 @@
 - (void)didEndTouchWithSliderView:(SliderView*)sliderView
 {
     [_musicManager stopPlaying];
+}
+
+- (void)_confirmPurchase:(NSString*)productId
+{
+    if ([_controlDelegate isPurchasedWithProductId:productId]) {
+        [_controlDelegate showInfoMessage:NSLocalizedString(@"already_purchased", nil)];
+        return;
+    }
+    __weak SettingView* weakSelf = self;
+    NSString* title;
+    NSString* message;
+    BOOL isReward = [productId isEqualToString:PRODUCT_ID_REWARD];
+    if (isReward) {
+        title = [NSString stringWithFormat:NSLocalizedString(@"remove_ads_reward", nil), [_controlDelegate priceWithProductId:PRODUCT_ID_REWARD]];
+        message = NSLocalizedString(@"remove_ads_reward_about", nil);
+    } else {
+        title = [NSString stringWithFormat:NSLocalizedString(@"remove_ads_banner", nil), [_controlDelegate priceWithProductId:PRODUCT_ID_BANNER]];
+        message = NSLocalizedString(@"remove_ads_banner_about", nil);
+    }
+    UIAlertController* controller = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil)
+                                                     style:UIAlertActionStyleCancel
+                                                   handler:nil];
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"purchase", nil)
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(UIAlertAction * _Nonnull action) {
+        [weakSelf _purchase:productId];
+    }];
+    [controller addAction:cancel];
+    [controller addAction:ok];
+    [_controlDelegate presentViewController:controller];
+}
+
+- (void)_purchase:(NSString*)productId
+{
+    NSLog(@"start purchase: %@", productId);
+    _purchaseProductId = productId;
+    [_controlDelegate startProgressWithMessage:NSLocalizedString(@"connecting_appstore", nil)];
+    [_controlDelegate purchaseWithProductId:productId purchaseDelegate:self];
+}
+
+- (void)purchaseDidSucceed
+{
+    [_controlDelegate stopProgress];
+}
+
+- (void)purchaseDidFailedWithError:(NSError*)error
+{
+    [_controlDelegate stopProgress];
+    if (error.localizedDescription) {
+        [_controlDelegate showErrorMessage:error.localizedDescription];
+    }
+}
+
+- (void)purchaseDidRestored
+{
+    [_controlDelegate stopProgress];
 }
 
 @end

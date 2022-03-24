@@ -12,6 +12,7 @@
 "please_wait" = "Please wait…";
 "ok" = "OK";
 "cancel" = "Cancel";
+"purchase" = "Purchase";
 "ask_unlock_all" = "You can unlock all songs by playing reward ads.\nAre you sure you want to play it?";
 "ask_lock" = "Are you sure you want to lock the %@?\n\nNote: You will need to play the reward ad when you unlock it again.";
 "generating_shuffle_play_list" = "Generating shuffle play list…";
@@ -34,6 +35,7 @@
 "support_twitter" = "Twitter: @suzukiplan";
 "support_github" = "Web: suzukiplan.github.io";
 "connecting_server" = "Connecting Server...";
+"connecting_appstore" = "Connecting AppStore...";
 "communication_error" = "Communication with the server has failed. (status code: %ld)";
 "information" = "Information";
 "list_is_latest" = "All songs are up to date.\nThe first update information for new songs will be posted on my Twitter, so please follow me if you like.";
@@ -47,3 +49,14 @@
 "unlock_soon" = "Unlock";
 "info" = "Information";
 "check_apple_music" = "Check original songs (Apple Music)";
+"remove_ads" = "Remove Ads";
+"remove_ads_reward" = "Remove Reward Ads\nPrice: %@";
+"remove_ads_reward_about" = "Purchase of this product will allow you to unlock songs without playing reward video ads. Once purchased, this product can be used permanently on your AppleID.";
+"remove_ads_banner" = "Remove Banner and Shuffle Ads\nPrice: %@";
+"remove_ads_banner_about" = "Purchase of this product will eliminate the banner ads at the top of the screen and the interstitial ads during shuffle playback. Because these ads are important for us to avoid operating at a loss, they are priced at a high level. Once purchased, this product can be used permanently on your AppleID.";
+"restore_purchases" = "Restore Purchase";
+"already_purchased" = "You have already purchased this item.";
+"already_restored" = "Product information has already been restored.";
+"choose_operation" = "Select the operation for this song.";
+"lock_song" = "Lock this song";
+"apple_music_not_found" = "This music is not yet available on AppleMusic.";
