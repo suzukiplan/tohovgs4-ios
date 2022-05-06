@@ -164,7 +164,8 @@ extern void* vgsdec;
     _keepSong = nil;
     _playingSong = song;
     NSString* mmlPath = [self mmlPathOfSong:song];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, 0, seek, 16);
+    NSInteger kobushi = [[NSUserDefaults standardUserDefaults] integerForKey:@"compat_kobushi"];
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, kobushi ? 1 : 0, seek, 16);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
