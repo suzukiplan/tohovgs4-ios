@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enterForeground;
 - (void)enterBackground;
 - (void)destroy;
+- (void)savePreferences;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -6,8 +6,9 @@
 #import "SettingView.h"
 #import "PushableView.h"
 #import "SliderView.h"
+#import "ToggleView.h"
 
-@interface SettingView() <PushableViewDelegate, SliderViewDelegate, PurchaseDelegate>
+@interface SettingView() <PushableViewDelegate, SliderViewDelegate, PurchaseDelegate, ToggleViewDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) id<SettingViewDelegate> settingDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
@@ -20,6 +21,8 @@
 @property (nonatomic) NSInteger masterVolume;
 @property (nonatomic) UILabel* masterVolumeLabel;
 @property (nonatomic) SliderView* masterVolumeSlider;
+@property (nonatomic) UILabel* kobusiLabel;
+@property (nonatomic) ToggleView* kobusiSwitch;
 @property (nonatomic) UILabel* supportLabel;
 @property (nonatomic) PushableView* twitter;
 @property (nonatomic) UILabel* twitterLabel;
@@ -71,6 +74,11 @@
         _masterVolumeSlider.progress = _masterVolume;
         _masterVolumeLabel.text = self.masterVolumeText;
         [self addSubview:_masterVolumeSlider];
+        _kobusiLabel = [self _makeHeader:NSLocalizedString(@"kobusi_mode", nil)];
+        _kobusiLabel.textColor = [UIColor whiteColor];
+        [self addSubview:_kobusiLabel];
+        _kobusiSwitch = [[ToggleView alloc] initWithDelegate:self status:[[NSUserDefaults standardUserDefaults] integerForKey:@"compat_kobushi"] ? YES : NO];
+        [self addSubview:_kobusiSwitch];
         _supportLabel = [self _makeHeader:NSLocalizedString(@"support", nil)];
         [self addSubview:_supportLabel];
         _twitter = [[PushableView alloc] initWithDelegate:self];
@@ -166,6 +174,9 @@
     _masterVolumeLabel.frame = CGRectMake(16, y, frame.size.width - 32, th);
     y += th + 8;
     _masterVolumeSlider.frame = CGRectMake(24, y, frame.size.width - 48, 44);
+    y += 44 + 8;
+    _kobusiLabel.frame = CGRectMake(16, y, _kobusiLabel.intrinsicContentSize.width, 44);
+    _kobusiSwitch.frame = CGRectMake(frame.size.width - 60, y, 44, 44);
     y += 44 + 32;
     _supportLabel.frame = CGRectMake(8, y, frame.size.width - 16, th);
     y += th + 12;
@@ -346,6 +357,13 @@
 - (void)purchaseDidRestored
 {
     [_controlDelegate stopProgress];
+}
+
+- (void)toggleView:(ToggleView *)toggleView didChangeStatus:(BOOL)status
+{
+    if (toggleView == _kobusiSwitch) {
+        [[NSUserDefaults standardUserDefaults] setInteger:status? 1 : 0 forKey:@"compat_kobushi"];
+    }
 }
 
 @end

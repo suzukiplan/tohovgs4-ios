@@ -203,6 +203,10 @@
     if (_pageMoving) return;
     [_musicManager stopPlaying];
     _pageMoving = YES;
+    BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
+    if (currentPageIsRetro) {
+        [(RetroView*)_pageView savePreferences];
+    }
     UIView* nextPage;
     NSInteger nextPageIndex;
     switch (type) {
@@ -249,7 +253,6 @@
     nextPage.frame = CGRectMake(moveToRight ? w : -w, y, w, h + (3 <= nextPageIndex ? SEEKBAR_HEIGHT : 0));
     __weak ViewController* weakSelf = self;
     _bannerView.hidden = NO;
-    BOOL currentPageIsRetro = [_pageView isKindOfClass:[RetroView class]];
     BOOL nextPageIsRetro = [nextPage isKindOfClass:[RetroView class]];
     _bannerView.alpha = currentPageIsRetro ? 0 : 1;
     _bannerBgView.alpha = _bannerView.alpha;

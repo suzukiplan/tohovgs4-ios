@@ -158,6 +158,18 @@ static int _moveCur;
     [self destroy];
 }
 
+- (void)savePreferences
+{
+    struct Preferences* prf = tohovgs_getPreference();
+    [_userDefaults setInteger:prf->base forKey:@"compat_base"];
+    [_userDefaults setInteger:prf->currentTitleId forKey:@"compat_current_title_id"];
+    [_userDefaults setInteger:prf->infinity forKey:@"compat_infinity"];
+    [_userDefaults setInteger:prf->kobushi forKey:@"compat_kobushi"];
+    [_userDefaults setInteger:prf->listType forKey:@"compat_list_type"];
+    [_userDefaults setInteger:prf->loop forKey:@"compat_loop"];
+    [_userDefaults setInteger:prf->localeId forKey:@"compat_locale_id"];
+}
+
 - (void)destroy
 {
     if (!_destroyed) {
@@ -165,14 +177,7 @@ static int _moveCur;
         [_displayLink invalidate];
         _displayLink = nil;
         _destroyed = YES;
-        struct Preferences* prf = tohovgs_getPreference();
-        [_userDefaults setInteger:prf->base forKey:@"compat_base"];
-        [_userDefaults setInteger:prf->currentTitleId forKey:@"compat_current_title_id"];
-        [_userDefaults setInteger:prf->infinity forKey:@"compat_infinity"];
-        [_userDefaults setInteger:prf->kobushi forKey:@"compat_kobushi"];
-        [_userDefaults setInteger:prf->listType forKey:@"compat_list_type"];
-        [_userDefaults setInteger:prf->loop forKey:@"compat_loop"];
-        [_userDefaults setInteger:prf->localeId forKey:@"compat_locale_id"];
+        [self savePreferences];
         tohovgs_cleanUp();
     }
     UIApplication* application = [UIApplication sharedApplication];

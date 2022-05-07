@@ -140,6 +140,7 @@ void tohovgs_setPreference(int currentTitleId,
     PRF.kobushi = kobushi;
     PRF.localeId = localeId;
     PRF.listType = listType;
+    PRF.isFirst = 1;
 }
 
 struct Preferences *tohovgs_getPreference(void) {
@@ -169,7 +170,6 @@ void tohovgs_clearMusicCursor(void)
  */
 int vge_tick(void) {
     static const char *tn[4] = {"TRI", "SAW", "SQ", "NOZ"};
-    static int isFirst = 1;
     static double base = 4.0;
     static double baseX = 0.0;
     static double move = 0;
@@ -207,9 +207,9 @@ int vge_tick(void) {
     int playingTitle;
 
     /* preferences */
-    if (isFirst) {
+    if (PRF.isFirst) {
         /* load preferences and setup */
-        isFirst = 0;
+        PRF.isFirst = 0;
         base = (double) PRF.base;
         for (i = 0; i < fs_TitleNum; i++) {
             if (fs_title[i].id == PRF.currentTitleId) break;
