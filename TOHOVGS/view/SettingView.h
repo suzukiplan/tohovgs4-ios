@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SettingViewDelegate <NSObject>
 - (void)didChangeSongListFromSettingView:(SettingView*)view;
-- (void)didNeedReloadFooterViewFromSettingView:(SettingView*)view;
 @end
 
 @interface SettingView : UIScrollView

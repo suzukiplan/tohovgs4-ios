@@ -40,9 +40,6 @@
             case FooterButtonTypeAll:
                 _image.image = [UIImage imageNamed:@"footer_all"];
                 break;
-            case FooterButtonTypeMyList:
-                _image.image = [UIImage imageNamed:@"footer_mylist"];
-                break;
             case FooterButtonTypeShuffle:
                 _image.image = [UIImage imageNamed:@"footer_shuffle"];
                 break;

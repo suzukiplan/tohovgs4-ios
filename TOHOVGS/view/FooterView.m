@@ -28,8 +28,7 @@
                      [self _makeButton:FooterButtonTypeAll],
                      [self _makeButton:FooterButtonTypeShuffle],
                      [self _makeButton:FooterButtonTypeRetro],
-                     [self _makeButton:FooterButtonTypeSettings],
-                     [self _makeButton:FooterButtonTypeMyList]];
+                     [self _makeButton:FooterButtonTypeSettings]];
         for (UIView* view in _buttons) {
             [self addSubview:view];
         }
@@ -50,22 +49,11 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    CGFloat width = frame.size.width / 5;
+    CGFloat width = frame.size.width / _buttons.count;
     CGFloat x = 0;
-    for (NSInteger i = 0; i < 5; i++, x += width) {
-        NSInteger buttonIndex = i;
-        if (1 == i) {
-            if ([[NSUserDefaults standardUserDefaults] integerForKey:@"mylist_mode"]) {
-                buttonIndex = 5;
-                _buttons[1].hidden = YES;
-                _buttons[5].hidden = NO;
-            } else {
-                _buttons[1].hidden = NO;
-                _buttons[5].hidden = YES;
-            }
-        }
-        _buttons[buttonIndex].frame = CGRectMake(x, 0, width, frame.size.height);
-        _buttons[buttonIndex].enabled = buttonIndex != _selection;
+    for (NSInteger i = 0; i < _buttons.count; i++, x += width) {
+        _buttons[i].frame = CGRectMake(x, 0, width, frame.size.height);
+        _buttons[i].enabled = i != _selection;
     }
     _buttons[2].enabled = YES; // support shuffle again
     _cursor.frame = CGRectMake(_selection * width + 4, 4, width - 8, frame.size.height - 8);
@@ -113,7 +101,6 @@
         case FooterButtonTypeShuffle: return _buttons[2];
         case FooterButtonTypeRetro: return _buttons[3];
         case FooterButtonTypeSettings: return _buttons[4];
-        case FooterButtonTypeMyList: return _buttons[5];
     }
 }
 

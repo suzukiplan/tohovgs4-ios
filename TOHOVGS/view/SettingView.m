@@ -17,8 +17,6 @@
 @property (nonatomic) PushableView* download;
 @property (nonatomic) UILabel* downloadLabel;
 @property (nonatomic) UIImageView* downloadBadge;
-@property (nonatomic) UILabel* mylistLabel;
-@property (nonatomic) ToggleView* mylistSwitch;
 @property (nonatomic) UILabel* soundLabel;
 @property (nonatomic) NSInteger masterVolume;
 @property (nonatomic) UILabel* masterVolumeLabel;
@@ -69,11 +67,6 @@
         _downloadBadge = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_badge"]];
         _downloadBadge.hidden = ![[NSUserDefaults standardUserDefaults] boolForKey:@"badge"];
         [_download addSubview:_downloadBadge];
-        _mylistLabel = [self _makeHeader:NSLocalizedString(@"mylist_mode", nil)];
-        _mylistLabel.textColor = [UIColor whiteColor];
-        [self addSubview:_mylistLabel];
-        _mylistSwitch = [[ToggleView alloc] initWithDelegate:self status:[[NSUserDefaults standardUserDefaults] integerForKey:@"mylist_mode"] ? YES : NO];
-        [self addSubview:_mylistSwitch];
         _soundLabel = [self _makeHeader:NSLocalizedString(@"sound", nil)];
         [self addSubview:_soundLabel];
         _masterVolumeLabel = [self _makeHeader:self.masterVolumeText];
@@ -189,9 +182,6 @@
         CGFloat dy = (_download.frame.size.height - dh) / 2;
         _downloadBadge.frame = CGRectMake(dx + dw, dy - 4, 8, 8);
     }
-    y += 44 + 8;
-    _mylistLabel.frame = CGRectMake(16, y, _mylistLabel.intrinsicContentSize.width, 44);
-    _mylistSwitch.frame = CGRectMake(frame.size.width - 60, y, 44, 44);
     y += 44 + 32;
     _soundLabel.frame = CGRectMake(8, y, frame.size.width - 16, th);
     y += th + 12;
@@ -397,9 +387,6 @@
 {
     if (toggleView == _kobusiSwitch) {
         [[NSUserDefaults standardUserDefaults] setInteger:status? 1 : 0 forKey:@"compat_kobushi"];
-    } else if (toggleView == _mylistSwitch) {
-        [[NSUserDefaults standardUserDefaults] setInteger:status? 1 : 0 forKey:@"mylist_mode"];
-        [_settingDelegate didNeedReloadFooterViewFromSettingView:self];
     }
 }
 
