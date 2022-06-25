@@ -31,9 +31,11 @@
 "download_latest_songs" = "Download latest songs from server";
 "sound" = "Sound";
 "master_volume" = "Master Volume: %ld%%";
-"support" = "Support";
+"support" = "Social Media";
 "support_twitter" = "Twitter: @suzukiplan";
-"support_github" = "Web: suzukiplan.github.io";
+"support_youtube" = "YouTube: SUZUKI PLAN";
+"support_tiktok" = "TikTok: @suzukiplan";
+"support_github" = "GitHub: suzukiplan.github.io";
 "connecting_server" = "Connecting Server...";
 "connecting_appstore" = "Connecting AppStore...";
 "communication_error" = "Communication with the server has failed. (status code: %ld)";

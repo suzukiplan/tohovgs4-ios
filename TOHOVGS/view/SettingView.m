@@ -26,6 +26,10 @@
 @property (nonatomic) UILabel* supportLabel;
 @property (nonatomic) PushableView* twitter;
 @property (nonatomic) UILabel* twitterLabel;
+@property (nonatomic) PushableView* youtube;
+@property (nonatomic) UILabel* youtubeLabel;
+@property (nonatomic) PushableView* tiktok;
+@property (nonatomic) UILabel* tiktokLabel;
 @property (nonatomic) PushableView* github;
 @property (nonatomic) UILabel* githubLabel;
 @property (nonatomic) UILabel* infoLabel;
@@ -86,6 +90,16 @@
         [self addSubview:_twitter];
         _twitterLabel = [self _makeButton:NSLocalizedString(@"support_twitter", nil)];
         [_twitter addSubview:_twitterLabel];
+        _youtube = [[PushableView alloc] initWithDelegate:self];
+        _youtube.touchAlphaAnimation = YES;
+        [self addSubview:_youtube];
+        _youtubeLabel = [self _makeButton:NSLocalizedString(@"support_youtube", nil)];
+        [_youtube addSubview:_youtubeLabel];
+        _tiktok = [[PushableView alloc] initWithDelegate:self];
+        _tiktok.touchAlphaAnimation = YES;
+        [self addSubview:_tiktok];
+        _tiktokLabel = [self _makeButton:NSLocalizedString(@"support_tiktok", nil)];
+        [_tiktok addSubview:_tiktokLabel];
         _github = [[PushableView alloc] initWithDelegate:self];
         _github.touchAlphaAnimation = YES;
         [self addSubview:_github];
@@ -183,6 +197,12 @@
     _twitter.frame = CGRectMake(8, y, frame.size.width - 16, 44);
     _twitterLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
     y += 44 + 8;
+    _youtube.frame = CGRectMake(8, y, frame.size.width - 16, 44);
+    _youtubeLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
+    y += 44 + 8;
+    _tiktok.frame = CGRectMake(8, y, frame.size.width - 16, 44);
+    _tiktokLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
+    y += 44 + 8;
     _github.frame = CGRectMake(8, y, frame.size.width - 16, 44);
     _githubLabel.frame = CGRectMake(0, 0, frame.size.width - 16, 44);
     y += 44 + 32;
@@ -253,6 +273,10 @@
         return;
     } else if (pushableView == _twitter) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://twitter.com/suzukiplan"]];
+    } else if (pushableView == _youtube) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.youtube.com/channel/UCAIpmEfeuTAXQ0ERTSkb6oA"]];
+    } else if (pushableView == _tiktok) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.tiktok.com/@suzukiplan"]];
     } else if (pushableView == _github) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://suzukiplan.github.io/tohovgs4-ios/"]];
     } else if (pushableView == _appleMusic) {
