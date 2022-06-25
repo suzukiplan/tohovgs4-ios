@@ -568,6 +568,11 @@
     _footer.badge = NO;
 }
 
+- (void)didNeedReloadFooterViewFromSettingView:(SettingView*)view
+{
+    [_footer setFrame:_footer.frame];
+}
+
 - (void)showUpdateSongs:(NSArray<Song*>*)songs
 {
     SongListViewController* vc = [[SongListViewController alloc] init];

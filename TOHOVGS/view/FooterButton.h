@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, FooterButtonType) {
     FooterButtonTypeShuffle,
     FooterButtonTypeRetro,
     FooterButtonTypeSettings,
+    FooterButtonTypeMyList,
 };
 
 @class FooterButton;
