@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, weak) Song* playingSong;
 @property (nonatomic) BOOL infinity;
 @property (nonatomic) NSInteger masterVolume;
+@property (nonatomic, readonly) NSMutableArray<Song*>* favoriteSongs;
 - (NSString*)mmlPathOfSong:(Song*)song;
 - (void)playSong:(Song*)song;
 - (void)stopPlaying;
@@ -34,10 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)seekTo:(NSInteger)progress;
 - (BOOL)isLockedSong:(Song*)song;
 - (void)lock:(BOOL)lock song:(Song*)song;
+- (BOOL)isFavoriteSong:(Song*)song;
+- (void)favorite:(BOOL)favorite song:(Song*)song;
 - (void)checkUpdateWithCallback:(void(^)(BOOL updateExist))done;
 - (void)updateSongListWithCallback:(void(^)(NSError* _Nullable error,
                                             BOOL updated,
                                             NSArray<Song*>* _Nullable downloaded))done;
+- (void)sortFavorites;
+- (void)shuffleFavorites;
 @end
 
 NS_ASSUME_NONNULL_END

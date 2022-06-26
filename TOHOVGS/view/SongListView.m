@@ -5,12 +5,13 @@
 
 #import "SongListView.h"
 #import "SongCell.h"
+#import "PushableView.h"
 #import "../api/MusicManager.h"
 #import "../AdSettings.h"
 #import "../vgs/vgsplay-ios.h"
 @import GoogleMobileAds;
 
-@interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate>
+@interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate, PushableViewDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic) UITableView* table;
@@ -20,6 +21,11 @@
 @property (nonatomic, nullable) NSMutableArray<Album*>* splitAlbums;
 @property (nonatomic, nullable) NSMutableDictionary<NSString*, NSMutableArray<Song*>*>* splitSongs;
 @property (nonatomic) BOOL splitByAlbum;
+@property (nonatomic) BOOL favoriteOnly;
+@property (nonatomic, nullable) PushableView* sortByDefault;
+@property (nonatomic, nullable) UILabel* sortByDefaultLabel;
+@property (nonatomic, nullable) PushableView* shuffle;
+@property (nonatomic, nullable) UILabel* shuffleLabel;
 @end
 
 @implementation SongListView
@@ -27,11 +33,19 @@
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
                                   songs:(NSArray<Song*>*)songs
                            splitByAlbum:(BOOL)splitByAlbum
-                                shuffle:(BOOL)shuffle;
+                                shuffle:(BOOL)shuffle
+                           favoriteOnly:(BOOL)favoriteOnly
 {
     if (self = [super init]) {
-        _songs = shuffle ? nil : songs;
+        _favoriteOnly = favoriteOnly;
         _splitByAlbum = splitByAlbum;
+        if (!shuffle) {
+            if (!favoriteOnly) {
+                _songs = songs;
+            } else {
+                _songs = [controlDelegate getViewController].musicManager.favoriteSongs;
+            }
+        }
         if (splitByAlbum) {
             _splitAlbums = [NSMutableArray array];
             _splitSongs = [NSMutableDictionary dictionary];
@@ -68,6 +82,20 @@
         if (shuffle) {
             _songs = songs;
             [self shuffleWithControlDelegate:controlDelegate];
+        }
+        if (favoriteOnly) {
+            _sortByDefault = [[PushableView alloc] initWithDelegate:self];
+            _sortByDefault.tapBoundAnimation = NO;
+            _sortByDefault.touchAlphaAnimation = YES;
+            _sortByDefaultLabel = [self _makeButton:NSLocalizedString(@"sort_by_default", nil)];
+            [_sortByDefault addSubview:_sortByDefaultLabel];
+            [self addSubview:_sortByDefault];
+            _shuffle = [[PushableView alloc] initWithDelegate:self];
+            _shuffle.tapBoundAnimation = NO;
+            _shuffle.touchAlphaAnimation = YES;
+            _shuffleLabel = [self _makeButton:NSLocalizedString(@"shuffle_favorites", nil)];
+            [_shuffle addSubview:_shuffleLabel];
+            [self addSubview:_shuffle];
         }
     }
     return self;
@@ -120,8 +148,14 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    _table.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+    _table.frame = CGRectMake(0, 0, frame.size.width, frame.size.height - (_favoriteOnly ? 52 : 0));
     _noContentMessage.frame = _table.frame;
+    if (_favoriteOnly) {
+        _sortByDefault.frame = CGRectMake(4, frame.size.height - 48, frame.size.width / 2 - 6, 44);
+        _sortByDefaultLabel.frame = CGRectMake(0, 0, _sortByDefault.frame.size.width, _sortByDefault.frame.size.height);
+        _shuffle.frame = CGRectMake(frame.size.width / 2 + 2, frame.size.height - 48, frame.size.width / 2 - 6, 44);
+        _shuffleLabel.frame = CGRectMake(0, 0, _shuffle.frame.size.width, _shuffle.frame.size.height);
+    }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -239,6 +273,26 @@
     }];
 }
 
+
+- (BOOL)songCell:(SongCell*)songCell didRequestCheckFavoriteSong:(Song*)song
+{
+    return [_musicManager isFavoriteSong:song];
+}
+
+- (void)songCell:(SongCell *)songCell didRequestChangeFavorite:(BOOL)favorite forSong:(Song*)song
+{
+    [_musicManager favorite:favorite song:song];
+    if (favorite) {
+        [_musicManager.favoriteSongs addObject:song];
+    } else {
+        [_musicManager.favoriteSongs removeObject:song];
+    }
+    if (_favoriteOnly) {
+        [self reload];
+        [_musicManager purgeKeepInfo];
+    }
+}
+
 - (void)stopSong
 {
     for (Song* song in _songs) {
@@ -300,6 +354,34 @@
     if (target) {
         [self _scrollToSong:target];
     }
+}
+
+- (void)didPushPushableView:(PushableView*)pushableView
+{
+    if (pushableView == _sortByDefault) {
+        [_musicManager sortFavorites];
+        _songs = _musicManager.favoriteSongs;
+        [self reload];
+    } else if (pushableView == _shuffle) {
+        [_musicManager shuffleFavorites];
+        _songs = _musicManager.favoriteSongs;
+        [self reload];
+    }
+}
+
+- (UILabel*)_makeButton:(NSString*)text
+{
+    UILabel* label = [[UILabel alloc] init];
+    label.text = text;
+    label.font = [UIFont boldSystemFontOfSize:12];
+    label.textColor = [UIColor whiteColor];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.backgroundColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.5 alpha:0.5];
+    label.layer.borderColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.5 alpha:0.25].CGColor;
+    label.layer.borderWidth = 2;
+    label.layer.cornerRadius = 4.0;
+    label.clipsToBounds = YES;
+    return label;
 }
 
 @end

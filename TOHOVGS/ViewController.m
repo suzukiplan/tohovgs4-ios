@@ -8,6 +8,7 @@
 #import "view/SeekBarView.h"
 #import "view/FooterView.h"
 #import "view/AlbumPagerView.h"
+#import "view/AllPagerView.h"
 #import "view/SongListView.h"
 #import "view/RetroView.h"
 #import "view/ProgressView.h"
@@ -215,10 +216,7 @@
             nextPageIndex = 0;
             break;
         case FooterButtonTypeAll:
-            nextPage = [[SongListView alloc] initWithControlDelegate:self
-                                                               songs:_musicManager.allUnlockedSongs
-                                                        splitByAlbum:YES
-                                                             shuffle:NO];
+            nextPage = [[AllPagerView alloc] initWithControlDelegate:self];
             nextPageIndex = 1;
             break;
         case FooterButtonTypeShuffle:
@@ -230,7 +228,8 @@
             nextPage = [[SongListView alloc] initWithControlDelegate:self
                                                                songs:_musicManager.allUnlockedSongs
                                                         splitByAlbum:NO
-                                                             shuffle:YES];
+                                                             shuffle:YES
+                                                        favoriteOnly:NO];
             nextPageIndex = 2;
             break;
         case FooterButtonTypeRetro:
@@ -320,6 +319,9 @@
     if ([_pageView isKindOfClass:[AlbumPagerView class]]) {
         [(AlbumPagerView*)_pageView requireNextSong:song
                                            infinity:_musicManager.infinity];
+    } else if ([_pageView isKindOfClass:[AllPagerView class]]) {
+        [(AllPagerView*)_pageView requireNextSong:song
+                                         infinity:_musicManager.infinity];
     } else if ([_pageView isKindOfClass:[SongListView class]]) {
         [(SongListView*)_pageView requireNextSong:song
                                          infinity:_musicManager.infinity];

@@ -31,11 +31,11 @@
 "download_latest_songs" = "Download latest songs from server";
 "sound" = "Sound";
 "master_volume" = "Master Volume: %ld%%";
-"support" = "Social Media";
-"support_twitter" = "Twitter: @suzukiplan";
-"support_youtube" = "YouTube: SUZUKI PLAN";
-"support_tiktok" = "TikTok: @suzukiplan";
-"support_github" = "GitHub: suzukiplan.github.io";
+"support" = "SUZUKI PLAN - Social Media";
+"support_twitter" = "Twitter";
+"support_youtube" = "YouTube";
+"support_tiktok" = "TikTok";
+"support_github" = "GitHub";
 "connecting_server" = "Connecting Server...";
 "connecting_appstore" = "Connecting AppStore...";
 "communication_error" = "Communication with the server has failed. (status code: %ld)";
@@ -63,3 +63,7 @@
 "lock_song" = "Lock this song";
 "apple_music_not_found" = "This music is not yet available on AppleMusic.";
 "kobusi_mode" = "KoBuSi mode";
+"all_songs" = "All Songs";
+"favorites" = "Favorites";
+"sort_by_default" = "Sort by Art-Work";
+"shuffle_favorites" = "Shuffle";

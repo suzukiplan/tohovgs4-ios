@@ -15,6 +15,8 @@
 @property (nonatomic) UIImageView* pauseLabel;
 @property (nonatomic) PushableView* lockedCover;
 @property (nonatomic) UIImageView* lockedImage;
+@property (nonatomic) PushableView* favorite;
+@property (nonatomic) UIImageView* favoriteImage;
 @end
 
 @implementation SongCell
@@ -49,6 +51,13 @@
         _lockedImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_lock_white_18pt"]];
         _lockedImage.alpha = 0.5;
         [_lockedCover addSubview:_lockedImage];
+        _favorite = [[PushableView alloc] initWithDelegate:self];
+        _favorite.tapBoundAnimation = YES;
+        _favorite.touchAlphaAnimation = NO;
+        [self.contentView addSubview:_favorite];
+        _favoriteImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ic_like_off"]];
+        _favoriteImage.frame = CGRectMake(18.5, 18.5, 7, 7);
+        [_favorite addSubview:_favoriteImage];
     }
     return self;
 }
@@ -56,34 +65,47 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    _pushable.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+    BOOL isLocking = [_delegate songCell:self didRequestCheckLockedSong:_song];
+    BOOL isPlaying = _song.isPlaying;
+    const CGFloat width = frame.size.width;
+    const CGFloat height = frame.size.height;
+    _pushable.frame = CGRectMake(0, 0, width, height);
     if (_englishLabel.text) {
-        CGFloat y = (frame.size.height - (_titleLabel.intrinsicContentSize.height + _englishLabel.intrinsicContentSize.height)) / 2;
-        _titleLabel.frame = CGRectMake(8, y, frame.size.width - 16, _titleLabel.intrinsicContentSize.height);
+        CGFloat y = (height - (_titleLabel.intrinsicContentSize.height + _englishLabel.intrinsicContentSize.height)) / 2;
+        _titleLabel.frame = CGRectMake(8, y, width - 16, _titleLabel.intrinsicContentSize.height);
         y += _titleLabel.intrinsicContentSize.height;
-        _englishLabel.frame = CGRectMake(8, y, frame.size.width - 16, _englishLabel.intrinsicContentSize.height);
+        _englishLabel.frame = CGRectMake(8, y, width - 16, _englishLabel.intrinsicContentSize.height);
     } else {
-        _titleLabel.frame = CGRectMake(8, 0, frame.size.width - 16, frame.size.height);
+        _titleLabel.frame = CGRectMake(8, 0, width - 16, height);
     }
     _pauseLabel.frame = CGRectMake(4, 4, 28, 8);
-    if ([_delegate songCell:self didRequestCheckLockedSong:_song]) {
+    if (isLocking) {
         _titleLabel.font = [UIFont systemFontOfSize:14.5];
         self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
-        _lockedCover.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-        _lockedImage.frame = CGRectMake((frame.size.width - 18) / 2, (frame.size.height - 18) / 2, 18, 18);
+        _lockedCover.frame = CGRectMake(0, 0, width, height);
+        _lockedImage.frame = CGRectMake((width - 18) / 2, (height - 18) / 2, 18, 18);
         _lockedCover.hidden = NO;
         _lockedImage.hidden = NO;
         _pauseLabel.hidden = YES;
+        _favorite.hidden = YES;
     } else {
         _lockedCover.hidden = YES;
         _lockedImage.hidden = YES;
-        if (_song.isPlaying) {
+        if (isPlaying) {
             _titleLabel.font = [UIFont boldSystemFontOfSize:14.5];
             _pauseLabel.hidden = vgsplay_isPlaying() ? YES : NO;
+            if ([_delegate songCell:self didRequestCheckFavoriteSong:_song]) {
+                _favoriteImage.image = [UIImage imageNamed:@"ic_like_on"];
+            } else {
+                _favoriteImage.image = [UIImage imageNamed:@"ic_like_off"];
+            }
+            _favorite.hidden = NO;
+            _favorite.frame = CGRectMake(width - 44, (height - 44) / 2, 44, height);
             self.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
         } else {
             _titleLabel.font = [UIFont systemFontOfSize:14.5];
             _pauseLabel.hidden = YES;
+            _favorite.hidden = YES;
             self.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1];
         }
     }
@@ -103,6 +125,10 @@
         [_delegate songCell:self didTapSong:_song];
     } else if (pushableView == _lockedCover) {
         [_delegate songCell:self didRequestUnlockSong:_song];
+    } else if (pushableView == _favorite) {
+        BOOL favorite = ![_delegate songCell:self didRequestCheckFavoriteSong:_song];
+        [_delegate songCell:self didRequestChangeFavorite:favorite forSong:_song];
+        [self setFrame:self.frame];
     }
 }
 
