@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithControlDelegate:(id<ControlDelegate>)controlDelegate
                                   songs:(NSArray<Song*>*)songs
                            splitByAlbum:(BOOL)splitByAlbum
-                                shuffle:(BOOL)shuffle;
+                                shuffle:(BOOL)shuffle
+                           favoriteOnly:(BOOL)favoriteOnly;
 - (void)stopSong;
 - (void)requireNextSong:(Song*)song
                infinity:(BOOL)infinity;

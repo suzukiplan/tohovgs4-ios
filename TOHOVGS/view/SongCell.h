@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)songCell:(SongCell*)songCell didLongPressSong:(Song*)song;
 - (BOOL)songCell:(SongCell*)songCell didRequestCheckLockedSong:(Song*)song;
 - (void)songCell:(SongCell*)songCell didRequestUnlockSong:(Song*)song;
+- (BOOL)songCell:(SongCell*)songCell didRequestCheckFavoriteSong:(Song*)song;
+- (void)songCell:(SongCell*)songCell didRequestChangeFavorite:(BOOL)favorite forSong:(Song*)song;
 @end
 
 @interface SongCell : UITableViewCell

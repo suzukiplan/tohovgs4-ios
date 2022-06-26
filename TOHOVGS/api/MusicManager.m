@@ -21,6 +21,7 @@ extern void* vgsdec;
 @property (nonatomic) int keepDuration;
 @property (nonatomic) NSTimer* monitoringTimer;
 @property (nonatomic) NSError* mmlDownloadError;
+@property (nonatomic, readwrite) NSMutableArray<Song*>* favoriteSongs;
 @end
 
 @implementation MusicManager
@@ -76,6 +77,9 @@ extern void* vgsdec;
         }
         _albums = _songList.albums;
 
+        // reset favorites list
+        [self sortFavorites];
+
         // reset master volume
         _masterVolume = 100 - [_userDefaults integerForKey:@"master_volume"];
         vgsplay_changeMasterVolume((int)_masterVolume);
@@ -83,6 +87,33 @@ extern void* vgsdec;
         [self _refreshAllUnlockedSongs];
     }
     return self;
+}
+
+- (void)sortFavorites
+{
+    if (!_favoriteSongs) {
+        _favoriteSongs = [NSMutableArray array];
+    } else {
+        [_favoriteSongs removeAllObjects];
+    }
+    NSArray<Song*>* songs = [self enumUndownloadedMmlSongs];
+    for (Song* song in songs) {
+        if ([self isFavoriteSong:song]) {
+            [_favoriteSongs addObject:song];
+        }
+    }
+}
+
+- (void)shuffleFavorites
+{
+    srand((unsigned int)time(NULL));
+    NSMutableArray<Song*>* shuffle = [NSMutableArray arrayWithCapacity:_favoriteSongs.count];
+    while (0 < _favoriteSongs.count) {
+        Song* song = [_favoriteSongs objectAtIndex:rand() % _favoriteSongs.count];
+        [shuffle addObject:song];
+        [_favoriteSongs removeObject:song];
+    }
+    _favoriteSongs = shuffle;
 }
 
 - (NSString*)_getMmlPathWithSong:(Song*)song
@@ -256,14 +287,19 @@ extern void* vgsdec;
     vgsplay_changeInfinity(infinity ? 1 : 0);
 }
 
-- (NSString*)_keyForSong:(Song*)song
+- (NSString*)_lockKeyForSong:(Song*)song
 {
     return [NSString stringWithFormat:@"locked_%@", song.mml];
 }
 
+- (NSString*)_favoriteKeyForSong:(Song*)song
+{
+   return [NSString stringWithFormat:@"fav_%@", song.mml];
+}
+
 - (BOOL)isLockedSong:(Song*)song
 {
-    NSString* locked = [_userDefaults stringForKey:[self _keyForSong:song]];
+    NSString* locked = [_userDefaults stringForKey:[self _lockKeyForSong:song]];
     if (!locked) {
         return song.parentAlbum.defaultLocked;
     }
@@ -273,7 +309,18 @@ extern void* vgsdec;
 - (void)lock:(BOOL)lock song:(Song*)song
 {
     NSString* locked = lock ? @"L" : @"U";
-    [_userDefaults setObject:locked forKey:[self _keyForSong:song]];
+    [_userDefaults setObject:locked forKey:[self _lockKeyForSong:song]];
+    [self _refreshAllUnlockedSongs];
+}
+
+- (BOOL)isFavoriteSong:(Song*)song
+{
+    return [_userDefaults boolForKey:[self _favoriteKeyForSong:song]];
+}
+
+- (void)favorite:(BOOL)favorite song:(Song*)song
+{
+    [_userDefaults setBool:favorite forKey:[self _favoriteKeyForSong:song]];
     [self _refreshAllUnlockedSongs];
 }
 

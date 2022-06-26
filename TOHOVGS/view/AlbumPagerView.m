@@ -50,7 +50,8 @@
             SongListView* page = [[SongListView alloc] initWithControlDelegate:controlDelegate
                                                                          songs:album.songs
                                                                   splitByAlbum:NO
-                                                                       shuffle:NO];
+                                                                       shuffle:NO
+                                                                  favoriteOnly:NO];
             [_pager addSubview:page];
             [pages addObject:page];
             if ([album.albumId isEqualToString:initialAlbumId]) {

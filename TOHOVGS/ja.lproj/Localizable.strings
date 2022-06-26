@@ -31,9 +31,11 @@
 "download_latest_songs" = "サーバーから最新楽曲をダウンロード";
 "sound" = "サウンド";
 "master_volume" = "マスターボリューム: %ld%%";
-"support" = "サポート";
-"support_twitter" = "Twitter: @suzukiplan";
-"support_github" = "Web: suzukiplan.github.io";
+"support" = "SUZUKI PLAN - SNS";
+"support_twitter" = "Twitter";
+"support_youtube" = "YouTube";
+"support_tiktok" = "TikTok";
+"support_github" = "GitHub";
 "connecting_server" = "サーバーと通信中...";
 "connecting_appstore" = "AppStoreと通信中...";
 "communication_error" = "サーバーとの通信に失敗しました (状態コード: %ld)";
@@ -61,3 +63,7 @@
 "lock_song" = "ロックする";
 "apple_music_not_found" = "この楽曲はまだAppleMusicでは配信されていません。";
 "kobusi_mode" = "KoBuSi モード";
+"all_songs" = "全楽曲";
+"favorites" = "お気に入り";
+"sort_by_default" = "作品順にソート";
+"shuffle_favorites" = "シャッフル";
