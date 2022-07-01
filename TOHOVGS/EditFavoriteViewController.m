@@ -55,7 +55,7 @@
     y += _songName.intrinsicContentSize.height;
     _englishName.frame = CGRectMake(8, y, frame.size.width - 68, _englishName.intrinsicContentSize.height);
     _favorite.frame = CGRectMake(frame.size.width - 52, 10, 44, 44);
-    _favoriteImage.frame = CGRectMake(18.5, 18.5, 7, 7);
+    _favoriteImage.frame = CGRectMake(15, 15, 14, 14);
 }
 
 - (void)setSong:(Song*)song withLike:(BOOL)like
