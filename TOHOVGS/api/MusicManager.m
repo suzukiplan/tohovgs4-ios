@@ -321,6 +321,11 @@ extern void* vgsdec;
 - (void)favorite:(BOOL)favorite song:(Song*)song
 {
     [_userDefaults setBool:favorite forKey:[self _favoriteKeyForSong:song]];
+    if (favorite) {
+        [_favoriteSongs addObject:song];
+    } else {
+        [_favoriteSongs removeObject:song];
+    }
     [self _refreshAllUnlockedSongs];
 }
 

@@ -9,9 +9,10 @@
 #import "../api/MusicManager.h"
 #import "../AdSettings.h"
 #import "../vgs/vgsplay-ios.h"
+#import "../EditFavoriteViewController.h"
 @import GoogleMobileAds;
 
-@interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate, PushableViewDelegate>
+@interface SongListView() <UITableViewDataSource, UITableViewDelegate, SongCellDelegate, PushableViewDelegate, EditFavoriteViewControllerDelegate>
 @property (nonatomic, weak) id<ControlDelegate> controlDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic) UITableView* table;
@@ -26,6 +27,8 @@
 @property (nonatomic, nullable) UILabel* sortByDefaultLabel;
 @property (nonatomic, nullable) PushableView* shuffle;
 @property (nonatomic, nullable) UILabel* shuffleLabel;
+@property (nonatomic, nullable) PushableView* addFavorite;
+@property (nonatomic, nullable) UILabel* addFavoriteLabel;
 @end
 
 @implementation SongListView
@@ -96,6 +99,12 @@
             _shuffleLabel = [self _makeButton:NSLocalizedString(@"shuffle_favorites", nil)];
             [_shuffle addSubview:_shuffleLabel];
             [self addSubview:_shuffle];
+            _addFavorite = [[PushableView alloc] initWithDelegate:self];
+            _addFavorite.tapBoundAnimation = YES;
+            _addFavorite.touchAlphaAnimation = NO;
+            _addFavoriteLabel = [self _makeButton:@"+"];
+            [_addFavorite addSubview:_addFavoriteLabel];
+            [self addSubview:_addFavorite];
         }
     }
     return self;
@@ -151,10 +160,17 @@
     _table.frame = CGRectMake(0, 0, frame.size.width, frame.size.height - (_favoriteOnly ? 52 : 0));
     _noContentMessage.frame = _table.frame;
     if (_favoriteOnly) {
-        _sortByDefault.frame = CGRectMake(4, frame.size.height - 48, frame.size.width / 2 - 6, 44);
-        _sortByDefaultLabel.frame = CGRectMake(0, 0, _sortByDefault.frame.size.width, _sortByDefault.frame.size.height);
-        _shuffle.frame = CGRectMake(frame.size.width / 2 + 2, frame.size.height - 48, frame.size.width / 2 - 6, 44);
-        _shuffleLabel.frame = CGRectMake(0, 0, _shuffle.frame.size.width, _shuffle.frame.size.height);
+        CGFloat x = 4;
+        CGFloat y = frame.size.height - 48;
+        CGFloat w = (frame.size.width - 56) / 2;
+        _sortByDefault.frame = CGRectMake(x, y, w, 44);
+        _sortByDefaultLabel.frame = CGRectMake(0, 0, w, 44);
+        x += w + 4;
+        _shuffle.frame = CGRectMake(x, y, w, 44);
+        _shuffleLabel.frame = CGRectMake(0, 0, w, 44);
+        x += w + 4;
+        _addFavorite.frame = CGRectMake(x, y, 44, 44);
+        _addFavoriteLabel.frame = CGRectMake(0, 0, 44, 44);
     }
 }
 
@@ -282,11 +298,6 @@
 - (void)songCell:(SongCell *)songCell didRequestChangeFavorite:(BOOL)favorite forSong:(Song*)song
 {
     [_musicManager favorite:favorite song:song];
-    if (favorite) {
-        [_musicManager.favoriteSongs addObject:song];
-    } else {
-        [_musicManager.favoriteSongs removeObject:song];
-    }
     if (_favoriteOnly) {
         [self reload];
         [_musicManager purgeKeepInfo];
@@ -366,7 +377,22 @@
         [_musicManager shuffleFavorites];
         _songs = _musicManager.favoriteSongs;
         [self reload];
+    } else if (pushableView == _addFavorite) {
+        EditFavoriteViewController* vc = [[EditFavoriteViewController alloc] init];
+        vc.songs = _musicManager.allUnlockedSongs;
+        vc.musicManager = _musicManager;
+        vc.modalPresentationStyle = UIModalPresentationPopover;
+        vc.delegate = self;
+        [[_controlDelegate getViewController] presentViewController:vc animated:YES completion:^{
+            ;
+        }];
     }
+}
+
+- (void)didDissmissEditFavoriteViewController:(EditFavoriteViewController *)viewController
+{
+    _songs = _musicManager.favoriteSongs;
+    [_table reloadData];
 }
 
 - (UILabel*)_makeButton:(NSString*)text
