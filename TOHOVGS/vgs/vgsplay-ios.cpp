@@ -150,6 +150,7 @@ struct CurrentPlayingData {
     int kobushi;
     int seek;
     int numberOfBuffer;
+    int speed;
 };
 static struct CurrentPlayingData _currentPlayingData;
 
@@ -158,10 +159,12 @@ void vgsplay_start(const char* mmlPath,
                    int infinity,
                    int kobushi,
                    int seek,
-                   int numberOfBuffer)
+                   int numberOfBuffer,
+                   int speed)
 {
     vgsplay_stop();
     pthread_mutex_lock(&fs_mutex);
+    vgsmml_playback_speed = speed;
     fs_context = internal_sound_create(mmlPath, loop, infinity, kobushi, seek, numberOfBuffer);
     strcpy(_currentPlayingData.mmlPath, mmlPath);
     _currentPlayingData.loop = loop;
@@ -169,6 +172,7 @@ void vgsplay_start(const char* mmlPath,
     _currentPlayingData.kobushi = kobushi;
     _currentPlayingData.seek = seek;
     _currentPlayingData.numberOfBuffer = numberOfBuffer;
+    _currentPlayingData.speed = speed;
     pthread_mutex_unlock(&fs_mutex);
 }
 
@@ -230,7 +234,8 @@ void vgsplay_seek(unsigned int time)
                       _currentPlayingData.infinity,
                       _currentPlayingData.kobushi,
                       _currentPlayingData.seek,
-                      _currentPlayingData.numberOfBuffer);
+                      _currentPlayingData.numberOfBuffer,
+                      _currentPlayingData.speed);
     }
 }
 

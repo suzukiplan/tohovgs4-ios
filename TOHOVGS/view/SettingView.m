@@ -13,6 +13,7 @@
 @property (nonatomic, weak) id<SettingViewDelegate> settingDelegate;
 @property (nonatomic, weak) MusicManager* musicManager;
 @property (nonatomic, readonly) NSString* masterVolumeText;
+@property (nonatomic, readonly) NSString* playbackSpeedText;
 @property (nonatomic) UILabel* contentLabel;
 @property (nonatomic) PushableView* download;
 @property (nonatomic) UILabel* downloadLabel;
@@ -21,6 +22,9 @@
 @property (nonatomic) NSInteger masterVolume;
 @property (nonatomic) UILabel* masterVolumeLabel;
 @property (nonatomic) SliderView* masterVolumeSlider;
+@property (nonatomic) NSInteger playbackSpeed;
+@property (nonatomic) UILabel* playbackSpeedLabel;
+@property (nonatomic) SliderView* playbackSpeedSlider;
 @property (nonatomic) UILabel* kobusiLabel;
 @property (nonatomic) ToggleView* kobusiSwitch;
 @property (nonatomic) UILabel* supportLabel;
@@ -78,6 +82,15 @@
         _masterVolumeSlider.progress = _masterVolume;
         _masterVolumeLabel.text = self.masterVolumeText;
         [self addSubview:_masterVolumeSlider];
+        _playbackSpeedLabel = [self _makeHeader:self.playbackSpeedText];
+        _playbackSpeedLabel.textColor = [UIColor whiteColor];
+        [self addSubview:_playbackSpeedLabel];
+        _playbackSpeedSlider = [[SliderView alloc] initWithDelegate:self];
+        _playbackSpeedSlider.max = (200 - 25) / 5;
+        _playbackSpeed = _musicManager.playbackSpeed;
+        _playbackSpeedSlider.progress = (_playbackSpeed - 25) / 5;
+        _playbackSpeedLabel.text = self.playbackSpeedText;
+        [self addSubview:_playbackSpeedSlider];
         _kobusiLabel = [self _makeHeader:NSLocalizedString(@"kobusi_mode", nil)];
         _kobusiLabel.textColor = [UIColor whiteColor];
         [self addSubview:_kobusiLabel];
@@ -141,6 +154,11 @@
     return [NSString stringWithFormat:NSLocalizedString(@"master_volume", nil), _masterVolume];
 }
 
+- (NSString*)playbackSpeedText
+{
+    return [NSString stringWithFormat:NSLocalizedString(@"playback_speed", nil), _playbackSpeed / 100, _playbackSpeed % 100];
+}
+
 - (UILabel*)_makeHeader:(NSString*)text
 {
     UILabel* label = [[UILabel alloc] init];
@@ -188,6 +206,10 @@
     _masterVolumeLabel.frame = CGRectMake(16, y, frame.size.width - 32, th);
     y += th + 8;
     _masterVolumeSlider.frame = CGRectMake(24, y, frame.size.width - 48, 44);
+    y += 44 + 8;
+    _playbackSpeedLabel.frame = CGRectMake(16, y, frame.size.width - 32, th);
+    y += th + 8;
+    _playbackSpeedSlider.frame = CGRectMake(24, y, frame.size.width - 48, 44);
     y += 44 + 8;
     _kobusiLabel.frame = CGRectMake(16, y, _kobusiLabel.intrinsicContentSize.width, 44);
     _kobusiSwitch.frame = CGRectMake(frame.size.width - 60, y, 44, 44);
@@ -309,19 +331,30 @@
 - (void)sliderView:(SliderView*)sliderView didChangeProgress:(NSInteger)progress max:(NSInteger)max
 {
     if (!_initialized) return;
-    _masterVolume = progress;
-    _masterVolumeLabel.text = self.masterVolumeText;
-    _musicManager.masterVolume = _masterVolume;
+    if (sliderView == _masterVolumeSlider) {
+        _masterVolume = progress;
+        _masterVolumeLabel.text = self.masterVolumeText;
+        _musicManager.masterVolume = _masterVolume;
+    } else if (sliderView == _playbackSpeedSlider) {
+        _playbackSpeed = progress * 5 + 25;
+        _playbackSpeedLabel.text = self.playbackSpeedText;
+        _musicManager.playbackSpeed = _playbackSpeed;
+        [_settingDelegate settingView:self didChangedSpeed:_playbackSpeed];
+    }
 }
 
 - (void)didStartTouchWithSliderView:(SliderView*)sliderView
 {
-    [_musicManager playSong:_musicManager.albums[0].songs[0]];
+    if (sliderView == _masterVolumeSlider) {
+        [_musicManager playSong:_musicManager.albums[0].songs[0]];
+    }
 }
 
 - (void)didEndTouchWithSliderView:(SliderView*)sliderView
 {
-    [_musicManager stopPlaying];
+    if (sliderView == _masterVolumeSlider) {
+        [_musicManager stopPlaying];
+    }
 }
 
 - (void)_confirmPurchase:(NSString*)productId

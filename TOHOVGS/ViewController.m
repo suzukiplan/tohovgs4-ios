@@ -15,6 +15,7 @@
 #import "view/SettingView.h"
 #import "vgs/vgsplay-ios.h"
 #import "SongListViewController.h"
+#import "PlaybackSettingViewController.h"
 #import "ControlDelegate.h"
 #include "AdSettings.h"
 @import GoogleMobileAds;
@@ -25,7 +26,7 @@
 #define FOOTER_HEIGHT 56
 #define SEEKBAR_HEIGHT 48
 
-@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate, ProductManagerDelegate>
+@interface ViewController () <FooterButtonDelegate, ControlDelegate, MusicManagerDelegate, SeekBarViewDelegate, GADFullScreenContentDelegate, GADBannerViewDelegate, SettingViewDelegate, SongListViewControllerDelegate, ProductManagerDelegate, PlaybackSettingViewControllerDelegate>
 @property (nonatomic, readwrite) MusicManager* musicManager;
 @property (nonatomic, readwrite) ProductManager* productManager;
 @property (nonatomic) UIView* adContainer;
@@ -347,6 +348,30 @@
 - (void)seekBarView:(SeekBarView*)seek didChangeInfinity:(BOOL)infinity
 {
     _musicManager.infinity = infinity;
+}
+
+- (void)seekBarview:(SeekBarView*)seek didRequestChangeSpeedFrom:(NSInteger)speed
+{
+    [_musicManager stopPlaying];
+    PlaybackSettingViewController* vc = [[PlaybackSettingViewController alloc] init];
+    vc.modalPresentationStyle = UIModalPresentationPopover;
+    vc.delegate = self;
+    vc.musicManager = _musicManager;
+    [self presentViewController:vc animated:YES completion:^{
+        ;
+    }];
+}
+
+- (void)playbackSettingViewController:(PlaybackSettingViewController*)viewController
+                   didCloseWithVolume:(NSInteger)volume
+                                speed:(NSInteger)speed
+{
+    [_seekBar updateSpeed:speed];
+}
+
+- (void)settingView:(SettingView*)view didChangedSpeed:(NSInteger)speed
+{
+    [_seekBar updateSpeed:speed];
 }
 
 - (void)startProgressWithMessage:(NSString *)message

@@ -58,11 +58,24 @@
 - (void)didPushPushableView:(PushableView*)pushableView
 {
     _status = !_status;
+    [self _animate];
+}
+
+- (void)_animate
+{
     [_toggleDelegate toggleView:self didChangeStatus:_status];
     __weak ToggleView* weakSelf = self;
     [UIView animateWithDuration:0.2 animations:^{
         [weakSelf setFrame:weakSelf.frame];
     }];
+}
+
+- (void)changeStatus:(BOOL)status
+{
+    if (status != _status) {
+        _status = status;
+        [self _animate];
+    }
 }
 
 @end

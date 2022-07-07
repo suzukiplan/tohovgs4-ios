@@ -29,8 +29,9 @@
 "error_idfa" = "You are not allowed to get an IDFA, so you cannot play ads.";
 "contents" = "Content";
 "download_latest_songs" = "Download latest songs from server";
-"sound" = "Sound";
+"sound" = "Playback Settings";
 "master_volume" = "Master Volume: %ld%%";
+"playback_speed" = "Playback Speed: x%ld.%02ld";
 "support" = "SUZUKI PLAN - Social Media";
 "support_twitter" = "Twitter";
 "support_youtube" = "YouTube";
@@ -68,3 +69,4 @@
 "sort_by_default" = "Sort by Art-Work";
 "shuffle_favorites" = "Shuffle";
 "edit_favorite_songs" = "Edit Favorites";
+"reset" = "Reset";
