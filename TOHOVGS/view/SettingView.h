@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SettingViewDelegate <NSObject>
 - (void)didChangeSongListFromSettingView:(SettingView*)view;
+- (void)settingView:(SettingView*)view didChangedSpeed:(NSInteger)speed;
 @end
 
 @interface SettingView : UIScrollView

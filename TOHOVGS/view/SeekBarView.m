@@ -7,9 +7,11 @@
 #import "SliderView.h"
 #import "ToggleView.h"
 
-@interface SeekBarView() <SliderViewDelegate, ToggleViewDelegate>
+@interface SeekBarView() <SliderViewDelegate, ToggleViewDelegate, PushableViewDelegate>
 @property (nonatomic) UILabel* progressLabel;
-@property (nonatomic) UILabel* leftLabel;
+@property (nonatomic) PushableView* speedButton;
+@property (nonatomic) UILabel* speedLabel;
+@property (nonatomic) NSInteger speed;
 @property (nonatomic) SliderView* slider;
 @property (nonatomic) UIView* border;
 @property (nonatomic) UILabel* inifinityLabel;
@@ -29,12 +31,17 @@
         _progressLabel.textAlignment = NSTextAlignmentCenter;
         _progressLabel.text = @"00:00";
         [self addSubview:_progressLabel];
-        _leftLabel = [[UILabel alloc] init];
-        _leftLabel.font = [UIFont monospacedDigitSystemFontOfSize:12 weight:UIFontWeightRegular];
-        _leftLabel.textColor = [UIColor colorWithWhite:1 alpha:1];
-        _leftLabel.textAlignment = NSTextAlignmentCenter;
-        _leftLabel.text = @"00:00";
-        [self addSubview:_leftLabel];
+        _speed = [[NSUserDefaults standardUserDefaults] integerForKey:@"playback_speed"];
+        if (_speed < 1) _speed = 100;
+        _speedButton = [[PushableView alloc] initWithDelegate:self];
+        _speedButton.tapBoundAnimation = YES;
+        [self addSubview:_speedButton];
+        _speedLabel = [[UILabel alloc] init];
+        _speedLabel.font = [UIFont monospacedDigitSystemFontOfSize:12 weight:UIFontWeightRegular];
+        _speedLabel.textColor = [UIColor colorWithWhite:1 alpha:1];
+        _speedLabel.textAlignment = NSTextAlignmentCenter;
+        [self _updateSpeedText];
+        [_speedButton addSubview:_speedLabel];
         _slider = [[SliderView alloc] initWithDelegate:self];
         [self addSubview:_slider];
         _border = [[UIView alloc] init];
@@ -52,6 +59,17 @@
     return self;
 }
 
+- (void)_updateSpeedText
+{
+    _speedLabel.text = [NSString stringWithFormat:@"x%ld.%02ld", _speed / 100, _speed % 100];
+}
+
+- (void)updateSpeed:(NSInteger)speed
+{
+    _speed = speed;
+    [self _updateSpeedText];
+}
+
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
@@ -66,7 +84,8 @@
     x += timeLableWidth;
     _slider.frame = CGRectMake(x + margin, margin, sliderWidth - margin * 2, height);
     x += sliderWidth;
-    _leftLabel.frame = CGRectMake(x, margin, timeLableWidth, height);
+    _speedButton.frame = CGRectMake(x, margin, timeLableWidth, height);
+    _speedLabel.frame = CGRectMake(0, 0, timeLableWidth, height);
     x += timeLableWidth + margin;
     _border.frame = CGRectMake(x, 1, 1, frame.size.height - 1);
     x += 1 + margin;
@@ -90,7 +109,6 @@
 {
     NSInteger sec = progress / 22050;
     _progressLabel.text = [self _timeFromValue:sec];
-    _leftLabel.text = [self _timeFromValue:max / 22050 - sec];
 }
 
 - (NSString*)_timeFromValue:(NSInteger)sec
@@ -112,6 +130,13 @@
 {
     if (!_isDragging) {
         _slider.progress = progress;
+    }
+}
+
+- (void)didPushPushableView:(PushableView*)pushableView
+{
+    if (pushableView == _speedButton) {
+        [_delegate seekBarview:self didRequestChangeSpeedFrom:_speed];
     }
 }
 

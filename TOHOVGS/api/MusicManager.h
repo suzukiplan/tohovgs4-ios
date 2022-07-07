@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, weak) Song* playingSong;
 @property (nonatomic) BOOL infinity;
 @property (nonatomic) NSInteger masterVolume;
+@property (nonatomic) NSInteger playbackSpeed;
 @property (nonatomic, readonly) NSMutableArray<Song*>* favoriteSongs;
 - (NSString*)mmlPathOfSong:(Song*)song;
 - (void)playSong:(Song*)song;

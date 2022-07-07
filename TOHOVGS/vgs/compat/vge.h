@@ -43,6 +43,7 @@ struct Preferences {
     int localeId;
     int listType;
     int isFirst;
+    int speed;
 };
 
 extern struct _VRAM _vram;
@@ -88,7 +89,8 @@ void tohovgs_setPreference(int currentTitleId,
                            int infinity,
                            int kobushi,
                            int localeId,
-                           int listType);
+                           int listType,
+                           int speed);
 
 struct Preferences *tohovgs_getPreference(void);
 
@@ -112,11 +114,11 @@ void vge_boxfSP(int fx, int fy, int tx, int ty, unsigned char c);
 
 void vge_touch(int *s, int *cx, int *cy, int *dx, int *dy);
 
-void vge_bplay(const char *mmlPath, int loop, int infinity, int kobushi);
+void vge_bplay(const char *mmlPath, int loop, int infinity, int kobushi, int speed);
 
 void vge_bstop(void);
 
-void vge_bresume(int, int, int);
+void vge_bresume(int, int, int, int);
 
 void vge_restartCurrentSong(void);
 

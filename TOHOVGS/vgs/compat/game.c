@@ -131,7 +131,8 @@ void tohovgs_setPreference(int currentTitleId,
                            int infinity,
                            int kobushi,
                            int localeId,
-                           int listType) {
+                           int listType,
+                           int speed) {
     memset(&PRF, 0, sizeof(PRF));
     PRF.currentTitleId = currentTitleId;
     PRF.loop = loop;
@@ -141,6 +142,7 @@ void tohovgs_setPreference(int currentTitleId,
     PRF.localeId = localeId;
     PRF.listType = listType;
     PRF.isFirst = 1;
+    PRF.speed = speed;
 }
 
 struct Preferences *tohovgs_getPreference(void) {
@@ -258,7 +260,7 @@ int vge_tick(void) {
         playwait--;
         if (0 == playwait) {
             g_songChanged++;
-            vge_bplay(fs_list[fs_musicCursor].mmlPath, loop, infinity, kobushi);
+            vge_bplay(fs_list[fs_musicCursor].mmlPath, loop, infinity, kobushi, PRF.speed);
             focus = 1;
             whourai = 120;
             playing = 1;
@@ -943,7 +945,7 @@ int vge_tick(void) {
                 vge_putSP(0, 48, 32, 24, 12, 2 + ii, 112);
                 if (push) {
                     paused = 0;
-                    vge_bresume(loop, infinity, kobushi);
+                    vge_bresume(loop, infinity, kobushi, PRF.speed);
                     playing = 1;
                 }
             } else {

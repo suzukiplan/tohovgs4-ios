@@ -15,7 +15,8 @@ void vgsplay_start(const char* mmlPath,
                    int infinity,
                    int kobushi,
                    int seek,
-                   int numberOfBuffer);
+                   int numberOfBuffer,
+                   int speed);
 void vgsplay_stop(void);
 unsigned int vgsplay_getSongLength(void);
 unsigned int vgsplay_getCurrentTime(void);

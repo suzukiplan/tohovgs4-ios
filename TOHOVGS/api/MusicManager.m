@@ -84,6 +84,10 @@ extern void* vgsdec;
         _masterVolume = 100 - [_userDefaults integerForKey:@"master_volume"];
         vgsplay_changeMasterVolume((int)_masterVolume);
 
+        // reset playback speed
+        _playbackSpeed = [_userDefaults integerForKey:@"playback_speed"];
+        if (_playbackSpeed < 1) _playbackSpeed = 100;
+
         [self _refreshAllUnlockedSongs];
     }
     return self;
@@ -196,7 +200,7 @@ extern void* vgsdec;
     _playingSong = song;
     NSString* mmlPath = [self mmlPathOfSong:song];
     NSInteger kobushi = [[NSUserDefaults standardUserDefaults] integerForKey:@"compat_kobushi"];
-    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, kobushi ? 1 : 0, seek, 16);
+    vgsplay_start(mmlPath.UTF8String, (int)song.loop, _infinity ? 1 : 0, kobushi ? 1 : 0, seek, 16, (int)_playbackSpeed);
     [_delegate musicManager:self didStartPlayingSong:song];
     _monitoringTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
                                                         target:self
@@ -335,6 +339,15 @@ extern void* vgsdec;
         _masterVolume = masterVolume;
         [_userDefaults setInteger:(100 - masterVolume) forKey:@"master_volume"];
         vgsplay_changeMasterVolume((int)masterVolume);
+    }
+}
+
+- (void)setPlaybackSpeed:(NSInteger)playbackSpeed
+{
+    if (_playbackSpeed != playbackSpeed) {
+        _playbackSpeed = playbackSpeed;
+        [_userDefaults setInteger:playbackSpeed forKey:@"playback_speed"];
+        // TODO
     }
 }
 

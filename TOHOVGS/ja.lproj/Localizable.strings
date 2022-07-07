@@ -29,8 +29,9 @@
 "error_idfa" = "IDFAの取得が許可されていないため、広告を再生することができません。";
 "contents" = "コンテンツ";
 "download_latest_songs" = "サーバーから最新楽曲をダウンロード";
-"sound" = "サウンド";
+"sound" = "再生設定";
 "master_volume" = "マスターボリューム: %ld%%";
+"playback_speed" = "再生速度: x%ld.%02ld";
 "support" = "SUZUKI PLAN - SNS";
 "support_twitter" = "Twitter";
 "support_youtube" = "YouTube";
@@ -68,3 +69,4 @@
 "sort_by_default" = "作品順にソート";
 "shuffle_favorites" = "シャッフル";
 "edit_favorite_songs" = "お気に入り編集";
+"reset" = "リセット";

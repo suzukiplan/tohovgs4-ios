@@ -125,7 +125,8 @@ static int _moveCur;
                           (int)[_userDefaults integerForKey:@"compat_infinity"],
                           (int)[_userDefaults integerForKey:@"compat_kobushi"],
                           (int)[_userDefaults integerForKey:@"compat_locale_id"],
-                          (int)[_userDefaults integerForKey:@"compat_list_type"]);
+                          (int)[_userDefaults integerForKey:@"compat_list_type"],
+                          (int)_musicManager.playbackSpeed);
     self.opaque = NO;
     self.clearsContextBeforeDrawing = NO;
     self.multipleTouchEnabled = NO;

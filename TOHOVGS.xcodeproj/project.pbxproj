@@ -49,6 +49,7 @@
 		7443D7DE27926DA1002EF802 /* RetroLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7443D7DD27926DA1002EF802 /* RetroLayer.m */; };
 		7463A5622867C7F5004650E2 /* AllPagerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7463A5612867C7F5004650E2 /* AllPagerView.m */; };
 		7463A5652867C811004650E2 /* TextTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7463A5642867C811004650E2 /* TextTabView.m */; };
+		74C47FC02875B9FE00055FF0 /* PlaybackSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74C47FBF2875B9FE00055FF0 /* PlaybackSettingViewController.m */; };
 		764C3B1D55EDFF58F1966712 /* Pods_TOHOVGS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F716217E36F9D7048F9D3D80 /* Pods_TOHOVGS.framework */; };
 /* End PBXBuildFile section */
 
@@ -139,6 +140,8 @@
 		7463A5612867C7F5004650E2 /* AllPagerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AllPagerView.m; sourceTree = "<group>"; };
 		7463A5632867C811004650E2 /* TextTabView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextTabView.h; sourceTree = "<group>"; };
 		7463A5642867C811004650E2 /* TextTabView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TextTabView.m; sourceTree = "<group>"; };
+		74C47FBE2875B9FE00055FF0 /* PlaybackSettingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlaybackSettingViewController.h; sourceTree = "<group>"; };
+		74C47FBF2875B9FE00055FF0 /* PlaybackSettingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlaybackSettingViewController.m; sourceTree = "<group>"; };
 		F716217E36F9D7048F9D3D80 /* Pods_TOHOVGS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TOHOVGS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -204,6 +207,8 @@
 				7401A3272799681D00ECA917 /* SongListViewController.m */,
 				740E94C5286E6C69005DBC8B /* EditFavoriteViewController.h */,
 				740E94C6286E6C69005DBC8B /* EditFavoriteViewController.m */,
+				74C47FBE2875B9FE00055FF0 /* PlaybackSettingViewController.h */,
+				74C47FBF2875B9FE00055FF0 /* PlaybackSettingViewController.m */,
 				7443D75D278D161F002EF802 /* Main.storyboard */,
 				7443D760278D1620002EF802 /* Assets.xcassets */,
 				7443D762278D1620002EF802 /* LaunchScreen.storyboard */,
@@ -462,6 +467,7 @@
 				7443D767278D1620002EF802 /* main.m in Sources */,
 				7443D7C7279063CC002EF802 /* vgs2tone.c in Sources */,
 				7463A5652867C811004650E2 /* TextTabView.m in Sources */,
+				74C47FC02875B9FE00055FF0 /* PlaybackSettingViewController.m in Sources */,
 				7401A3282799681D00ECA917 /* SongListViewController.m in Sources */,
 				743C679B27EBF83700083D1C /* ProductManager.m in Sources */,
 				7443D777278D1855002EF802 /* Album.m in Sources */,
@@ -635,7 +641,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 431;
+				CURRENT_PROJECT_VERSION = 433;
 				DEVELOPMENT_TEAM = J24C22Y22U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
@@ -653,7 +659,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.21;
+				MARKETING_VERSION = 4.22;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -668,7 +674,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 431;
+				CURRENT_PROJECT_VERSION = 433;
 				DEVELOPMENT_TEAM = J24C22Y22U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TOHOVGS/Info.plist;
@@ -686,7 +692,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.21;
+				MARKETING_VERSION = 4.22;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.suzukiplan.Touhou-VGS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
