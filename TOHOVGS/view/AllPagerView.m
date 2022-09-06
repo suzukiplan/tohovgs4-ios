@@ -76,6 +76,11 @@
     if (_pages.count <= position) position = _pages.count - 1;
     if (position < 0) position = 0;
     _tabView.position = position;
+    [self _changePosition:position];
+}
+
+- (void)_changePosition:(NSInteger)position
+{
     if (_currentPosition != position) {
         _currentPosition = position;
         [[_controlDelegate getViewController].musicManager purgeKeepInfo];
@@ -92,7 +97,7 @@
     _forceScrolling = YES;
     [_pager scrollRectToVisible:_pages[position].frame animated:YES];
     [[_controlDelegate getViewController].musicManager purgeKeepInfo];
-    for (SongListView* page in _pages) [page reload];
+    [self _changePosition:position];
 }
 
 - (void)didPushPushableView:(PushableView*)pushableView

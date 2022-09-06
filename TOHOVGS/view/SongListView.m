@@ -322,12 +322,23 @@
     } else {
         NSInteger next = infinity ? current : (current + 1) % _songs.count;
         NSInteger giveUp = next;
-        while ([_musicManager isLockedSong:_songs[next]]) {
-            next++;
-            next %= _songs.count;
-            if (giveUp == next) {
-                NSLog(@"All unlocked");
-                return;
+        if (_favoriteOnly) {
+            while ([_musicManager isLockedSong:_songs[next]] && ![_musicManager isFavoriteSong:_songs[next]]) {
+                next++;
+                next %= _songs.count;
+                if (giveUp == next) {
+                    NSLog(@"All unlocked or Favroite not exist");
+                    return;
+                }
+            }
+        } else {
+            while ([_musicManager isLockedSong:_songs[next]]) {
+                next++;
+                next %= _songs.count;
+                if (giveUp == next) {
+                    NSLog(@"All unlocked");
+                    return;
+                }
             }
         }
         NSLog(@"next: %@", _songs[next].name);
