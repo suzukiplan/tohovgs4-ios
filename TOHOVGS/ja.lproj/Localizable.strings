@@ -70,3 +70,4 @@
 "shuffle_favorites" = "シャッフル";
 "edit_favorite_songs" = "お気に入り編集";
 "reset" = "リセット";
+"unlock_without_ads" = "広告の読み込みに失敗したためリワード広告を再生せずに楽曲のロックを解除します。";

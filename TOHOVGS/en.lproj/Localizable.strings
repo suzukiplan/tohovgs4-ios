@@ -70,3 +70,4 @@
 "shuffle_favorites" = "Shuffle";
 "edit_favorite_songs" = "Edit Favorites";
 "reset" = "Reset";
+"unlock_without_ads" = "Unlock the song without playing the reward ad because the ad failed to load.";
