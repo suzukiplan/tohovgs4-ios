@@ -558,8 +558,10 @@
         if (error) {
             NSLog(@"Rewarded ad failed to load with error: %@", [error localizedDescription]);
             [weakSelf stopProgress];
-            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
+            // 外的要因（広告在庫が無い or 広告配信制限中など）も考えられるので無条件でアンロック
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"unlock_without_ads", nil), error.localizedDescription];
             [weakSelf showErrorMessage:message];
+            earnReward();
             return;
         }
         weakSelf.rewardedAd = ad;
@@ -576,12 +578,6 @@
     [self stopProgress];
     NSString* message = [NSString stringWithFormat:NSLocalizedString(@"error_ads", nil), error.localizedDescription];
     [self showErrorMessage:message];
-}
-
-- (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad
-{
-    NSLog(@"Ad did present full screen content.");
-    [self stopProgress];
 }
 
 - (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad

@@ -1083,7 +1083,7 @@ int vge_tick(void) {
  * change to the next song
  *----------------------------------------------------------------------------
  */
-static void nextSong() {
+static void nextSong(void) {
     fs_musicCursor++;
     if (fs_SongNum <= fs_musicCursor) {
         fs_musicCursor = 0;
